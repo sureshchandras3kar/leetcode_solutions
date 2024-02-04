@@ -58,5 +58,4 @@ Encountered a bug or issue? [Open a new issue](https://github.com/your-username/
 
 Have an idea or feature request? [Open a new issue](https://github.com/your-username/leetcode_solutions/issues/new) and share your thoughts with us.
 
-
 Let's make LeetCode Solutions the go-to resource for mastering coding challenges! Happy coding! 🎉
