@@ -16,11 +16,11 @@ Have you heard of LeetCode? It's like a big online playground where people who l
 
 As part of my daily challenge, I'm spending quality time solving problems on LeetCode. It's not just about finding solutions; it's about the journey of rediscovery. If you're here because you're on a similar journey or just looking for solutions to LeetCode questions, you've found your tribe.
 
-### Tutorials and Solutions 📚
+## Tutorials and Solutions 📚
 
 I've been writing down how I solve the problems on LeetCode in simple terms, so even if you're just starting out, you can understand. We'll go through problems together and figure out how to solve them step by step.
 
-### Tips and Tricks 💡
+## Tips and Tricks 💡
 
 I've also picked up some handy tips and tricks along the way that have helped me solve problems faster. I'll share those with you too, so we can all learn together.
 
