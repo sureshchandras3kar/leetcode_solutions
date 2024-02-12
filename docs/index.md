@@ -24,4 +24,16 @@ I've been writing down how I solve the problems on LeetCode in simple terms, so 
 
 I've also picked up some handy tips and tricks along the way that have helped me solve problems faster. I'll share those with you too, so we can all learn together.
 
+## Join the Community 🌐
+
+Let's build a thriving community of coders! Share your thoughts, ask questions, or simply connect with fellow enthusiasts. Your participation makes this journey more exciting and enriching.
+
+## Contribution 🤝
+
+Contributions are always welcome! If you have a solution to a LeetCode problem that you'd like to share, or if you've come up with an interesting tip or trick, feel free to contribute. Together, we can make this platform even more valuable for aspiring coders.
+
+## Upcoming Content 📅
+
+Curious about what's coming next? Stay tuned for exciting tutorials, challenging problems, and insightful discussions. Get ready to level up your coding skills!
+
 Whether you're on a comeback journey or just here for the solutions, welcome to LeetCode Solutions – where we navigate the coding maze together! 🎉
