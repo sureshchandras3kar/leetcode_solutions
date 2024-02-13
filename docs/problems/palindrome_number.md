@@ -118,6 +118,7 @@ function reverseInteger(num):
     ``` JavaScript title="Without Using String" linenums="1"
     --8<-- 'src\JavaScript\palindrome_number_without_string.js'
     ```
+
 [TryIt](https://repl.it/languages){ .md-button target="_blank" }
 
 ## Approach 2: Using String
@@ -177,7 +178,7 @@ function isPalindrome(num):
 
 === "Python"
     ``` Python title="With Using String" linenums="1"
-    --8<-- 'src\Python\palindrome_number_with_string.py'
+    --8<-- 'https://github.com/sureshchandras3kar/leetcode_solutions/blob/main/src/Python/palindrome_number_with_string.py'
     ```
 
 === "C++"
