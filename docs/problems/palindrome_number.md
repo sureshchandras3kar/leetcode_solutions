@@ -178,31 +178,32 @@ function isPalindrome(num):
 
 === "Python"
     ``` Python title="With Using String" linenums="1"
-    --8<-- 'src\Python\palindrome_number_with_string.py'
+    --8<-- "Python/palindrome_number_with_string.py"
     ```
 
 === "C++"
     ``` c++ title="With Using String" linenums="1"
-    --8<-- 'src\C++\palindrome_number_with_string.cpp'
+    --8<-- "C++/palindrome_number_with_string.cpp"
     ```
 
 === "Rust"
     ``` rust title="With Using String" linenums="1"
-    --8<-- 'src\Rust\palindrome_number_with_string.rs'
+    --8<-- "Rust/palindrome_number_with_string.rs"
     ```
 
 === "Go"
     ``` Go title="With Using String" linenums="1"
-    --8<-- 'src\Golang\palindrome_number_with_string.go'
+    --8<-- "Golang/palindrome_number_with_string.go"
     ```
 
 === "Java"
     ``` Java title="With Using String" linenums="1"
-    --8<-- 'src\Java\palindrome_number_with_string.java'
+    --8<-- "Java/palindrome_number_with_string.java"
     ```
 
 === "JavaScript"
     ``` JavaScript title="With Using String" linenums="1"
-    --8<-- 'src\JavaScript\palindrome_number_with_string.js'
+    --8<-- "JavaScript/palindrome_number_with_string.js"
     ```
+
 [TryIt](https://repl.it/languages){ .md-button target="_blank" }
