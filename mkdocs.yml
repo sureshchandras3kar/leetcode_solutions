@@ -1,4 +1,5 @@
 site_name: LeetCode Solutions
+site_url: https://sureshchandras3kar.github.io/leetcode_solutions/
 theme:
   name: material
   features:
