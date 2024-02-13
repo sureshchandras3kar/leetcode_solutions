@@ -91,7 +91,7 @@ function reverseInteger(num):
 
 === "Python"
     ``` Python title="Without Using String" linenums="1"
-    --8<-- 'src\Python\palindrome_number_without_string.py'
+    --8<-- 'leetcode_solutions/src/Python/palindrome_number_without_string.py'
     ```
 
 === "C++"
@@ -178,7 +178,7 @@ function isPalindrome(num):
 
 === "Python"
     ``` Python title="With Using String" linenums="1"
-    --8<-- 'https://github.com/sureshchandras3kar/leetcode_solutions/blob/main/src/Python/palindrome_number_with_string.py'
+    --8<-- 'src\Python\palindrome_number_with_string.py'
     ```
 
 === "C++"
