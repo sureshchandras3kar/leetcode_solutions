@@ -43,7 +43,7 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets:
-        base_path: 'src/'
+        base_path: "src/"
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.superfences:
