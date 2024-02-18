@@ -2,6 +2,8 @@ site_name: LeetCode Solutions
 site_url: https://sureshchandras3kar.github.io/leetcode_solutions/
 theme:
   name: material
+  favicon: assets/img/favicon.jpg
+  logo: assets/img/programmer.png
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -58,7 +60,7 @@ nav:
   - Home: index.md
   - Problems:
     - Palindrome numbers: problems/palindrome_number.md
-
+    - Two Sum: problems/two_sum.md
 
 extra:
   social:

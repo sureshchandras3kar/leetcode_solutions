@@ -10,6 +10,11 @@ Given an integer `x`, return true if `x` is a palindrome number. Palindrome numb
 
 ## Approach 1: Without Using String
 
+- Reverse the entire integer and compare it with the original
+- Time Complexity: O(log(n)), where n is the number of digits in the input number.
+- Space Complexity: O(1).
+- This approach is also efficient, but it involves reversing the entire number.
+
 ### Flowchart
 
 ``` mermaid
@@ -37,22 +42,19 @@ graph LR;
 ### Pseudocode
 
 ```plaintext
-function reverseInteger(num):
-    // Initialize variables
-    reverse = 0
-    original = num
-    
-    // Iterate over each digit of the number
-    for each digit in num:
-        // Extract the last digit of the number
-        digit = num % 10
-        // Update the reverse by adding the extracted digit
-        reverse = reverse * 10 + digit
-        // Remove the last digit from the number
-        num = num // 10
-    
-    // Return the reversed integer
-    return reverse
+function isPalindrome(x):
+    if x < 0:
+        return False
+    original = x
+    reversed_x = 0
+    while x > 0:
+        # Extract the last digit of x
+        last_digit = x % 10
+        # Append the last digit to the reversed number
+        reversed_x = reversed_x * 10 + last_digit
+        # Remove the last digit from x
+        x = x // 10
+    return original == reversed_x
 ```
 
 ### Explanation
@@ -122,6 +124,11 @@ function reverseInteger(num):
 [TryIt](https://repl.it/languages){ .md-button target="_blank" }
 
 ## Approach 2: Using String
+
+- Convert the integer to a string and then compare the string with its reverse.
+- Time Complexity: O(n), where n is the number of digits in the input number.
+- Space Complexity: O(n), where n is the number of digits in the input number.
+- While this approach is straightforward, it requires additional space to store the string representation of the number.
 
 ### Flowchart
 
