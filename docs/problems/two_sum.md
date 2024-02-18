@@ -21,14 +21,12 @@ This approach has linear time complexity because we iterate through the array on
 
 ```mermaid
 graph LR
-    Start[Start] --> Initialize[Initialize empty hash map]
-    Initialize --> Loop[Loop through nums array]
-    Loop --> Calculate[Calculate complement (target - current number)]
-    Calculate --> Check
-    Check{Check if complement exists in hash map}
-    Check -- Yes --> Return[Return indices]
-    Check -- No --> Store[Store current number and its index in hash map]
+    Start --> Initialize
+    Initialize --> Loop
+    Loop --> Calculate
+    Calculate --> Check{Check if complement exists in hash map}
+    Check -- Yes --> Return
+    Check -- No --> Store
     Store --> Loop
-    Return --> End[End]
-    Loop --> End
+    Return --> End
 ```
