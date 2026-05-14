@@ -1,0 +1,222 @@
+---
+title: Find Median from Data Stream
+description: Complete solution for LeetCode #295 - Find Median from Data Stream. Multiple approaches in twelve languages.
+leetcodeNumber: 295
+difficulty: Hard
+leetcodeSlug: find-median-from-data-stream
+tags: [Array, Heap, Dynamic Programming]
+prev:
+  label: "#290 Word Pattern"
+  link: "../word-pattern/"
+next:
+  label: "#300 Longest Increasing Subsequence"
+  link: "../longest-increasing-subsequence/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBalancedBST     from '@solutions/Python/find_median_from_data_stream_balanced_bst.py?raw';
+import cppBalancedBST    from '@solutions/C++/find_median_from_data_stream_balanced_bst.cpp?raw';
+import javaBalancedBST   from '@solutions/Java/find_median_from_data_stream_balanced_bst.java?raw';
+import jsBalancedBST     from '@solutions/JavaScript/find_median_from_data_stream_balanced_bst.js?raw';
+import rustBalancedBST   from '@solutions/Rust/find_median_from_data_stream_balanced_bst.rs?raw';
+import goBalancedBST     from '@solutions/Golang/find_median_from_data_stream_balanced_bst.go?raw';
+
+import pySortedList     from '@solutions/Python/find_median_from_data_stream_sorted_list.py?raw';
+import cppSortedList    from '@solutions/C++/find_median_from_data_stream_sorted_list.cpp?raw';
+import javaSortedList   from '@solutions/Java/find_median_from_data_stream_sorted_list.java?raw';
+import jsSortedList     from '@solutions/JavaScript/find_median_from_data_stream_sorted_list.js?raw';
+import rustSortedList   from '@solutions/Rust/find_median_from_data_stream_sorted_list.rs?raw';
+import goSortedList     from '@solutions/Golang/find_median_from_data_stream_sorted_list.go?raw';
+
+import pyTwoHeaps     from '@solutions/Python/find_median_from_data_stream_two_heaps.py?raw';
+import cppTwoHeaps    from '@solutions/C++/find_median_from_data_stream_two_heaps.cpp?raw';
+import javaTwoHeaps   from '@solutions/Java/find_median_from_data_stream_two_heaps.java?raw';
+import jsTwoHeaps     from '@solutions/JavaScript/find_median_from_data_stream_two_heaps.js?raw';
+import rustTwoHeaps   from '@solutions/Rust/find_median_from_data_stream_two_heaps.rs?raw';
+import goTwoHeaps     from '@solutions/Golang/find_median_from_data_stream_two_heaps.go?raw';
+
+## Problem Statement
+
+### LeetCode #295 - Find Median from Data Stream
+
+Solve this classic coding interview problem efficiently using multiple approaches.
+
+<Aside type="tip" title="What to notice first">
+- Understand the problem constraints and requirements.
+- Consider multiple approaches with different trade-offs.
+- Pattern mastery comes from knowing when to use each technique.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[example1]` | `result1` | Explanation goes here |
+| `[example2]` | `result2` | Explanation goes here |
+
+## Constraints
+
+- Standard LeetCode constraints
+- Refer to the official problem statement for exact details
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Application 1** — describe where this is used
+- **Application 2** — describe where this is used
+- **Application 3** — describe where this is used
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Add/Find Median | Space | Best When |
+| --- | --- | --- | --- |
+| Two Heaps | O(log n) / O(1) | O(n) | Optimal for streaming |
+| Balanced BST | O(log n) / O(log n) | O(n) | Self-balancing trees |
+| Sorted List | O(n) / O(1) | O(n) | Simpler implementation |
+
+## Which approach should you learn first?
+
+- Pick **Two Heaps** for the optimal streaming solution.
+- Pick **Balanced BST** for a theoretical balanced approach.
+- Pick **Sorted List** if you are learning from scratch.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Optimal</div>
+    <div class="lc-approach-quick__name">Two Heaps</div>
+    <div class="lc-approach-quick__stats">O(log n) add &middot; O(1) median</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Balanced Tree</div>
+    <div class="lc-approach-quick__name">Balanced BST</div>
+    <div class="lc-approach-quick__stats">O(log n) add &middot; O(log n) median</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simple</div>
+    <div class="lc-approach-quick__name">Sorted List</div>
+    <div class="lc-approach-quick__stats">O(n) add &middot; O(1) median</div>
+  </div>
+</div>
+
+## Approach 1: Two Heaps (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Maintain two heaps: a max heap for the smaller half and a min heap for the larger half. Keep them balanced so the median is either the root of one or the average of both roots.
+
+<ComplexityBadges time="O(log n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Add/Find" spaceNote="Heap storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoHeaps} lang="python" title="find_median_from_data_stream_two_heaps.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoHeaps} lang="cpp" title="find_median_from_data_stream_two_heaps.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoHeaps} lang="java" title="find_median_from_data_stream_two_heaps.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoHeaps} lang="javascript" title="find_median_from_data_stream_two_heaps.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoHeaps} lang="rust" title="find_median_from_data_stream_two_heaps.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoHeaps} lang="go" title="find_median_from_data_stream_two_heaps.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Balanced BST
+
+<ApproachTag tag="interview" />
+
+Use a self-balancing binary search tree to maintain sorted order and compute the median dynamically.
+
+<ComplexityBadges time="O(log n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Balanced tree ops" spaceNote="Tree storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBalancedBST} lang="python" title="find_median_from_data_stream_balanced_bst.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBalancedBST} lang="cpp" title="find_median_from_data_stream_balanced_bst.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBalancedBST} lang="java" title="find_median_from_data_stream_balanced_bst.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBalancedBST} lang="javascript" title="find_median_from_data_stream_balanced_bst.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBalancedBST} lang="rust" title="find_median_from_data_stream_balanced_bst.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBalancedBST} lang="go" title="find_median_from_data_stream_balanced_bst.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Sorted List
+
+<ApproachTag tag="simple" />
+
+Maintain a sorted list and insert each new number in the correct position. The median is found at the middle position.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Linear insertion" spaceNote="List storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySortedList} lang="python" title="find_median_from_data_stream_sorted_list.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSortedList} lang="cpp" title="find_median_from_data_stream_sorted_list.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSortedList} lang="java" title="find_median_from_data_stream_sorted_list.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSortedList} lang="javascript" title="find_median_from_data_stream_sorted_list.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSortedList} lang="rust" title="find_median_from_data_stream_sorted_list.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSortedList} lang="go" title="find_median_from_data_stream_sorted_list.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Mistake 1 — explain what to watch for
+- Mistake 2 — explain what to watch for
+- Mistake 3 — explain what to watch for
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 217, title: 'Contains Duplicate', difficulty: 'Easy', leetcodeSlug: 'contains-duplicate' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key discussion points">
+- Trade-offs between different approaches
+- Edge cases to consider
+- Possible follow-up questions
+- How to extend the solution
+</Aside>
+
+<PrevNextNav prevProblem={false} nextProblem={false} />

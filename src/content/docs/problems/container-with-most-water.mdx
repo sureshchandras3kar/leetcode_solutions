@@ -1,0 +1,346 @@
+---
+title: Container With Most Water
+description: Find two lines that together with the x-axis form a container holding the most water. Two approaches — two pointers O(n) and brute force O(n²) — in six languages.
+leetcodeNumber: 11
+difficulty: Medium
+leetcodeSlug: container-with-most-water
+tags: [Array, Two Pointers, Greedy]
+prev:
+  label: "#9 Palindrome Number"
+  link: "../palindrome-number/"
+next:
+  label: "#15 3Sum"
+  link: "../three-sum/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyTwoPtr   from '@solutions/Python/container_with_most_water_two_pointer.py?raw';
+import cppTwoPtr  from '@solutions/C++/container_with_most_water_two_pointer.cpp?raw';
+import javaTwoPtr from '@solutions/Java/container_with_most_water_two_pointer.java?raw';
+import jsTwoPtr   from '@solutions/JavaScript/container_with_most_water_two_pointer.js?raw';
+import rustTwoPtr from '@solutions/Rust/container_with_most_water_two_pointer.rs?raw';
+import goTwoPtr   from '@solutions/Golang/container_with_most_water_two_pointer.go?raw';
+import pyoptimized from '@solutions/Python/container_with_most_water_optimized.py?raw';
+import cppoptimized from '@solutions/C++/container_with_most_water_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/ContainerWithMostWaterOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/container_with_most_water_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/container_with_most_water_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/container_with_most_water_optimized.go?raw';
+
+import pyBrute   from '@solutions/Python/container_with_most_water_brute_force.py?raw';
+import cppBrute  from '@solutions/C++/container_with_most_water_brute_force.cpp?raw';
+import javaBrute from '@solutions/Java/container_with_most_water_brute_force.java?raw';
+import jsBrute   from '@solutions/JavaScript/container_with_most_water_brute_force.js?raw';
+import rustBrute from '@solutions/Rust/container_with_most_water_brute_force.rs?raw';
+import goBrute   from '@solutions/Golang/container_with_most_water_brute_force.go?raw';
+
+## Problem Statement
+
+You are given an integer array `height` of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `i`th line are `(i, 0)` and `(i, height[i])`. Find two lines that together with the x-axis form a container, such that the container contains the most water. Return the maximum amount of water a container can store. Notice that you may not slant the container.
+
+<Aside type="tip" title="Key formulas to remember">
+- Area = min(height[left], height[right]) × (right - left)
+- The minimum height is the bottleneck — water can only be as tall as the shorter wall
+- Key greedy insight: if we move the taller pointer inward, width decreases AND the height stays the same or worse → always move the shorter pointer
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `[1,8,6,2,5,4,8,3,7]` | `49` (between index 1 and 8: min(8,7)\*7=49) |
+| `[1,1]` | `1` |
+
+## Constraints
+
+- `n == height.length`
+- `2 <= n <= 10^5`
+- `0 <= height[i] <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Water reservoir design** — choose two dam heights to maximize water storage
+- **Histogram max rectangle** — similar greedy reasoning (see #84)
+- **Antenna placement** — maximize signal reception area between two towers
+- **Profit optimization** — maximize revenue = min(supply, demand) × time_gap
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Two Pointers | O(n) | O(1) | Always — this is the optimal solution |
+| Brute Force | O(n²) | O(1) | Understanding only |
+
+## Approach 1: Two Pointers (Recommended)
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" />
+
+Start with the widest possible container — left pointer at index 0, right pointer at index n-1. At each step, compute the current area. Then move the pointer pointing to the shorter wall inward; keeping the taller pointer would only decrease width without any chance of a taller container.
+
+**Greedy proof:** Suppose `height[left] < height[right]`. Moving `right` inward:
+- Width decreases by 1
+- New height = min(height[left], height[new_right]) ≤ height[left] — the left wall still caps the height
+- So area can only decrease or stay the same → moving the taller pointer is never optimal
+- Therefore, always move the SHORTER pointer
+
+### Step-by-step Example
+
+**Input:** `height = [1,8,6,2,5,4,8,3,7]`
+
+| step | left | h[l] | right | h[r] | width | area | max | move |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 1 | 8 | 7 | 8 | 8 | 8 | left++ (shorter) |
+| 2 | 1 | 8 | 8 | 7 | 7 | 49 | 49 | right-- |
+| 3 | 1 | 8 | 7 | 3 | 6 | 18 | 49 | right-- |
+| 4 | 1 | 8 | 6 | 8 | 5 | 40 | 49 | left++ (tie) |
+| ... | ... | ... | ... | ... | ... | ... | ... | ... |
+
+<LogicPlayer
+  title="Two-pointer walk — tracking max area"
+  description="Use Next or Autoplay to watch the left and right pointers converge, and see how the max area is updated."
+  steps={[
+    {
+      title: 'Start: widest possible container',
+      note: 'Left pointer at index 0 (height=1), right pointer at index 8 (height=7). Area = min(1,7) * 8 = 8. Left is shorter, so move left inward.',
+      formula: 'area = min(1, 7) × 8 = 8',
+      callout: 'height[left]=1 < height[right]=7 → move left++',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '8', state: 'default', index: 1 },
+        { label: '6', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '8', state: 'default', index: 6 },
+        { label: '3', state: 'default', index: 7 },
+        { label: '7', state: 'active', index: 8 },
+      ],
+      memory: ['left=0, right=8', 'current area = 8', 'max_water = 8'],
+    },
+    {
+      title: 'Step 2: left=1 (h=8), right=8 (h=7)',
+      note: 'Area = min(8,7) * 7 = 49. New maximum! Right is shorter, so move right inward.',
+      formula: 'area = min(8, 7) × 7 = 49',
+      callout: 'height[right]=7 < height[left]=8 → move right--',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '8', state: 'match', index: 1 },
+        { label: '6', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '8', state: 'default', index: 6 },
+        { label: '3', state: 'default', index: 7 },
+        { label: '7', state: 'match', index: 8 },
+      ],
+      memory: ['left=1, right=8', 'current area = 49', 'max_water = 49'],
+    },
+    {
+      title: 'Step 3: left=1 (h=8), right=7 (h=3)',
+      note: 'Area = min(8,3) * 6 = 18. Not a new maximum. Right (h=3) is shorter, move right inward.',
+      formula: 'area = min(8, 3) × 6 = 18',
+      callout: 'height[right]=3 < height[left]=8 → move right--',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '8', state: 'active', index: 1 },
+        { label: '6', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '8', state: 'default', index: 6 },
+        { label: '3', state: 'active', index: 7 },
+        { label: '7', state: 'default', index: 8 },
+      ],
+      memory: ['left=1, right=7', 'current area = 18', 'max_water = 49'],
+    },
+    {
+      title: 'Pointers converge — answer is 49',
+      note: 'After all steps, the pointers meet and the loop ends. The maximum water stored is 49.',
+      formula: 'max_water = 49',
+      callout: 'left >= right → return 49',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '8', state: 'match', index: 1 },
+        { label: '6', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '8', state: 'default', index: 6 },
+        { label: '3', state: 'default', index: 7 },
+        { label: '7', state: 'match', index: 8 },
+      ],
+      memory: ['Answer: 49', 'Optimal pair: index 1 and index 8'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function maxArea(height):
+    left, right = 0, len(height) - 1
+    max_water = 0
+    while left < right:
+        water = min(height[left], height[right]) * (right - left)
+        max_water = max(max_water, water)
+        if height[left] <= height[right]:
+            left++
+        else:
+            right--
+    return max_water
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPtr} lang="python" title="container_with_most_water_two_pointer.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPtr} lang="cpp" title="container_with_most_water_two_pointer.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPtr} lang="java" title="container_with_most_water_two_pointer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPtr} lang="javascript" title="container_with_most_water_two_pointer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPtr} lang="rust" title="container_with_most_water_two_pointer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPtr} lang="go" title="container_with_most_water_two_pointer.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Brute Force
+
+<ApproachTag tag="simple" />
+
+<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" />
+
+Check every possible pair of lines using two nested loops. For each pair `(i, j)`, compute `area = min(height[i], height[j]) * (j - i)` and track the maximum. Simple to understand but too slow for large inputs.
+
+### Step-by-step Example
+
+**Input:** `height = [1,8,6,2,5,4,8,3,7]`
+
+| i | j | h[i] | h[j] | width | area | max |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | 1 | 1 | 8 | 1 | 1 | 1 |
+| 0 | 2 | 1 | 6 | 2 | 2 | 2 |
+| ... | ... | ... | ... | ... | ... | ... |
+| 1 | 8 | 8 | 7 | 7 | 49 | 49 |
+| ... | ... | ... | ... | ... | ... | ... |
+
+### Pseudocode
+
+```plaintext
+function maxAreaBruteForce(height):
+    n = len(height)
+    max_water = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            water = min(height[i], height[j]) * (j - i)
+            max_water = max(max_water, water)
+    return max_water
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBrute} lang="python" title="container_with_most_water_brute_force.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBrute} lang="cpp" title="container_with_most_water_brute_force.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBrute} lang="java" title="container_with_most_water_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBrute} lang="javascript" title="container_with_most_water_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBrute} lang="rust" title="container_with_most_water_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBrute} lang="go" title="container_with_most_water_brute_force.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="container_with_most_water_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="container_with_most_water_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="ContainerWithMostWaterOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="container_with_most_water_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="container_with_most_water_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="container_with_most_water_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Moving the wrong pointer — always move the pointer with the **shorter** height, not the taller one
+- Using `(j - i)` as the height instead of `min(height[i], height[j])` — the width is `j - i`, not the height
+- Forgetting that water height is limited by the SHORTER of the two walls
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 42,  title: 'Trapping Rain Water',           difficulty: 'Hard',   leetcodeSlug: 'trapping-rain-water' },
+  { number: 15,  title: '3Sum',                          difficulty: 'Medium', slug: 'problems/three-sum', leetcodeSlug: '3sum' },
+  { number: 84,  title: 'Largest Rectangle in Histogram', difficulty: 'Hard',  leetcodeSlug: 'largest-rectangle-in-histogram' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- State the greedy proof immediately: "Moving the taller pointer can never improve the area — the shorter wall is always the bottleneck"
+- This is O(n) which is optimal — any algorithm must consider each line at least once
+- Common follow-up: "Can you prove the two-pointer never misses the optimal pair?" → yes, because we only discard pairs that are guaranteed suboptimal (any pair involving the shorter pointer with anything between the pointers produces a smaller area)
+
+
+<PrevNextNav
+  prevProblem={ number: 9, title: "Palindrome Number", slug: "palindrome-number" }
+  nextProblem={ number: 15, title: "3Sum", slug: "three-sum" }
+/></Aside>

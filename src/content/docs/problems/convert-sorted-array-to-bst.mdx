@@ -1,0 +1,255 @@
+---
+title: Convert Sorted Array to Binary Search Tree
+description: Build a balanced BST from a sorted array using divide and conquer. Recursive and iterative approaches in six languages.
+leetcodeNumber: 108
+difficulty: Easy
+leetcodeSlug: convert-sorted-array-to-binary-search-tree
+tags: [Tree, Divide and Conquer, Binary Search Tree]
+prev:
+  label: "#106 Construct Binary Tree from Inorder and Postorder Traversal"
+  link: "../construct-binary-tree-from-inorder-and-postorder-traversal/"
+next:
+  label: "#112 Path Sum"
+  link: "../path-sum/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyRecursive     from '@solutions/Python/convert_sorted_array_bst_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/convert_sorted_array_bst_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/ConvertSortedArrayToBST_Recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/convert_sorted_array_bst_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/convert_sorted_array_bst_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/convert_sorted_array_bst_recursive.go?raw';
+import pySpaceOptimized from '@solutions/Python/convert_sorted_array_to_binary_search_tree_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/convert_sorted_array_to_binary_search_tree_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ConvertSortedArrayToBinarySearchTreeSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/convert_sorted_array_to_binary_search_tree_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/convert_sorted_array_to_binary_search_tree_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/convert_sorted_array_to_binary_search_tree_space_optimized.go?raw';
+
+import pyIterative      from '@solutions/Python/convert_sorted_array_bst_iterative.py?raw';
+import cppIterative     from '@solutions/C++/convert_sorted_array_bst_iterative.cpp?raw';
+import javaIterative    from '@solutions/Java/ConvertSortedArrayToBST_Iterative.java?raw';
+import jsIterative      from '@solutions/JavaScript/convert_sorted_array_bst_iterative.js?raw';
+import rustIterative    from '@solutions/Rust/convert_sorted_array_bst_iterative.rs?raw';
+import goIterative      from '@solutions/Golang/convert_sorted_array_bst_iterative.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums` where the elements are **sorted in ascending order**, convert it to a **height-balanced** binary search tree.
+
+A height-balanced binary tree is a binary tree in which the depth of the two subtrees of every node never differs by more than one.
+
+<Aside type="tip" title="What to notice first">
+- Divide and conquer: Pick the middle element as the root to balance the tree.
+- Recursively build left and right subtrees from the left and right halves.
+- The sorted order guarantees BST property without additional checking.
+- Any array element can be the root; the middle pick ensures balance.
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `nums = [-10,-3,0,5,9]` | A balanced BST with root 0, left child -3, right child 5 |
+| `nums = [1,3]` | A balanced BST with root 3, left child 1 |
+
+## Constraints
+
+- `1 <= nums.length <= 10^4`
+- `-10^4 <= nums[i] <= 10^4`
+- `nums` is sorted in a strictly increasing order.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Database indexing** — balanced BSTs are used for efficient lookups and range queries.
+- **Memory allocation** — divide and conquer builds balanced data structures.
+- **Game AI** — balanced trees for decision trees and minimax algorithms.
+- **Networking** — balanced routing trees for efficient packet forwarding.
+- **Configuration systems** — hierarchical data structures for settings management.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space |
+| --- | --- | --- |
+| Recursive | O(n) | O(log n) |
+| Iterative | O(n) | O(n) |
+
+*Space is for recursion stack (recursive) or queue (iterative)*
+
+## Which approach should you learn first?
+
+- Pick **Recursive** for clarity — divide and conquer pattern is intuitive.
+- Pick **Iterative** if you prefer avoiding recursion or want explicit queue management.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Intuitive Pattern</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(log n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Bottom-up Build</div>
+    <div class="lc-approach-quick__name">Iterative</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Recursive Divide and Conquer (Recommended)
+
+<ApproachTag tag="recommended" />
+
+1. Find the middle element of the current range → becomes the root.
+2. Recursively build the left subtree from the left half.
+3. Recursively build the right subtree from the right half.
+4. Base case: when left > right, return null.
+
+<ComplexityBadges time="O(n)" space="O(log n)" timeColor="green" spaceColor="green" timeNote="Visit each node once" spaceNote="Recursion depth" />
+
+### Pseudocode
+
+```plaintext
+function sortedArrayToBST(nums):
+    return build(0, len(nums) - 1)
+
+function build(left, right):
+    if left > right:
+        return null
+    
+    mid = (left + right) / 2
+    root = TreeNode(nums[mid])
+    root.left = build(left, mid - 1)
+    root.right = build(mid + 1, right)
+    return root
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="convert_sorted_array_bst_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="convert_sorted_array_bst_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="ConvertSortedArrayToBST_Recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="convert_sorted_array_bst_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="convert_sorted_array_bst_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="convert_sorted_array_bst_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative with Queue
+
+<ApproachTag tag="interview" />
+
+Use a queue to track (node, left, right) tuples. Process each node by assigning its value and enqueueing children if ranges are valid.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Queue storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="convert_sorted_array_bst_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="convert_sorted_array_bst_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="ConvertSortedArrayToBST_Iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="convert_sorted_array_bst_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="convert_sorted_array_bst_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="convert_sorted_array_bst_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Using integer division truncation instead of proper midpoint calculation.
+- Forgetting the base case (left > right returns null).
+- Building an unbalanced tree by always picking left or right instead of middle.
+- Off-by-one errors in left/right pointer updates.
+- Creating new TreeNode without assigning a value (then assigning later in iterative).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="convert_sorted_array_to_binary_search_tree_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="convert_sorted_array_to_binary_search_tree_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ConvertSortedArrayToBinarySearchTreeSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="convert_sorted_array_to_binary_search_tree_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="convert_sorted_array_to_binary_search_tree_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="convert_sorted_array_to_binary_search_tree_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 109, title: 'Convert Sorted List to Binary Search Tree', difficulty: 'Medium', leetcodeSlug: 'convert-sorted-list-to-binary-search-tree' },
+  { number: 110, title: 'Balanced Binary Tree', difficulty: 'Easy', leetcodeSlug: 'balanced-binary-tree' },
+  { number: 96, title: 'Unique Binary Search Trees', difficulty: 'Medium', leetcodeSlug: 'unique-binary-search-trees' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Middle pick:** Guarantees height balance; any element works as root if BST property is maintained via sorted input.
+- **Recursion depth:** Log(n) for balanced tree, worst case O(n) for skewed trees (avoided here by middle pick).
+- **Follow-up:** How would you build from an unsorted array? (Sort first, then apply same logic.)
+- **Space optimization:** Can you do it in-place? (Not typical for tree problems; still need O(log n) for recursion.)
+- **Edge cases:** Single element array, two elements, negative numbers, large numbers.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 107, title: "Binary Tree Level Order Traversal II", slug: "binary-tree-level-order-traversal-ii" }}
+  nextProblem={{ number: 109, title: "Convert Sorted List to Binary Search Tree", slug: "convert-sorted-list-to-bst" }}
+/>

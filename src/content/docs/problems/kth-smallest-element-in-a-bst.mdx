@@ -1,0 +1,345 @@
+---
+title: Kth Smallest Element in a BST
+description: Find the kth smallest element in a binary search tree. Two approaches — In-Order DFS O(n) and Morris In-Order O(n) with O(1) space — in six languages.
+leetcodeNumber: 230
+difficulty: Medium
+leetcodeSlug: kth-smallest-element-in-a-bst
+tags: [Binary Search Tree, DFS, Tree, In-Order Traversal]
+prev:
+  label: "#228 Summary Ranges"
+  link: "../summary-ranges/"
+next:
+  label: "#235 Lowest Common Ancestor of a Binary Search Tree"
+  link: "../lowest-common-ancestor-of-a-binary-search-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyInorder     from '@solutions/Python/kth_smallest_in_bst_inorder_dfs.py?raw';
+import cppInorder    from '@solutions/C++/kth_smallest_in_bst_inorder_dfs.cpp?raw';
+import javaInorder   from '@solutions/Java/KthSmallestInBST_InorderDFS.java?raw';
+import jsInorder     from '@solutions/JavaScript/kth_smallest_in_bst_inorder_dfs.js?raw';
+import rustInorder   from '@solutions/Rust/kth_smallest_in_bst_inorder_dfs.rs?raw';
+import goInorder     from '@solutions/Golang/kth_smallest_in_bst_inorder_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/kth_smallest_element_in_a_bst_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/kth_smallest_element_in_a_bst_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/KthSmallestElementInABstBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/kth_smallest_element_in_a_bst_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/kth_smallest_element_in_a_bst_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/kth_smallest_element_in_a_bst_bfs_iterative.go?raw';
+
+import pyMorris       from '@solutions/Python/kth_smallest_in_bst_morris_inorder.py?raw';
+import cppMorris      from '@solutions/C++/kth_smallest_in_bst_morris_inorder.cpp?raw';
+import javaMorris     from '@solutions/Java/KthSmallestInBST_MorrisInorder.java?raw';
+import jsMorris       from '@solutions/JavaScript/kth_smallest_in_bst_morris_inorder.js?raw';
+import rustMorris     from '@solutions/Rust/kth_smallest_in_bst_morris_inorder.rs?raw';
+import goMorris       from '@solutions/Golang/kth_smallest_in_bst_morris_inorder.go?raw';
+
+## Problem Statement
+
+Given the `root` of a binary search tree and an integer `k`, return the **kth smallest value** (1-indexed) of all the values of the nodes in the tree.
+
+<Aside type="tip" title="What to notice first">
+- In a BST, **in-order traversal visits nodes in ascending sorted order**.
+- You can count as you traverse and stop at the kth node.
+- No need to store all values; process on-the-fly.
+</Aside>
+
+### Examples
+
+| Input | k | Output | Explanation |
+| --- | --- | --- | --- |
+| Tree: `3, 1→null, 1→2, 4` | 1 | 1 | Sorted: `[1, 2, 3, 4]`, 1st = 1 |
+| Tree: `3, 1→null, 1→2, 4` | 3 | 2 | Sorted: `[1, 2, 3, 4]`, 3rd = 2 |
+| Tree: `5, 3, 6` | 1 | 3 | Sorted: `[3, 5, 6]`, 1st = 3 |
+
+## Constraints
+
+- The number of nodes in the tree is `n`.
+- `1 <= k <= n <= 10^4`
+- `0 <= Node.val <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Percentile ranking** — find the kth percentile student score in a sorted dataset.
+- **Leaderboard systems** — retrieve the kth highest score efficiently.
+- **Data streaming** — find the kth smallest event timestamp without storing all events.
+- **Statistical analysis** — extract medians and quartiles from sorted data.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Key Idea | Best When |
+| --- | --- | --- | --- | --- |
+| In-Order DFS | O(n) | O(h) | Recursive in-order, count k nodes, return | **General case** — simple and elegant |
+| Morris In-Order | O(n) | O(1) | Thread-based traversal, no recursion stack | **Space-critical** — embedded systems, interview edge case |
+
+## Which approach should you learn first?
+
+- Pick **In-Order DFS** as your primary solution.
+- Learn **Morris In-Order** if you want to optimize space to O(1).
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Common</div>
+    <div class="lc-approach-quick__name">In-Order DFS</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(h) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Space-Optimized</div>
+    <div class="lc-approach-quick__name">Morris In-Order</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: In-Order DFS (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Recursively traverse the tree in in-order (left → node → right). Maintain a counter that increments with each node visited. When the counter equals k, return the current node's value.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Worst case: visit all nodes" spaceColor="Recursion depth" />
+
+### Step-by-step Example
+
+**Input:** Tree with values `[3, 1, 4, 2]`, `k = 1`
+
+In-order sequence: `[1, 2, 3, 4]`
+
+| Step | Node | count | Action |
+| --- | --- | --- | --- |
+| 1 | 1 | 1 | count == k, return 1 ✓ |
+
+<LogicPlayer
+  title="How in-order DFS finds the kth smallest element"
+  description="Watch the count increment as nodes are visited in sorted order. Stop when count reaches k."
+  target="1"
+  steps={[
+    {
+      title: 'Start at root (3), go left',
+      note: 'In-order: visit left subtree first. Count starts at 0.',
+      formula: 'inorder(3.left)',
+      callout: 'Traverse to find smallest element.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+      ],
+      memory: ['count = 0'],
+    },
+    {
+      title: 'Visit leaf 1, increment count to 1',
+      note: 'First node in sorted order. Count = 1 matches k = 1.',
+      formula: 'count = 1, count == k → return 1',
+      callout: 'Found the 1st smallest element!',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+      ],
+      memory: ['count = 1', 'k = 1 → return 1'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function kthSmallest_inorder(root, k):
+    count = 0
+    result = null
+
+    function inorder(node):
+        if node is null or result is not null:
+            return
+
+        inorder(node.left)
+
+        count++
+        if count == k:
+            result = node.val
+            return
+
+        inorder(node.right)
+
+    inorder(root)
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyInorder} lang="python" title="kth_smallest_element_in_bst_inorder.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppInorder} lang="cpp" title="kth_smallest_element_in_bst_inorder.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaInorder} lang="java" title="KthSmallestElementInBST_inorder.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsInorder} lang="javascript" title="kth_smallest_element_in_bst_inorder.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustInorder} lang="rust" title="kth_smallest_element_in_bst_inorder.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goInorder} lang="go" title="kth_smallest_element_in_bst_inorder.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Morris In-Order Traversal
+
+<ApproachTag tag="advanced" />
+
+Morris traversal enables in-order traversal without recursion or an explicit stack. It uses "threading" — temporary pointers to connect nodes. This achieves O(1) space.
+
+The algorithm works in two passes per node: on the first visit, create a thread back to the current node; on the second visit, remove the thread and process the node.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="All nodes visited" spaceNote="No extra structure" />
+
+### Step-by-step Example
+
+**Input:** Tree with values `[3, 1, 4, 2]`, `k = 1`
+
+1. Start at 3 (root).
+2. Find predecessor of 3: it's 2.
+3. Thread 2 → 3 (first visit to 2).
+4. Move to left child 1.
+5. 1 has no left child. Visit 1, count = 1. **Return 1**.
+
+### Pseudocode
+
+```plaintext
+function kthSmallest_morris(root, k):
+    count = 0
+    current = root
+
+    while current is not null:
+        if current.left is null:
+            // No left child: visit current node
+            count++
+            if count == k:
+                return current.val
+            current = current.right
+        else:
+            // Find in-order predecessor
+            predecessor = current.left
+            while predecessor.right and predecessor.right != current:
+                predecessor = predecessor.right
+
+            if predecessor.right is null:
+                // First visit: create thread
+                predecessor.right = current
+                current = current.left
+            else:
+                // Second visit: remove thread, process current
+                predecessor.right = null
+                count++
+                if count == k:
+                    return current.val
+                current = current.right
+
+    return -1
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyMorris} lang="python" title="kth_smallest_element_in_bst_morris.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppMorris} lang="cpp" title="kth_smallest_element_in_bst_morris.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaMorris} lang="java" title="KthSmallestElementInBST_morris.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsMorris} lang="javascript" title="kth_smallest_element_in_bst_morris.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustMorris} lang="rust" title="kth_smallest_element_in_bst_morris.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goMorris} lang="go" title="kth_smallest_element_in_bst_morris.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Counting from 0 vs 1:** The problem uses 1-indexed k. Ensure your counter starts at 0 and increments *before* checking k.
+- **Early termination:** Once the kth element is found, avoid further recursion. Use a flag or check `result != null`.
+- **Off-by-one errors in Morris:** Ensure threads are created and removed correctly during first and second visits.
+- **Modifying the tree (Morris):** Morris traversal temporarily modifies the tree. Ensure threads are restored for re-entrant code.
+</Aside>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="kth_smallest_element_in_a_bst_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="kth_smallest_element_in_a_bst_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="KthSmallestElementInABstBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="kth_smallest_element_in_a_bst_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="kth_smallest_element_in_a_bst_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="kth_smallest_element_in_a_bst_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 530, title: 'Minimum Absolute Difference in BST', difficulty: 'Easy', slug: 'problems/minimum-absolute-difference-in-bst', leetcodeSlug: 'minimum-absolute-difference-in-bst' },
+  { number: 98, title: 'Validate Binary Search Tree', difficulty: 'Medium', slug: 'problems/validate-binary-search-tree', leetcodeSlug: 'validate-binary-search-tree' },
+  { number: 235, title: 'Lowest Common Ancestor of a BST', difficulty: 'Easy', slug: 'problems/lowest-common-ancestor-of-a-binary-search-tree', leetcodeSlug: 'lowest-common-ancestor-of-a-bst' },
+  { number: 94, title: 'Binary Tree Inorder Traversal', difficulty: 'Easy', slug: 'problems/binary-tree-inorder-traversal', leetcodeSlug: 'binary-tree-inorder-traversal' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **DFS vs Morris:** DFS is simpler and more intuitive. Morris is an advanced technique that shows deep understanding of tree traversal.
+- **Space complexity:** In-Order DFS uses O(h) recursion stack. For balanced trees, h = log(n). For skewed trees, h = n.
+- **Follow-up:** "Can you solve this in O(log n) time if the BST is augmented with subtree sizes?" Yes — use binary search within the tree structure.
+- **Edge cases:** k = 1 (smallest element), k = n (largest element), single-node trees.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 229, title: "Majority Element II", slug: "majority-element-ii" }}
+  nextProblem={{ number: 231, title: "Power of Two", slug: "power-of-two" }}
+/>

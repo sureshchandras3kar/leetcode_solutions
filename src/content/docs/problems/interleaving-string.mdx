@@ -1,0 +1,186 @@
+---
+title: Interleaving String
+description: Determine if one string can be formed by interleaving two strings.
+leetcodeNumber: 97
+difficulty: Medium
+leetcodeSlug: interleaving-string
+tags: [String, Dynamic Programming]
+prev:
+  label: "#92 Reverse Linked List II"
+  link: "../reverse-linked-list-ii/"
+next:
+  label: "#98 Validate Binary Search Tree"
+  link: "../validate-binary-search-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pythona from '@solutions/Python/interleaving-string_top_down_dp.py?raw';
+import c++a from '@solutions/C++/interleaving-string_top_down_dp.cpp?raw';
+import javaa from '@solutions/Java/interleaving-string_top_down_dp.java?raw';
+import javascripta from '@solutions/JavaScript/interleaving-string_top_down_dp.js?raw';
+import rusta from '@solutions/Rust/interleaving-string_top_down_dp.rs?raw';
+import goa from '@solutions/Golang/interleaving-string_top_down_dp.go?raw';
+import pythonb from '@solutions/Python/interleaving-string_bottom_up_dp.py?raw';
+import c++b from '@solutions/C++/interleaving-string_bottom_up_dp.cpp?raw';
+import javab from '@solutions/Java/interleaving-string_bottom_up_dp.java?raw';
+import javascriptb from '@solutions/JavaScript/interleaving-string_bottom_up_dp.js?raw';
+import rustb from '@solutions/Rust/interleaving-string_bottom_up_dp.rs?raw';
+import gob from '@solutions/Golang/interleaving-string_bottom_up_dp.go?raw';
+import pythonc from '@solutions/Python/interleaving-string_optimized_dp.py?raw';
+import c++c from '@solutions/C++/interleaving-string_optimized_dp.cpp?raw';
+import javac from '@solutions/Java/interleaving-string_optimized_dp.java?raw';
+import javascriptc from '@solutions/JavaScript/interleaving-string_optimized_dp.js?raw';
+import rustc from '@solutions/Rust/interleaving-string_optimized_dp.rs?raw';
+import goc from '@solutions/Golang/interleaving-string_optimized_dp.go?raw';
+
+## Problem Statement
+
+Determine if one string can be formed by interleaving two strings.
+
+<Aside type="tip" title="Key Insight">
+This problem requires dynamic programming or hash-based techniques to solve efficiently. Start by understanding the recurrence relation or the hash structure needed.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation here |
+| Example 2 | Result 2 | Explanation here |
+
+## Constraints
+
+- Constraints go here
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Text editors and autocomplete systems
+- DNA sequence alignment and bioinformatics
+- Compiler lexical analysis and tokenization
+- Search engine indexing and pattern matching
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best For |
+| --- | --- | --- | --- |
+| Top-Down DP | Bottom-Up DP | Optimized DP | TBD | TBD | TBD |
+
+## Approach 1: Top-Down DP
+
+<ApproachTag tag="recommended" />
+
+Detailed explanation of approach 1.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Pseudocode
+
+```plaintext
+function solution():
+    // Pseudocode here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pya}} lang="python" title="interleaving-string_approach1.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppa}} lang="cpp" title="interleaving-string_approach1.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaa}} lang="java" title="interleaving-string_approach1.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsa}} lang="javascript" title="interleaving-string_approach1.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rusta}} lang="rust" title="interleaving-string_approach1.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goa}} lang="go" title="interleaving-string_approach1.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Bottom-Up DP
+
+<ApproachTag tag="interview" />
+
+Detailed explanation of approach 2.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="yellow" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyb}} lang="python" title="interleaving-string_approach2.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppb}} lang="cpp" title="interleaving-string_approach2.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javab}} lang="java" title="interleaving-string_approach2.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsb}} lang="javascript" title="interleaving-string_approach2.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustb}} lang="rust" title="interleaving-string_approach2.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{gob}} lang="go" title="interleaving-string_approach2.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Optimized DP
+
+<ApproachTag tag="simple" />
+
+Detailed explanation of approach 3.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="red" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyc}} lang="python" title="interleaving-string_approach3.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppc}} lang="cpp" title="interleaving-string_approach3.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javac}} lang="java" title="interleaving-string_approach3.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsc}} lang="javascript" title="interleaving-string_approach3.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustc}} lang="rust" title="interleaving-string_approach3.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goc}} lang="go" title="interleaving-string_approach3.go" />
+  </TabItem>
+</Tabs>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs">
+- Discuss time/space trade-offs
+- Mention edge cases
+- Explain optimization steps
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

@@ -1,0 +1,259 @@
+---
+title: Find Minimum in Rotated Sorted Array
+description: Find minimum in a rotated sorted array. Two approaches — binary search O(log n) and iterative O(log n) — in six languages.
+leetcodeNumber: 153
+difficulty: Medium
+leetcodeSlug: find-minimum-in-rotated-sorted-array
+tags: [Array, BinarySearch]
+prev:
+  label: "#150 Evaluate Reverse Polish Notation"
+  link: "../evaluate-reverse-polish-notation/"
+next:
+  label: "#155 Min Stack"
+  link: "../min-stack/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+## Problem Statement
+
+Suppose an array of length `n` sorted in ascending order is **rotated** between 1 and n times. For example, the array `[0,1,2,4,5,6,7]` might become `[4,5,6,7,0,1,2]`.
+
+You must find the **minimum element of this array** in `O(log n)` time. You may assume no duplicates exist in the array.
+
+<Aside type="tip" title="What to notice first">
+- The array is rotated but each half (around the rotation point) is still sorted.
+- The minimum is always at the rotation boundary.
+- Use binary search to find the boundary: if `mid < right`, the minimum is in the left half (or at mid); otherwise it's in the right half.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[3,4,5,1,2]` | `1` | Array was rotated 3 times. Minimum is at rotation point. |
+| `[4,5,6,7,0,1,2]` | `0` | Array was rotated 4 times. |
+| `[2,1]` | `1` | Array was rotated 1 time. |
+| `[1]` | `1` | No rotation (or rotated n times). |
+
+## Constraints
+
+- `n == nums.length`
+- `1 <= n <= 5000`
+- `-5000 <= nums[i] <= 5000`
+- All integers in `nums` are **unique**
+- `nums` is sorted in ascending order and rotated between 1 and n times
+
+import pyBinarySearch  from '@solutions/Python/find_minimum_rotated_binary_search.py?raw';
+import cppBinarySearch from '@solutions/C++/find_minimum_rotated_binary_search.cpp?raw';
+import javaBinarySearch from '@solutions/Java/FindMinimumRotatedBinarySearch.java?raw';
+import jsBinarySearch  from '@solutions/JavaScript/find_minimum_rotated_binary_search.js?raw';
+import rustBinarySearch from '@solutions/Rust/find_minimum_rotated_binary_search.rs?raw';
+import goBinarySearch  from '@solutions/Golang/find_minimum_rotated_binary_search.go?raw';
+import pySpaceOptimized from '@solutions/Python/find_minimum_in_rotated_sorted_array_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/find_minimum_in_rotated_sorted_array_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/FindMinimumInRotatedSortedArraySpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/find_minimum_in_rotated_sorted_array_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/find_minimum_in_rotated_sorted_array_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/find_minimum_in_rotated_sorted_array_space_optimized.go?raw';
+
+import pyIterative      from '@solutions/Python/find_minimum_rotated_iterative.py?raw';
+import cppIterative     from '@solutions/C++/find_minimum_rotated_iterative.cpp?raw';
+import javaIterative    from '@solutions/Java/FindMinimumRotatedIterative.java?raw';
+import jsIterative      from '@solutions/JavaScript/find_minimum_rotated_iterative.js?raw';
+import rustIterative    from '@solutions/Rust/find_minimum_rotated_iterative.rs?raw';
+import goIterative      from '@solutions/Golang/find_minimum_rotated_iterative.go?raw';
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Circular array search** — finding pivot points in rotated data.
+- **Load balancing** — detect where load distribution wraps around in circular queues.
+- **Time-series anomaly detection** — identify rotation points in cyclic data.
+- **Cyclic buffer management** — locate boundaries in ring buffers for memory management.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Binary Search | O(log n) | O(1) | Optimal; works by comparing mid with boundaries |
+| Iterative Scan | O(log n) | O(1) | Same complexity; alternative formulation |
+
+## Approach 1: Binary Search (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use binary search to find the rotation point. The key insight: in a rotated sorted array, one half is always sorted. If the middle element is greater than the right element, the minimum is in the right half. Otherwise, it's in the left half (or at mid).
+
+This avoids O(n) scanning while exploiting the sorted property.
+
+<ComplexityBadges time="O(log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Halving search space each iteration" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `[4, 5, 6, 7, 0, 1, 2]`
+
+| Iteration | left | right | mid | nums[mid] | nums[right] | Decision | Action |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 6 | 3 | 7 | 2 | 7 > 2 | min in right half; left = 4 |
+| 2 | 4 | 6 | 5 | 1 | 2 | 1 < 2 | min in left half; right = 5 |
+| 3 | 4 | 5 | 4 | 0 | 1 | 0 < 1 | min in left half; right = 4 |
+| 4 | left == right | **Return nums[4] = 0** |
+
+### Pseudocode
+
+```plaintext
+function findMin(nums):
+    left = 0
+    right = len(nums) - 1
+
+    while left < right:
+        mid = (left + right) / 2
+        if nums[mid] > nums[right]:
+            // Rotation point is in right half
+            left = mid + 1
+        else:
+            // Rotation point is in left half (or at mid)
+            right = mid
+
+    return nums[left]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBinarySearch} lang="python" title="find_minimum_rotated_binary_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBinarySearch} lang="cpp" title="find_minimum_rotated_binary_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBinarySearch} lang="java" title="FindMinimumRotatedBinarySearch.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBinarySearch} lang="javascript" title="find_minimum_rotated_binary_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBinarySearch} lang="rust" title="find_minimum_rotated_binary_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBinarySearch} lang="go" title="find_minimum_rotated_binary_search.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative Boundary Comparison
+
+<ApproachTag tag="simple" />
+
+Compare the middle element with the right boundary repeatedly, shrinking the search space. This variant makes the binary search logic explicit without recursion.
+
+<ComplexityBadges time="O(log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Halving on each iteration" spaceNote="No extra structures" />
+
+### Pseudocode
+
+```plaintext
+function findMin(nums):
+    left = 0
+    right = len(nums) - 1
+
+    while left < right:
+        mid = left + (right - left) / 2
+        if nums[mid] > nums[right]:
+            left = mid + 1
+        else:
+            right = mid
+
+    return nums[left]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="find_minimum_rotated_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="find_minimum_rotated_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="FindMinimumRotatedIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="find_minimum_rotated_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="find_minimum_rotated_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="find_minimum_rotated_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="find_minimum_in_rotated_sorted_array_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="find_minimum_in_rotated_sorted_array_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="FindMinimumInRotatedSortedArraySpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="find_minimum_in_rotated_sorted_array_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="find_minimum_in_rotated_sorted_array_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="find_minimum_in_rotated_sorted_array_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Comparing with left instead of right:** This can lead to incorrect decisions. Always compare nums[mid] with nums[right] to determine which half contains the minimum.
+- **Sorting instead of binary search:** O(n log n) defeats the purpose; the problem requires O(log n).
+- **Assuming no rotation:** If left and right are equal, the array might not be rotated; handle the base case correctly.
+- **Missing the exact rotation boundary:** The minimum is always at the rotation point, not necessarily in a specific half.
+</Aside>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why compare with right?** The right boundary guarantees the minimum exists in that half; left doesn't.
+- **Why not compare with left?** Comparing with left can lead to infinite loops or incorrect half selection.
+- **Follow-up with duplicates:** If duplicates exist, the problem becomes harder (LeetCode 154). Discuss how duplicates break the binary search assumption.
+- **Rotation edge cases:** No rotation (rotated n times), single rotation, all elements equal.
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

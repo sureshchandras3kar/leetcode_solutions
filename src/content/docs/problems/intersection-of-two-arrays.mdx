@@ -1,0 +1,344 @@
+---
+title: Intersection of Two Arrays
+description: Return the unique elements common to both arrays. Two approaches — hash set O(n+m) and two pointers O((n+m) log(n+m)) — in six languages.
+leetcodeNumber: 349
+difficulty: Easy
+leetcodeSlug: intersection-of-two-arrays
+tags: [Array, Hash Table, Two Pointers]
+prev:
+  label: "#347 Top K Frequent Elements"
+  link: "../top-k-frequent-elements/"
+next:
+  label: "#373 Find K Pairs with Smallest Sums"
+  link: "../find-k-pairs-with-smallest-sum/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySet      from '@solutions/Python/intersection_of_two_arrays_hash_set.py?raw';
+import cppSet     from '@solutions/C++/intersection_of_two_arrays_hash_set.cpp?raw';
+import javaSet    from '@solutions/Java/intersection_of_two_arrays_hash_set.java?raw';
+import jsSet      from '@solutions/JavaScript/intersection_of_two_arrays_hash_set.js?raw';
+import rustSet    from '@solutions/Rust/intersection_of_two_arrays_hash_set.rs?raw';
+import goSet      from '@solutions/Golang/intersection_of_two_arrays_hash_set.go?raw';
+import pyoptimized from '@solutions/Python/intersection_of_two_arrays_optimized.py?raw';
+import cppoptimized from '@solutions/C++/intersection_of_two_arrays_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/IntersectionOfTwoArraysOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/intersection_of_two_arrays_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/intersection_of_two_arrays_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/intersection_of_two_arrays_optimized.go?raw';
+
+import pyTwo      from '@solutions/Python/intersection_of_two_arrays_two_pointer.py?raw';
+import cppTwo     from '@solutions/C++/intersection_of_two_arrays_two_pointer.cpp?raw';
+import javaTwo    from '@solutions/Java/intersection_of_two_arrays_two_pointer.java?raw';
+import jsTwo      from '@solutions/JavaScript/intersection_of_two_arrays_two_pointer.js?raw';
+import rustTwo    from '@solutions/Rust/intersection_of_two_arrays_two_pointer.rs?raw';
+import goTwo      from '@solutions/Golang/intersection_of_two_arrays_two_pointer.go?raw';
+
+## Problem Statement
+
+Given two integer arrays `nums1` and `nums2`, return an array of their **intersection**. Each element in the result must appear only **once**, and the result can be in any order.
+
+<Aside type="tip" title="What to notice first">
+- The result requires **unique** values — even if a number appears multiple times in both arrays, it appears only once in the output.
+- The hash set approach is fastest when the arrays are unsorted or of different sizes.
+- The two-pointer approach shines when the input is already sorted or when no extra memory is available.
+</Aside>
+
+### Examples
+
+| nums1 | nums2 | Output | Explanation |
+| --- | --- | --- | --- |
+| `[1, 2, 2, 1]` | `[2, 2]` | `[2]` | `2` is common; duplicates collapsed |
+| `[4, 9, 5]` | `[9, 4, 9, 8, 4]` | `[9, 4]` | `9` and `4` are common |
+
+## Constraints
+
+- `1 <= nums1.length, nums2.length <= 1000`
+- `0 <= nums1[i], nums2[i] <= 1000`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Friend suggestions** — find users that two people both follow.
+- **Tag matching** — find categories that two documents share.
+- **Inventory cross-check** — find product SKUs that appear in both a purchase order and a warehouse manifest.
+- **DNS cache deduplication** — find hostnames resolved by both of two DNS resolvers over a time window.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Hash Set | O(n + m) | O(min(n, m)) | Unsorted arrays; fast lookup |
+| Two Pointers | O(n log n + m log m) | O(1)\* | Arrays are already sorted or memory is scarce |
+
+\* O(1) extra space beyond the output array (sort is in-place).
+
+## Which approach should you learn first?
+
+- Learn **Hash Set** first — it is the faster approach for unsorted inputs and the standard expectation in interviews.
+- Learn **Two Pointers** as a follow-up — it demonstrates the general sorted-merge pattern used across many problems.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Hash Set</div>
+    <div class="lc-approach-quick__stats">O(n+m) time &middot; O(min(n,m)) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">No Extra Memory</div>
+    <div class="lc-approach-quick__name">Two Pointers</div>
+    <div class="lc-approach-quick__stats">O(n log n + m log m) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Hash Set
+
+<ApproachTag tag="recommended" />
+
+Convert `nums1` into a set to deduplicate it. Scan `nums2` and collect every element that is in the set into a result set (to prevent duplicates in the output). Convert the result set to a list.
+
+<ComplexityBadges time="O(n + m)" space="O(min(n, m))" timeColor="green" spaceColor="yellow" timeNote="One pass each" spaceNote="Set of the smaller array" />
+
+### Step-by-step Example
+
+**Input:** `nums1 = [4, 9, 5]`, `nums2 = [9, 4, 9, 8, 4]`
+
+| Phase | Action | Result set |
+| --- | --- | --- |
+| Build set from nums1 | `{4, 9, 5}` | — |
+| Check 9 from nums2 | 9 ∈ set1 | `{9}` |
+| Check 4 from nums2 | 4 ∈ set1 | `{9, 4}` |
+| Check 9 again | Already in result | `{9, 4}` |
+| Check 8 | 8 ∉ set1 | `{9, 4}` |
+| Check 4 again | Already in result | `{9, 4}` |
+| **Return** | | `[9, 4]` |
+
+<LogicPlayer
+  title="How the hash set finds the unique intersection"
+  description="Use Next or Autoplay to see nums1 converted to a lookup set, then nums2 scanned for matches."
+  steps={[
+    {
+      title: 'Build a set from nums1 = [4, 9, 5]',
+      note: 'Converting nums1 to a set deduplicates it and gives O(1) membership checks.',
+      formula: 'set1 = {4, 9, 5}',
+      items: [
+        { label: '4', state: 'active', index: 0 },
+        { label: '9', state: 'active', index: 1 },
+        { label: '5', state: 'active', index: 2 },
+      ],
+      memory: ['set1: {4, 9, 5}', 'result: {}'],
+    },
+    {
+      title: 'Scan nums2 — 9 is in set1, add to result',
+      note: '9 is in set1. Add it to the result set. The result set prevents duplicates automatically.',
+      formula: '9 ∈ set1 → result.add(9)',
+      items: [
+        { label: '9', state: 'match', index: 0 },
+        { label: '4', state: 'default', index: 1 },
+        { label: '9', state: 'default', index: 2 },
+        { label: '8', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['set1: {4, 9, 5}', 'result: {9}'],
+    },
+    {
+      title: '4 is in set1, add to result; 9 again — already there',
+      note: '4 matches and is added. The second 9 is already in the result set so it is silently skipped.',
+      formula: '4 ∈ set1 → result.add(4)',
+      items: [
+        { label: '9', state: 'default', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '9', state: 'default', index: 2 },
+        { label: '8', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['set1: {4, 9, 5}', 'result: {9, 4}'],
+    },
+    {
+      title: '8 not in set1; second 4 already in result — done',
+      note: '8 has no match in set1. The second 4 is already in the result. Return the result as a list.',
+      formula: 'return list(result) = [9, 4]',
+      callout: 'Using a set for the result ensures uniqueness without any extra deduplication code.',
+      items: [
+        { label: '9', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '9', state: 'default', index: 2 },
+        { label: '8', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['set1: {4, 9, 5}', 'result: {9, 4}', 'return [9, 4] ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function intersection(nums1, nums2):
+    set1 = set(nums1)
+    result = set()
+    for num in nums2:
+        if num in set1:
+            result.add(num)
+    return list(result)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySet} lang="python" title="intersection_of_two_arrays_hash_set.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSet} lang="cpp" title="intersection_of_two_arrays_hash_set.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSet} lang="java" title="intersection_of_two_arrays_hash_set.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSet} lang="javascript" title="intersection_of_two_arrays_hash_set.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSet} lang="rust" title="intersection_of_two_arrays_hash_set.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSet} lang="go" title="intersection_of_two_arrays_hash_set.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Two Pointers
+
+<ApproachTag tag="interview" />
+
+Sort both arrays. Use two pointers starting at the beginning of each. Advance the pointer pointing to the smaller value. When both pointers point to equal values, record the result (skipping consecutive duplicates) and advance both.
+
+<ComplexityBadges time="O(n log n + m log m)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Sort dominates" spaceNote="In-place sort, no extra structure" />
+
+### Step-by-step Example
+
+**Input:** `nums1 = [4, 9, 5]`, `nums2 = [9, 4, 9, 8, 4]`
+
+After sorting: `nums1 = [4, 5, 9]`, `nums2 = [4, 4, 8, 9, 9]`
+
+| i | j | nums1[i] | nums2[j] | Action | result |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 0 | 4 | 4 | Equal → add, both++ | `[4]` |
+| 1 | 2 | 5 | 8 | 5 < 8 → i++ | `[4]` |
+| 2 | 2 | 9 | 8 | 9 > 8 → j++ | `[4]` |
+| 2 | 3 | 9 | 9 | Equal → add, both++ | `[4, 9]` |
+| 3 | 5 | — | — | Done | `[4, 9]` |
+
+### Pseudocode
+
+```plaintext
+function intersection(nums1, nums2):
+    sort(nums1); sort(nums2)
+    result = []
+    i, j = 0, 0
+    while i < len(nums1) and j < len(nums2):
+        if nums1[i] == nums2[j]:
+            if not result or result[-1] != nums1[i]:
+                result.append(nums1[i])
+            i++; j++
+        elif nums1[i] < nums2[j]:
+            i++
+        else:
+            j++
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwo} lang="python" title="intersection_of_two_arrays_two_pointer.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwo} lang="cpp" title="intersection_of_two_arrays_two_pointer.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwo} lang="java" title="intersection_of_two_arrays_two_pointer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwo} lang="javascript" title="intersection_of_two_arrays_two_pointer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwo} lang="rust" title="intersection_of_two_arrays_two_pointer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwo} lang="go" title="intersection_of_two_arrays_two_pointer.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to deduplicate: if the same value appears in both arrays multiple times, both approaches must ensure it appears only once in the output — the hash set does this automatically, but the two-pointer approach needs an explicit skip.
+- Sorting modifies the input arrays — if the caller needs the original order, sort copies instead.
+- Confusing this problem (#349, unique intersection) with #350 (Intersection of Two Arrays II), which allows duplicates in the result.
+</Aside>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="intersection_of_two_arrays_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="intersection_of_two_arrays_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="IntersectionOfTwoArraysOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="intersection_of_two_arrays_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="intersection_of_two_arrays_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="intersection_of_two_arrays_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum' },
+  { number: 217, title: 'Contains Duplicate', difficulty: 'Easy', slug: 'problems/contains-duplicate' },
+  { number: 350, title: 'Intersection of Two Arrays II', difficulty: 'Easy', leetcodeSlug: 'intersection-of-two-arrays-ii' },
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Hash set vs two pointers:** hash set wins on speed (O(n+m)), two pointers wins on space (O(1) extra). Know when to use each.
+- **Follow-up — if one array is very large and the other is small?** Build the set from the smaller array to minimise memory.
+- **Follow-up — if the arrays are already sorted?** Skip the sort cost and go directly to the two-pointer scan.
+- **Follow-up — intersection with duplicates (#350)?** Replace the result set with a frequency map and take the minimum count of each common element.
+
+
+<PrevNextNav
+  prevProblem={ number: 347, title: "Top K Frequent Elements", slug: "top-k-frequent-elements" }
+  nextProblem={ number: 373, title: "Find K Pairs with Smallest Sums", slug: "find-k-pairs-with-smallest-sum" }
+/></Aside>

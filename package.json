@@ -1,0 +1,16 @@
+{
+  "name": "leetcode-solutions",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "latest",
+    "astro": "latest"
+  }
+}

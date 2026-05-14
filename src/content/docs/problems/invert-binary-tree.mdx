@@ -1,0 +1,376 @@
+---
+title: Invert Binary Tree
+description: Swap all left and right child nodes in a binary tree. Two approaches — recursive DFS O(n) and iterative BFS O(n) — in six languages.
+leetcodeNumber: 226
+difficulty: Easy
+leetcodeSlug: invert-binary-tree
+tags: [Tree, Depth-First Search, Breadth-First Search]
+prev:
+  label: "#224 Basic Calculator"
+  link: "../basic-calculator/"
+next:
+  label: "#228 Summary Ranges"
+  link: "../summary-ranges/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDFS     from '@solutions/Python/invert_binary_tree_dfs.py?raw';
+import cppDFS    from '@solutions/C++/invert_binary_tree_dfs.cpp?raw';
+import javaDFS   from '@solutions/Java/invert_binary_tree_dfs.java?raw';
+import jsDFS     from '@solutions/JavaScript/invert_binary_tree_dfs.js?raw';
+import rustDFS   from '@solutions/Rust/invert_binary_tree_dfs.rs?raw';
+import goDFS     from '@solutions/Golang/invert_binary_tree_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/invert_binary_tree_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/invert_binary_tree_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/InvertBinaryTreeBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/invert_binary_tree_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/invert_binary_tree_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/invert_binary_tree_bfs_iterative.go?raw';
+
+import pyBFS     from '@solutions/Python/invert_binary_tree_bfs.py?raw';
+import cppBFS    from '@solutions/C++/invert_binary_tree_bfs.cpp?raw';
+import javaBFS   from '@solutions/Java/invert_binary_tree_bfs.java?raw';
+import jsBFS     from '@solutions/JavaScript/invert_binary_tree_bfs.js?raw';
+import rustBFS   from '@solutions/Rust/invert_binary_tree_bfs.rs?raw';
+import goBFS     from '@solutions/Golang/invert_binary_tree_bfs.go?raw';
+
+## Problem Statement
+
+Given the `root` of a binary tree, invert the tree, and return its root.
+
+Inverting a binary tree means swapping the left and right child nodes of every node in the tree.
+
+<Aside type="tip" title="What to notice first">
+- Every node in the tree must have its left and right children swapped.
+- The tree structure remains the same, only the direction of children changes.
+- This is a simple problem that teaches fundamental tree traversal techniques.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[4,2,7,1,3,6,9]` | `[4,7,2,9,6,3,1]` | All left-right children are swapped at each node |
+| `[2,1,3]` | `[2,3,1]` | Left and right children of root are swapped |
+| `[]` | `[]` | Empty tree remains empty |
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[0, 100]`.
+- `-100 <= Node.val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Mirror image processing** — create a mirror/flipped version of a hierarchical structure like organizational charts.
+- **Game tree reflection** — flip the decision tree in game AI for symmetry analysis.
+- **UI layout mirroring** — invert left/right layout for right-to-left (RTL) language support.
+- **Data structure optimization** — balance tree traversal patterns for hardware cache efficiency.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Type | Best When |
+| --- | --- | --- | --- | --- |
+| DFS Recursive | O(n) | O(h) | Elegant | General case — simple and intuitive |
+| BFS Iterative | O(n) | O(w) | Queue-based | Level-by-level processing preferred |
+
+*h = height of tree, w = max width at any level*
+
+## Which approach should you learn first?
+
+- Pick **DFS Recursive** if you want the cleanest, most readable solution.
+- Pick **BFS Iterative** if you prefer avoiding recursion or need level-order processing.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Elegant</div>
+    <div class="lc-approach-quick__name">DFS Recursive</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(h) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">No Recursion</div>
+    <div class="lc-approach-quick__name">BFS Iterative</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(w) space</div>
+  </div>
+</div>
+
+## Approach 1: DFS Recursive (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Recursively visit each node, swap its left and right children, then continue the process for its subtrees.
+
+The elegance of this approach lies in its simplicity: three lines of code (swap + two recursive calls) handle any tree size.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Visit each node once" spaceNote="Call stack depth" />
+
+### Step-by-step Example
+
+**Input:** `root = [4,2,7,1,3,6,9]`
+
+```
+Original tree:       4           Inverted tree:       4
+                   /   \                            /   \
+                  2     7                          7     2
+                 / \   / \                        / \   / \
+                1   3 6   9                      9   6 3   1
+```
+
+| Step | Action |
+| --- | --- |
+| 1 | Visit node 4: swap its children (2 ↔ 7) |
+| 2 | Recurse on new left child (7): swap (6 ↔ 9) |
+| 3 | Recurse on new right child (2): swap (1 ↔ 3) |
+| 4 | Return to leaf nodes (no children to swap) |
+
+<LogicPlayer
+  title="How the DFS recursive solution inverts the tree"
+  description="Use Next or Autoplay to watch the left-right swap operation at each node, starting from the root and moving down the tree."
+  target="invert"
+  steps={[
+    {
+      title: 'Start at root node (value 4)',
+      note: 'The recursion begins at the root. We will swap its left child (2) and right child (7).',
+      formula: 'swap(root.left, root.right)',
+      callout: 'Root node 4 has left=2 and right=7.',
+      items: [
+        { label: '4', state: 'active', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '7', state: 'default', index: 2 },
+      ],
+      memory: ['Node 4: swap left(2) and right(7)'],
+    },
+    {
+      title: 'After swapping at root',
+      note: 'Root node 4 now has left=7 and right=2. We will now recursively process the left subtree (7).',
+      formula: 'invertTree(root.left) = invertTree(7)',
+      callout: 'Now 4 has left=7 and right=2. Next, process node 7.',
+      items: [
+        { label: '4', state: 'visited', index: 0 },
+        { label: '7', state: 'active', index: 2 },
+        { label: '2', state: 'default', index: 1 },
+      ],
+      memory: ['Node 4: done', 'Node 7: swap left(6) and right(9)'],
+    },
+    {
+      title: 'Process node 7',
+      note: 'Node 7 has left=6 and right=9. We swap them.',
+      formula: 'swap(7.left, 7.right)',
+      callout: 'Node 7: swap left(6) and right(9).',
+      items: [
+        { label: '4', state: 'visited', index: 0 },
+        { label: '7', state: 'active', index: 2 },
+        { label: '6', state: 'default', index: 4 },
+        { label: '9', state: 'default', index: 5 },
+      ],
+      memory: ['Node 7: swap complete'],
+    },
+    {
+      title: 'Process node 2',
+      note: 'After processing left subtree, process right subtree. Node 2 has left=1 and right=3. Swap them.',
+      formula: 'swap(2.left, 2.right)',
+      callout: 'Node 2: swap left(1) and right(3).',
+      items: [
+        { label: '4', state: 'visited', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '1', state: 'default', index: 3 },
+        { label: '3', state: 'default', index: 4 },
+      ],
+      memory: ['Node 2: swap complete'],
+    },
+    {
+      title: 'Complete inversion',
+      note: 'All nodes have been visited and swapped. The tree is now fully inverted.',
+      formula: 'Return inverted root',
+      callout: 'Tree inversion complete! Every left-right pair has been swapped.',
+      items: [
+        { label: '4', state: 'match', index: 0 },
+        { label: '7', state: 'match', index: 2 },
+        { label: '2', state: 'match', index: 1 },
+      ],
+      memory: ['All nodes inverted successfully'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function invertTreeDFS(root):
+    if root is null:
+        return null
+    
+    swap(root.left, root.right)
+    invertTreeDFS(root.left)
+    invertTreeDFS(root.right)
+    
+    return root
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="invert_binary_tree_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="invert_binary_tree_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="invert_binary_tree_dfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="invert_binary_tree_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="invert_binary_tree_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="invert_binary_tree_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS Iterative
+
+<ApproachTag tag="interview" />
+
+Use a queue to visit nodes level by level, swapping children at each node without using the recursion call stack.
+
+This approach is useful when you want explicit control over traversal order or need to avoid stack overflow on very deep trees.
+
+<ComplexityBadges time="O(n)" space="O(w)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Queue width" />
+
+### Step-by-step Example
+
+**Input:** `root = [2,1,3]`
+
+After processing:
+
+| Step | Queue | Current Node | Action |
+| --- | --- | --- | --- |
+| 1 | `[2]` | 2 | Dequeue 2, swap (1 ↔ 3), enqueue [3, 1] |
+| 2 | `[3, 1]` | 3 | Dequeue 3, no children, continue |
+| 3 | `[1]` | 1 | Dequeue 1, no children, continue |
+| 4 | `[]` | - | Queue empty, done |
+
+### Pseudocode
+
+```plaintext
+function invertTreeBFS(root):
+    if root is null:
+        return root
+    
+    queue = Queue()
+    queue.enqueue(root)
+    
+    while queue is not empty:
+        node = queue.dequeue()
+        swap(node.left, node.right)
+        
+        if node.left is not null:
+            queue.enqueue(node.left)
+        if node.right is not null:
+            queue.enqueue(node.right)
+    
+    return root
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="invert_binary_tree_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="invert_binary_tree_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="invert_binary_tree_bfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="invert_binary_tree_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="invert_binary_tree_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="invert_binary_tree_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting to swap before recursing** — make sure the swap happens at the start, before processing children.
+- **Only processing one subtree** — remember to recursively invert both left and right subtrees.
+- **Returning the wrong node** — return the modified root, not one of its children.
+- **In BFS:** forgetting to add children to the queue before dequeuing the next node.
+</Aside>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="invert_binary_tree_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="invert_binary_tree_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="InvertBinaryTreeBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="invert_binary_tree_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="invert_binary_tree_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="invert_binary_tree_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 101, title: 'Symmetric Tree', difficulty: 'Easy', leetcodeSlug: 'symmetric-tree' },
+  { number: 100, title: 'Same Tree', difficulty: 'Easy', leetcodeSlug: 'same-tree' },
+  { number: 145, title: 'Binary Tree Postorder Traversal', difficulty: 'Easy', leetcodeSlug: 'binary-tree-postorder-traversal' },
+  { number: 144, title: 'Binary Tree Preorder Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-preorder-traversal' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why DFS over BFS?** Cleaner code, works well for most trees, and matches the tree's natural recursive structure. Use unless you have a specific reason to avoid recursion.
+- **Why BFS?** Explicit control, avoids deep recursion (good for very deep trees), and enables level-order processing if needed.
+- **Space complexity nuance:** For balanced trees, both are O(log n) due to tree shape. For skewed trees, DFS could approach O(n) with deep recursion, while BFS adapts to tree width.
+- **Follow-up — Flatten to linked list:** A natural extension combining inversion with other tree transformations.
+- **Follow-up — Spiral level order:** Combine BFS with direction reversal for zigzag traversal.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 225, title: "Implement Stack using Queues", slug: "implement-stack-using-queues" }}
+  nextProblem={{ number: 227, title: "Basic Calculator II", slug: "basic-calculator-ii" }}
+/>

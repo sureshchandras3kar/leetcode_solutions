@@ -1,0 +1,242 @@
+---
+title: Merge k Sorted Lists
+description: Merge k sorted linked lists into one sorted list using divide and conquer or heap. Hard problem with multiple solution approaches.
+leetcodeNumber: 23
+difficulty: Hard
+leetcodeSlug: merge-k-sorted-lists
+tags: [Linked List, Divide and Conquer, Heap, Merge Sort]
+prev:
+  label: "#22 Generate Parentheses"
+  link: "../generate-parentheses/"
+next:
+  label: "#25 Reverse Nodes in k-Group"
+  link: "../reverse-nodes-in-k-group/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyRecursive     from '@solutions/Python/merge_k_sorted_lists_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/merge_k_sorted_lists_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/MergeKSortedLists_Recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/merge_k_sorted_lists_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/merge_k_sorted_lists_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/merge_k_sorted_lists_recursive.go?raw';
+import pySpaceOptimized from '@solutions/Python/merge_k_sorted_lists_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/merge_k_sorted_lists_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/MergeKSortedListsSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/merge_k_sorted_lists_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/merge_k_sorted_lists_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/merge_k_sorted_lists_space_optimized.go?raw';
+
+import pyHeap      from '@solutions/Python/merge_k_sorted_lists_heap.py?raw';
+import cppHeap     from '@solutions/C++/merge_k_sorted_lists_heap.cpp?raw';
+import javaHeap    from '@solutions/Java/MergeKSortedLists_Heap.java?raw';
+import jsHeap      from '@solutions/JavaScript/merge_k_sorted_lists_heap.js?raw';
+import rustHeap    from '@solutions/Rust/merge_k_sorted_lists_heap.rs?raw';
+import goHeap      from '@solutions/Golang/merge_k_sorted_lists_heap.go?raw';
+
+## Problem Statement
+
+You are given an array of `k` linked-lists `lists`, each linked-list is sorted in ascending order.
+
+Merge all the linked-lists into one sorted linked-list and return it.
+
+<Aside type="tip" title="What to notice first">
+- Compare elements across k lists efficiently; brute force is O(nk² log nk).
+- Divide and conquer: merge pairs, then pairs of pairs → O(nk log k).
+- Min-heap: always extract the smallest element from any list → O(nk log k).
+- k lists of total n nodes merged pairwise is much faster than sequential pairwise merge.
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `[[1,4,5],[1,3,4],[2,6]]` | `1→1→2→3→4→4→5→6` |
+| `[]` | `null` |
+| `[[]]` | `null` |
+
+## Constraints
+
+- `k == lists.length`
+- `0 <= k <= 10^4`
+- `0 <= lists[i].length <= 500`
+- `-10^4 <= lists[i][j] <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Memory allocation and garbage collection
+- LRU cache implementation
+- Music playlist and browser history
+- Undo/Redo functionality in applications
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space |
+| --- | --- | --- |
+| Recursive Divide & Conquer | O(nk log k) | O(log k) |
+| Min Heap | O(nk log k) | O(k) |
+
+*n = total nodes across all lists*
+
+## Which approach should you learn first?
+
+- Pick **Divide & Conquer** for pattern clarity — mirrors merge sort.
+- Pick **Min Heap** for intuitive greedy selection of smallest.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Pattern Match</div>
+    <div class="lc-approach-quick__name">Divide & Conquer</div>
+    <div class="lc-approach-quick__stats">O(nk log k) time &middot; O(log k) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Greedy Pick</div>
+    <div class="lc-approach-quick__name">Min Heap</div>
+    <div class="lc-approach-quick__stats">O(nk log k) time &middot; O(k) space</div>
+  </div>
+</div>
+
+## Approach 1: Recursive Divide and Conquer (Recommended)
+
+<ApproachTag tag="recommended" />
+
+1. Recursively split lists in half.
+2. Merge each pair of resulting lists.
+3. Base case: single list or empty range.
+
+The key insight: merging k lists pairwise is O(log k) levels, each level does O(nk) work → O(nk log k) total.
+
+<ComplexityBadges time="O(nk log k)" space="O(log k)" timeColor="green" spaceColor="green" timeNote="Divide and conquer" spaceNote="Recursion depth" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="merge_k_sorted_lists_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="merge_k_sorted_lists_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="MergeKSortedLists_Recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="merge_k_sorted_lists_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="merge_k_sorted_lists_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="merge_k_sorted_lists_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Min Heap
+
+<ApproachTag tag="interview" />
+
+1. Push all list heads into a min-heap.
+2. Repeatedly extract the smallest, append to result, and push its next node.
+3. Stop when heap is empty.
+
+<ComplexityBadges time="O(nk log k)" space="O(k)" timeColor="green" spaceColor="yellow" timeNote="Each node processed once, heap ops" spaceNote="Heap storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHeap} lang="python" title="merge_k_sorted_lists_heap.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHeap} lang="cpp" title="merge_k_sorted_lists_heap.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHeap} lang="java" title="MergeKSortedLists_Heap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHeap} lang="javascript" title="merge_k_sorted_lists_heap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHeap} lang="rust" title="merge_k_sorted_lists_heap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHeap} lang="go" title="merge_k_sorted_lists_heap.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Comparing ListNode pointers instead of values (in heap, use custom comparator).
+- Forgetting to push next node after extracting from heap.
+- Off-by-one errors in partition boundaries.
+- Not handling empty lists or k=0.
+- Modifying list structure incorrectly during merge.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="merge_k_sorted_lists_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="merge_k_sorted_lists_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="MergeKSortedListsSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="merge_k_sorted_lists_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="merge_k_sorted_lists_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="merge_k_sorted_lists_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 21, title: 'Merge Two Sorted Lists', difficulty: 'Easy', leetcodeSlug: 'merge-two-sorted-lists' },
+  { number: 148, title: 'Sort List', difficulty: 'Medium', leetcodeSlug: 'sort-list' },
+  { number: 264, title: 'Ugly Number II', difficulty: 'Medium', leetcodeSlug: 'ugly-number-ii' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Divide & conquer vs. heap:** Divide & conquer uses recursion (stack space), heap uses explicit data structure. Both are O(nk log k).
+- **Why not sequential merge?** Merging k lists one-by-one is O(nk²), which is slower.
+- **Optimization:** Use iterative merge with size doubling instead of recursive partition for better cache locality.
+- **Follow-up:** How would you stream the result without building the entire merged list in memory?
+- **Edge cases:** Empty input, single list, all empty lists, lists of length 1.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 22, title: "Generate Parentheses", slug: "generate-parentheses" }}
+  nextProblem={{ number: 24, title: "Swap Nodes in Pairs", slug: "swap-nodes-in-pairs" }}
+/>

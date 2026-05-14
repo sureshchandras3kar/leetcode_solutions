@@ -1,0 +1,282 @@
+---
+title: Design Add and Search Words Data Structure
+description: Build a word dictionary supporting wildcard searches. Recursive and iterative DFS approaches for pattern matching in Trie structures.
+leetcodeNumber: 211
+difficulty: Medium
+leetcodeSlug: add-and-search-word-data-structure-design
+tags: [Trie, Design, String, Depth-First Search]
+prev:
+  label: "#210 Course Schedule II"
+  link: "../course-schedule-ii/"
+next:
+  label: "#212 Word Search II"
+  link: "../word-search-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyRecursive     from '@solutions/Python/design_search_words_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/design_search_words_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/DesignSearchWords_Recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/design_search_words_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/design_search_words_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/design_search_words_recursive.go?raw';
+import pySpaceOptimized from '@solutions/Python/design_add_and_search_words_data_structure_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/design_add_and_search_words_data_structure_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/DesignAddAndSearchWordsDataStructureSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/design_add_and_search_words_data_structure_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/design_add_and_search_words_data_structure_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/design_add_and_search_words_data_structure_space_optimized.go?raw';
+
+import pyIterative      from '@solutions/Python/design_search_words_iterative.py?raw';
+import cppIterative     from '@solutions/C++/design_search_words_iterative.cpp?raw';
+import javaIterative    from '@solutions/Java/DesignSearchWords_Iterative.java?raw';
+import jsIterative      from '@solutions/JavaScript/design_search_words_iterative.js?raw';
+import rustIterative    from '@solutions/Rust/design_search_words_iterative.rs?raw';
+import goIterative      from '@solutions/Golang/design_search_words_iterative.go?raw';
+
+## Problem Statement
+
+Design a data structure that supports adding words and searching for words with support for the '.' wildcard character.
+
+Implement the `WordDictionary` class:
+- `addWord(word)` — Adds word to the data structure without duplicates.
+- `search(word)` — Returns true if there is any word in the data structure that matches word. word may contain dots '.' where each dot can represent any single letter.
+
+<Aside type="tip" title="What to notice first">
+- The '.' wildcard can match any single character — you must explore all branches.
+- This is a Trie with backtracking for wildcard resolution.
+- When you encounter a '.', recursively search all child branches.
+- Exact character matches follow a direct path.
+</Aside>
+
+### Examples
+
+| Operation | Input | Output | State |
+| --- | --- | --- | --- |
+| AddWord | "bad" | — | Trie has: b→a→d |
+| AddWord | "dad" | — | Trie has: d→a→d, b→a→d |
+| AddWord | "mad" | — | Trie has: m→a→d, d→a→d, b→a→d |
+| Search | "pad" | false | No word starting with 'p' |
+| Search | "bad" | true | Exact match found |
+| Search | ".ad" | true | '.' matches 'b', 'd', or 'm' |
+| Search | "b.." | true | '.' matches 'a', then 'd' |
+
+## Constraints
+
+- `1 <= word.length <= 500`
+- `word` in `addWord` consists of lowercase English letters.
+- `word` in `search` consists of lowercase English letters and dots '.'.
+- At most `5000` calls will be made to `addWord` and `search`.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Fuzzy search / autocomplete** — match words with missing characters.
+- **Regex engines** — implement simple wildcard matching.
+- **DNS name resolution** — match domain patterns.
+- **Security filters** — detect malware using pattern-based signatures.
+- **Database queries** — wildcard-based string matching in SQL-like engines.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | AddWord | Search | Space |
+| --- | --- | --- | --- |
+| Recursive DFS | O(m) | O(n × 26^m) | O(m × 26) |
+| Iterative BFS | O(m) | O(n × 26^m) | O(m × 26) |
+
+*m = word length, n = number of words, search worst-case with many wildcards*
+
+## Which approach should you learn first?
+
+- Pick **Recursive DFS** for interview clarity — easier to explain the backtracking logic.
+- Pick **Iterative BFS** if you prefer avoiding recursion or have deep trees.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Clearer Logic</div>
+    <div class="lc-approach-quick__name">Recursive DFS</div>
+    <div class="lc-approach-quick__stats">O(m) insert &middot; O(n×26^m) search</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Avoids Recursion</div>
+    <div class="lc-approach-quick__name">Iterative BFS</div>
+    <div class="lc-approach-quick__stats">O(m) insert &middot; O(n×26^m) search</div>
+  </div>
+</div>
+
+## Approach 1: Recursive DFS (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use a Trie for storage. For each search:
+- If we encounter an exact letter, move to that child.
+- If we encounter '.', recursively try all 26 children.
+- Base case: reached end of word → check if it's marked as end-of-word.
+
+<ComplexityBadges time="O(n×26^m)" space="O(m×26)" timeColor="red" spaceColor="yellow" timeNote="Worst-case backtracking" spaceNote="Trie nodes" />
+
+### Pseudocode
+
+```plaintext
+class WordDictionary:
+    root = TrieNode()
+
+    function addWord(word):
+        node = root
+        for each char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+
+    function search(word):
+        return searchDFS(word, 0, root)
+
+    function searchDFS(word, index, node):
+        if index == len(word):
+            return node.is_end_of_word
+
+        char = word[index]
+        if char == '.':
+            for each child in node.children.values():
+                if searchDFS(word, index + 1, child):
+                    return True
+            return False
+        else:
+            if char not in node.children:
+                return False
+            return searchDFS(word, index + 1, node.children[char])
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="design_search_words_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="design_search_words_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="DesignSearchWords_Recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="design_search_words_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="design_search_words_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="design_search_words_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative BFS
+
+<ApproachTag tag="interview" />
+
+Maintain a queue of (node, index) pairs. For each step:
+- If exact character, add (child_node, index+1) to queue.
+- If '.', add all children with (child_node, index+1).
+- Base case: reach end of word and check end-of-word flag.
+
+<ComplexityBadges time="O(n×26^m)" space="O(m)" timeColor="red" spaceColor="yellow" timeNote="Worst-case all branches" spaceNote="Queue size" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="design_search_words_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="design_search_words_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="DesignSearchWords_Iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="design_search_words_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="design_search_words_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="design_search_words_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Treating '.' as a regular character instead of exploring all branches.
+- Returning early without checking all wildcard possibilities.
+- Forgetting to mark nodes as end-of-word during insertion.
+- In iterative approach, queue explosion with many wildcards — this is unavoidable in worst case.
+- Not handling the base case correctly (index == word length).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="design_add_and_search_words_data_structure_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="design_add_and_search_words_data_structure_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="DesignAddAndSearchWordsDataStructureSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="design_add_and_search_words_data_structure_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="design_add_and_search_words_data_structure_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="design_add_and_search_words_data_structure_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 208, title: 'Implement Trie (Prefix Tree)', difficulty: 'Medium', leetcodeSlug: 'implement-trie-prefix-tree' },
+  { number: 212, title: 'Word Search II', difficulty: 'Hard', leetcodeSlug: 'word-search-ii' },
+  { number: 79, title: 'Word Search', difficulty: 'Medium', leetcodeSlug: 'word-search' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Recursive vs. Iterative:** Recursive is cleaner and more intuitive for wildcards; iterative avoids stack overhead.
+- **When '.' is expensive:** With many wildcards, search becomes exponential. Discuss memoization or limiting wildcard count.
+- **Space-time tradeoff:** Trie takes more space upfront but makes adds/searches fast.
+- **Follow-up:** How would you optimize for many '.' searches? (Use memoization with (index, node) cache.)
+- **Edge cases:** Single '.' matching single character, all dots, no matches, duplicate adds.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 210, title: "Course Schedule III", slug: "course-schedule-iii" }}
+  nextProblem={{ number: 212, title: "Word Search II", slug: "word-search-ii" }}
+/>

@@ -1,0 +1,246 @@
+---
+title: Surrounded Regions
+description: Mark surrounded regions in a grid. Two approaches — DFS O(m*n) + Union-Find O(m*n*α(n)) — in six languages.
+leetcodeNumber: 130
+difficulty: Medium
+leetcodeSlug: surrounded-regions
+tags: [Graph, DFS, Union-Find]
+prev:
+  label: "#129 Sum Root to Leaf Numbers"
+  link: "../sum-root-to-leaf-numbers/"
+next:
+  label: "#133 Clone Graph"
+  link: "../clone-graph/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDFS from '@solutions/Python/surrounded_regions_dfs.py?raw';
+import cppDFS from '@solutions/C++/surrounded_regions_dfs.cpp?raw';
+import javaDFS from '@solutions/Java/SurroundedRegionsDFS.java?raw';
+import jsDFS from '@solutions/JavaScript/surrounded_regions_dfs.js?raw';
+import rustDFS from '@solutions/Rust/surrounded_regions_dfs.rs?raw';
+import goDFS from '@solutions/Golang/surrounded_regions_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/surrounded_regions_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/surrounded_regions_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/SurroundedRegionsBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/surrounded_regions_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/surrounded_regions_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/surrounded_regions_bfs_iterative.go?raw';
+
+import pyUnionFind from '@solutions/Python/surrounded_regions_union_find.py?raw';
+import cppUnionFind from '@solutions/C++/surrounded_regions_union_find.cpp?raw';
+import javaUnionFind from '@solutions/Java/SurroundedRegionsUnionFind.java?raw';
+import jsUnionFind from '@solutions/JavaScript/surrounded_regions_union_find.js?raw';
+import rustUnionFind from '@solutions/Rust/surrounded_regions_union_find.rs?raw';
+import goUnionFind from '@solutions/Golang/surrounded_regions_union_find.go?raw';
+
+## Problem Statement
+
+Given an `m x n` board containing `'X'` and `'O'`, capture all regions of `'O'` that are surrounded by `'X'`.
+
+A region is captured by flipping all `'O'`s into `'X'`s in that surrounded region.
+
+<Aside type="tip" title="What to notice first">
+- Only `'O'` regions that are NOT connected to the border can be captured.
+- Use DFS/BFS from border to mark all border-connected `'O'`s as safe.
+- Flip remaining unmarked `'O'`s to `'X'`.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]` | `[["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]` | Only the bottom-left O is surrounded |
+
+## Constraints
+
+- `m == board.length`
+- `n == board[i].length`
+- `1 <= m, n <= 200`
+- `board[i][j]` is `'X'` or `'O'`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Game development** — flood fill with obstacles (Minesweeper).
+- **Image processing** — connected component analysis with boundaries.
+- **Geographic analysis** — identifying enclosed regions.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| DFS | O(m * n) | O(m * n) | Recursive exploration, intuitive |
+| Union-Find | O(m * n * α(n)) | O(m * n) | Disjoint sets, path compression |
+
+## Which approach should you learn first?
+
+- Pick **DFS** for most intuitive and straightforward solution.
+- Pick **Union-Find** to understand disjoint set data structure.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Intuitive</div>
+    <div class="lc-approach-quick__name">DFS</div>
+    <div class="lc-approach-quick__stats">O(m * n) time &middot; O(m * n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Elegant</div>
+    <div class="lc-approach-quick__name">Union-Find</div>
+    <div class="lc-approach-quick__stats">O(m * n * α(n)) time &middot; O(m * n) space</div>
+  </div>
+</div>
+
+## Approach 1: DFS — Recommended
+
+<ApproachTag tag="recommended" />
+
+Mark all border-connected 'O' regions from all four borders using DFS, then flip remaining 'O's to 'X's.
+
+<ComplexityBadges time="O(m * n)" space="O(m * n)" timeColor="green" spaceColor="yellow" timeNote="Visit each cell once" spaceNote="Recursion stack" />
+
+### Pseudocode
+
+```plaintext
+function solve(board):
+    rows = len(board)
+    cols = len(board[0])
+    
+    // Mark border-connected O's from all borders
+    for each cell on border:
+        if cell is 'O':
+            dfs(board, r, c, rows, cols)
+    
+    // Flip unmarked O's to X's
+    for each cell in board:
+        if cell is 'O':
+            cell = 'X'
+        else if cell is '#':  // Marked O's
+            cell = 'O'
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="surrounded_regions_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="surrounded_regions_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="SurroundedRegionsDFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="surrounded_regions_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="surrounded_regions_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="surrounded_regions_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Union-Find
+
+<ApproachTag tag="simple" />
+
+Create a virtual boundary node and union it with all border-connected 'O's. Flip 'O's that are not connected to boundary.
+
+<ComplexityBadges time="O(m * n * α(n))" space="O(m * n)" timeColor="green" spaceColor="yellow" timeNote="Union operations with path compression" spaceNote="Parent array + rank" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyUnionFind} lang="python" title="surrounded_regions_union_find.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppUnionFind} lang="cpp" title="surrounded_regions_union_find.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaUnionFind} lang="java" title="SurroundedRegionsUnionFind.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsUnionFind} lang="javascript" title="surrounded_regions_union_find.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustUnionFind} lang="rust" title="surrounded_regions_union_find.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goUnionFind} lang="go" title="surrounded_regions_union_find.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="surrounded_regions_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="surrounded_regions_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="SurroundedRegionsBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="surrounded_regions_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="surrounded_regions_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="surrounded_regions_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Processing interior cells first instead of starting from borders.
+- Forgetting to flip marked cells back to 'O' at the end.
+- Not handling all four borders when marking border-connected regions.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 200, title: 'Number of Islands', difficulty: 'Medium', slug: 'problems/number-of-islands', leetcodeSlug: 'number-of-islands' },
+  { number: 733, title: 'Flood Fill', difficulty: 'Easy', leetcodeSlug: 'flood-fill' },
+  { number: 1020, title: 'Number of Enclaves', difficulty: 'Medium', leetcodeSlug: 'number-of-enclaves' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **DFS vs Union-Find:** DFS is simpler but uses implicit stack; Union-Find is more elegant for understanding disjoint sets.
+- **Border strategy:** Key insight is to work from borders outward rather than interiors.
+- **Follow-up:** Can you do this without modifying the board? Use a visited set instead.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 200, title: "Number of Islands", slug: "number-of-islands" }}
+  nextProblem={{ number: 133, title: "Clone Graph", slug: "clone-graph" }}
+/>

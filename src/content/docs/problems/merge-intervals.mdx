@@ -1,0 +1,181 @@
+---
+title: Merge Intervals
+description: Merge overlapping intervals. Two approaches — sort-and-merge O(n log n) and heap O(n log n) — in six languages.
+leetcodeNumber: 56
+difficulty: Medium
+leetcodeSlug: merge-intervals
+tags: [Array, Sorting]
+prev:
+  label: "#55 Jump Game"
+  link: "../jump-game/"
+next:
+  label: "#57 Insert Interval"
+  link: "../insert-interval/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySortMerge     from '@solutions/Python/merge_intervals_sort_and_merge.py?raw';
+import cppSortMerge    from '@solutions/C++/merge_intervals_sort_and_merge.cpp?raw';
+import javaSortMerge   from '@solutions/Java/merge_intervals_sort_and_merge.java?raw';
+import jsSortMerge     from '@solutions/JavaScript/merge_intervals_sort_and_merge.js?raw';
+import rustSortMerge   from '@solutions/Rust/merge_intervals_sort_and_merge.rs?raw';
+import goSortMerge     from '@solutions/Golang/merge_intervals_sort_and_merge.go?raw';
+
+import pyHeap     from '@solutions/Python/merge_intervals_heap.py?raw';
+import cppHeap    from '@solutions/C++/merge_intervals_heap.cpp?raw';
+import javaHeap   from '@solutions/Java/merge_intervals_heap.java?raw';
+import jsHeap     from '@solutions/JavaScript/merge_intervals_heap.js?raw';
+import rustHeap   from '@solutions/Rust/merge_intervals_heap.rs?raw';
+import goHeap     from '@solutions/Golang/merge_intervals_heap.go?raw';
+
+## Problem Statement
+
+Given an array of `intervals` where `intervals[i] = [starti, endi]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
+
+<Aside type="tip" title="What to notice first">
+- Two intervals `[a, b]` and `[c, d]` overlap if `c <= b`.
+- After merging, the result should contain non-overlapping intervals in sorted order.
+- A simple sort-and-scan approach is often optimal for this problem.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[[1,3],[2,6],[8,10],[15,18]]` | `[[1,6],[8,10],[15,18]]` | [1,3] and [2,6] overlap, merge to [1,6]. |
+| `[[1,4],[4,5]]` | `[[1,5]]` | [1,4] and [4,5] overlap at the boundary. |
+| `[[1,2],[1,2]]` | `[[1,2]]` | Identical intervals merge to one. |
+
+## Constraints
+
+- `1 <= intervals.length <= 10^4`
+- `intervals[i].length == 2`
+- `0 <= starti <= endi <= 10^4`
+
+<Aside type="note" title="Where this pattern appears">
+- **Calendar event merging** — Scheduling systems consolidating overlapping time blocks from multiple calendars or shared resources.
+- **Resource allocation** — Server and container orchestration merging time windows of resource availability or maintenance windows.
+- **Time slot consolidation** — Educational or booking systems merging adjacent or overlapping appointment slots into contiguous blocks.
+- **Meeting scheduling** — Calendar applications automatically merging or detecting conflicts between overlapping meeting times across participants.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Sort and Merge | O(n log n) | O(1) | Optimal — simplest and fastest |
+| Heap | O(n log n) | O(n) | Alternative structure |
+
+## Which approach should you learn first?
+
+- Pick **Sort and Merge** for the optimal interview solution — it is intuitive and efficient.
+- Pick **Heap** if you want to practice heap-based interval handling.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Optimal</div>
+    <div class="lc-approach-quick__name">Sort and Merge</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Heap-based</div>
+    <div class="lc-approach-quick__name">Heap</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Sort and Merge (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Sort intervals by start time, then iterate through and merge overlapping intervals by updating the end time when an overlap is detected.
+
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Sorting dominant" spaceNote="Constant" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySortMerge} lang="python" title="merge_intervals_sort_and_merge.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSortMerge} lang="cpp" title="merge_intervals_sort_and_merge.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSortMerge} lang="java" title="merge_intervals_sort_and_merge.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSortMerge} lang="javascript" title="merge_intervals_sort_and_merge.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSortMerge} lang="rust" title="merge_intervals_sort_and_merge.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSortMerge} lang="go" title="merge_intervals_sort_and_merge.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Heap / Priority Queue
+
+<ApproachTag tag="interview" />
+
+Use a min-heap to extract intervals in order by start time and merge them dynamically.
+
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Heap operations" spaceNote="Heap storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHeap} lang="python" title="merge_intervals_heap.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHeap} lang="cpp" title="merge_intervals_heap.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHeap} lang="java" title="merge_intervals_heap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHeap} lang="javascript" title="merge_intervals_heap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHeap} lang="rust" title="merge_intervals_heap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHeap} lang="go" title="merge_intervals_heap.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to sort intervals before merging.
+- Using `<` instead of `<=` when checking for overlaps.
+- Not updating the end of the current interval when merging.
+- Handling edge cases like adjacent intervals [1,2] and [2,3].
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 57, title: 'Insert Interval', difficulty: 'Medium', leetcodeSlug: 'insert-interval' },
+  { number: 228, title: 'Summary Ranges', difficulty: 'Easy', leetcodeSlug: 'summary-ranges' },
+  { number: 435, title: 'Non-overlapping Intervals', difficulty: 'Medium', leetcodeSlug: 'non-overlapping-intervals' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- **Sort first** — Sorting by start time is the crucial insight that makes merging linear in the sorted pass.
+- **Overlap detection** — Two intervals overlap if the next start is within or at the end of the current interval: `next.start <= current.end`.
+- **Why Sort and Merge is optimal** — Both approaches are O(n log n) due to sorting, but Sort and Merge uses O(1) space, making it superior.
+- **Heap alternative** — If intervals arrive in a stream, a heap lets you process them online without sorting the entire input first.
+- **Edge cases:** Adjacent intervals like [1,2] and [2,3] (should merge), duplicate intervals, single interval.
+- **Follow-up:** "What if intervals arrive in a stream?" → Use a heap-based approach or balanced tree for dynamic merging.
+</Aside>
+
+<PrevNextNav prevProblem={false} nextProblem={false} />

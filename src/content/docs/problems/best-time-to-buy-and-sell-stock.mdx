@@ -1,0 +1,393 @@
+---
+title: Best Time to Buy and Sell Stock
+description: Find the best buy and sell prices to maximize profit. Two approaches — single pass O(n) and brute force O(n²) — in six languages.
+leetcodeNumber: 121
+difficulty: Easy
+leetcodeSlug: best-time-to-buy-and-sell-stock
+tags: [Array, Dynamic Programming]
+prev:
+  label: "#120 Triangle"
+  link: "../triangle/"
+next:
+  label: "#122 Best Time to Buy and Sell Stock II"
+  link: "../best-time-to-buy-and-sell-stock-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySinglePass  from '@solutions/Python/best_time_to_buy_and_sell_stock_single_pass.py?raw';
+import cppSinglePass from '@solutions/C++/best_time_to_buy_and_sell_stock_single_pass.cpp?raw';
+import javaSinglePass from '@solutions/Java/best_time_to_buy_and_sell_stock_single_pass.java?raw';
+import jsSinglePass  from '@solutions/JavaScript/best_time_to_buy_and_sell_stock_single_pass.js?raw';
+import rustSinglePass from '@solutions/Rust/best_time_to_buy_and_sell_stock_single_pass.rs?raw';
+import goSinglePass  from '@solutions/Golang/best_time_to_buy_and_sell_stock_single_pass.go?raw';
+import pySpaceOptimized from '@solutions/Python/best_time_to_buy_and_sell_stock_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/best_time_to_buy_and_sell_stock_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/BestTimeToBuyAndSellStockSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/best_time_to_buy_and_sell_stock_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/best_time_to_buy_and_sell_stock_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/best_time_to_buy_and_sell_stock_space_optimized.go?raw';
+
+import pyBrute       from '@solutions/Python/best_time_to_buy_and_sell_stock_brute_force.py?raw';
+import cppBrute      from '@solutions/C++/best_time_to_buy_and_sell_stock_brute_force.cpp?raw';
+import javaBrute     from '@solutions/Java/best_time_to_buy_and_sell_stock_brute_force.java?raw';
+import jsBrute       from '@solutions/JavaScript/best_time_to_buy_and_sell_stock_brute_force.js?raw';
+import rustBrute     from '@solutions/Rust/best_time_to_buy_and_sell_stock_brute_force.rs?raw';
+import goBrute       from '@solutions/Golang/best_time_to_buy_and_sell_stock_brute_force.go?raw';
+
+## Problem Statement
+
+You are given an array `prices` where `prices[i]` is the price of a given stock on the ith day.
+
+You want to maximize your profit by choosing a **single day** to buy one stock and a **different day** in the future to sell that stock. Return the **maximum profit** you can achieve from this transaction. If you cannot achieve any profit, return `0`.
+
+<Aside type="tip" title="What to notice first">
+- You can only make **one transaction** — buy once, sell once.
+- You must buy **before** you sell — the sell day must come after the buy day.
+- The goal is to find the pair of days with the maximum gap (sell price - buy price).
+- You don't have to trade at all — if prices only fall, you can return `0`.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[7, 1, 5, 3, 6, 4]` | `5` | Buy at day 1 (price = 1), sell at day 4 (price = 6), profit = 6 - 1 = 5 |
+| `[7, 6, 4, 3, 1]` | `0` | Prices are falling. No profit is possible. |
+| `[2, 4, 1, 7, 5, 11]` | `9` | Buy at day 0 (price = 2), sell at day 5 (price = 11), profit = 11 - 2 = 9 |
+
+## Constraints
+
+- `1 <= prices.length <= 10^5`
+- `0 <= prices[i] <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Trading systems** — finding the best entry and exit points for a single stock position.
+- **Portfolio optimization** — identifying profitable time windows for buying and selling assets.
+- **Price monitoring** — flagging periods when an asset hits a local minimum and maximum in sequence.
+- **Historical analysis** — determining the best buy-sell window in any historical price series.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Single Pass | O(n) | O(1) | General case — fast, memory-efficient, tracks min price |
+| Brute Force | O(n²) | O(1) | Learning the pattern, arrays are very small |
+
+## Which approach should you learn first?
+
+- Pick **Single Pass** for the optimal solution — it is straightforward and O(n).
+- Pick **Brute Force** if you are just starting to understand the problem or need to explain the idea simply.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Single Pass</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simple to Learn</div>
+    <div class="lc-approach-quick__name">Brute Force</div>
+    <div class="lc-approach-quick__stats">O(n&sup2;) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Single Pass with Min Price Tracking
+
+<ApproachTag tag="recommended" />
+
+Keep track of the **lowest price seen so far** as you iterate through the prices. At each day, calculate the profit if you sell at that day's price. Update the maximum profit whenever a better profit is found.
+
+The key insight is that the best selling day for any given price is always after the minimum price we have seen. By scanning left to right, we ensure the buy day always comes before the sell day.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass, no extra structures" spaceNote="Only two variables" />
+
+### Step-by-step Example
+
+**Input:** `prices = [7, 1, 5, 3, 6, 4]`
+
+| Day | Price | Min Price Seen | Profit if Sell Today | Max Profit |
+| --- | --- | --- | --- | --- |
+| 0 | 7 | 7 | — | 0 |
+| 1 | 1 | 1 | 1 - 1 = 0 | 0 |
+| 2 | 5 | 1 | 5 - 1 = 4 | 4 |
+| 3 | 3 | 1 | 3 - 1 = 2 | 4 |
+| 4 | 6 | 1 | 6 - 1 = 5 | **5** ✓ |
+| 5 | 4 | 1 | 4 - 1 = 3 | 5 |
+
+<LogicPlayer
+  title="How single pass finds the maximum profit"
+  description="Use Next or Autoplay to watch the minimum price and maximum profit update as you scan through the prices."
+  steps={[
+    {
+      title: 'Start with the first price',
+      note: 'The minimum price is the first price. We cannot buy and sell on the same day, so profit is 0.',
+      formula: 'minPrice = 7, maxProfit = 0',
+      items: [
+        { label: '7', state: 'active', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '5', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['minPrice: 7', 'maxProfit: 0'],
+    },
+    {
+      title: 'Day 1: price = 1, new minimum',
+      note: '1 is lower than 7, so it becomes the new minimum. Profit if we sell at 1 is 0 (buy and sell at same price does not work, but 1-1=0 anyway).',
+      formula: 'profit = 1 - 1 = 0, minPrice = 1, maxProfit = 0',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'active', index: 1 },
+        { label: '5', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['minPrice: 1', 'maxProfit: 0'],
+    },
+    {
+      title: 'Day 2: price = 5, good profit',
+      note: 'If we sell at 5, we can buy at the minimum (1). Profit = 5 - 1 = 4. This is better than 0, so maxProfit = 4.',
+      formula: 'profit = 5 - 1 = 4, minPrice = 1, maxProfit = 4',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '5', state: 'active', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['minPrice: 1', 'maxProfit: 4'],
+    },
+    {
+      title: 'Day 3: price = 3, not better',
+      note: 'Profit if we sell at 3 is 3 - 1 = 2. This is worse than 4, so we keep maxProfit = 4.',
+      formula: 'profit = 3 - 1 = 2, minPrice = 1, maxProfit = 4',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '5', state: 'default', index: 2 },
+        { label: '3', state: 'active', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['minPrice: 1', 'maxProfit: 4'],
+    },
+    {
+      title: 'Day 4: price = 6, new best profit',
+      note: 'Profit if we sell at 6 is 6 - 1 = 5. This is better than 4, so maxProfit = 5. We found our answer!',
+      formula: 'profit = 6 - 1 = 5, minPrice = 1, maxProfit = 5',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '5', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'active', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['minPrice: 1', 'maxProfit: 5'],
+    },
+    {
+      title: 'Day 5: price = 4, no improvement',
+      note: 'Profit if we sell at 4 is 4 - 1 = 3. This is worse than 5, so we stop with maxProfit = 5.',
+      formula: 'profit = 4 - 1 = 3, minPrice = 1, maxProfit = 5',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '5', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'match', index: 4 },
+        { label: '4', state: 'active', index: 5 },
+      ],
+      memory: ['minPrice: 1', 'maxProfit: 5'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function maxProfitSinglePass(prices):
+    if prices.length < 2:
+        return 0
+
+    minPrice = prices[0]
+    maxProfit = 0
+
+    for i from 1 to len(prices) - 1:
+        profit = prices[i] - minPrice
+        maxProfit = max(maxProfit, profit)
+        minPrice = min(minPrice, prices[i])
+
+    return maxProfit
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySinglePass} lang="python" title="best_time_to_buy_and_sell_stock_single_pass.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSinglePass} lang="cpp" title="best_time_to_buy_and_sell_stock_single_pass.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSinglePass} lang="java" title="best_time_to_buy_and_sell_stock_single_pass.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSinglePass} lang="javascript" title="best_time_to_buy_and_sell_stock_single_pass.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSinglePass} lang="rust" title="best_time_to_buy_and_sell_stock_single_pass.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSinglePass} lang="go" title="best_time_to_buy_and_sell_stock_single_pass.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Brute Force
+
+<ApproachTag tag="simple" />
+
+For each pair of days (i, j) where i < j, calculate the profit as `prices[j] - prices[i]` and track the maximum. This is the most direct method but becomes slow for large arrays.
+
+<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="All pairs checked" spaceNote="No extra memory" />
+
+### Step-by-step Example
+
+**Input:** `prices = [7, 1, 5, 3, 6, 4]`
+
+| Buy Day | Sell Day | Buy Price | Sell Price | Profit |
+| --- | --- | --- | --- | --- |
+| 0 | 1 | 7 | 1 | -6 |
+| 0 | 2 | 7 | 5 | -2 |
+| 0 | 3 | 7 | 3 | -4 |
+| 0 | 4 | 7 | 6 | -1 |
+| 0 | 5 | 7 | 4 | -3 |
+| 1 | 2 | 1 | 5 | 4 |
+| 1 | 3 | 1 | 3 | 2 |
+| 1 | 4 | 1 | 6 | **5** ✓ |
+| 1 | 5 | 1 | 4 | 3 |
+| ... | ... | ... | ... | ... |
+
+### Pseudocode
+
+```plaintext
+function maxProfitBruteForce(prices):
+    n = len(prices)
+    maxProfit = 0
+
+    for i from 0 to n - 1:
+        for j from i + 1 to n - 1:
+            profit = prices[j] - prices[i]
+            maxProfit = max(maxProfit, profit)
+
+    return maxProfit
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBrute} lang="python" title="best_time_to_buy_and_sell_stock_brute_force.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBrute} lang="cpp" title="best_time_to_buy_and_sell_stock_brute_force.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBrute} lang="java" title="best_time_to_buy_and_sell_stock_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBrute} lang="javascript" title="best_time_to_buy_and_sell_stock_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBrute} lang="rust" title="best_time_to_buy_and_sell_stock_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBrute} lang="go" title="best_time_to_buy_and_sell_stock_brute_force.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="best_time_to_buy_and_sell_stock_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="best_time_to_buy_and_sell_stock_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="BestTimeToBuyAndSellStockSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="best_time_to_buy_and_sell_stock_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="best_time_to_buy_and_sell_stock_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="best_time_to_buy_and_sell_stock_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Selling before buying** — forgetting to check that j > i, or using past prices as sell prices. Always ensure the sell day comes after the buy day.
+- **Off-by-one errors** — starting the second loop at `i` instead of `i + 1`, which allows buying and selling on the same day.
+- **Initializing maxProfit to a price value** — initialize to 0, not `prices[0]`, since zero profit is always achievable (don't trade).
+- **Not handling small arrays** — edge case: arrays with only one element have no valid transaction, so return 0.
+- **Updating minPrice after checking profit** — in the single pass approach, always update minPrice *after* calculating profit for the current day.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 122, title: 'Best Time to Buy and Sell Stock II', difficulty: 'Medium', leetcodeSlug: 'best-time-to-buy-and-sell-stock-ii' },
+  { number: 123, title: 'Best Time to Buy and Sell Stock III', difficulty: 'Hard', leetcodeSlug: 'best-time-to-buy-and-sell-stock-iii' },
+  { number: 188, title: 'Best Time to Buy and Sell Stock IV', difficulty: 'Hard', leetcodeSlug: 'best-time-to-buy-and-sell-stock-iv' },
+  { number: 309, title: 'Best Time to Buy and Sell Stock with Cooldown', difficulty: 'Medium', leetcodeSlug: 'best-time-to-buy-and-sell-stock-with-cooldown' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Single Pass vs Brute Force:** O(n) vs O(n²) is a massive difference. In interviews, lead with the single pass approach.
+- **Why track minimum price?** Instead of comparing every pair, we keep the best buying opportunity we have seen so far. This is a greedy insight.
+- **Follow-up — multiple transactions:** Problem #122 allows unlimited buy-sell pairs. The techniques differ, but the single-pass mindset carries over.
+- **Edge cases to mention:** 
+  - Single-element array (no transaction possible, return 0)
+  - Falling prices (all differences are negative, so max is 0)
+  - Rising prices (best profit is last - first)
+  - Duplicate prices (profit is 0, but the algorithm still works)
+
+
+<PrevNextNav
+  prevProblem={ number: 120, title: "Triangle", slug: "triangle" }
+  nextProblem={ number: 122, title: "Best Time to Buy and Sell Stock II", slug: "best-time-to-buy-and-sell-stock-ii" }
+/></Aside>

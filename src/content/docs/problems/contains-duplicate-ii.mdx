@@ -1,0 +1,186 @@
+---
+title: Contains Duplicate II
+description: Check if array has duplicates within k indices.
+leetcodeNumber: 219
+difficulty: Easy
+leetcodeSlug: contains-duplicate-ii
+tags: [Array, Hash Table, Sliding Window]
+prev:
+  label: "#217 Contains Duplicate"
+  link: "../contains-duplicate/"
+next:
+  label: "#221 Maximal Square"
+  link: "../maximal-square/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pythona from '@solutions/Python/contains-duplicate-ii_hash_set_sliding_window.py?raw';
+import c++a from '@solutions/C++/contains-duplicate-ii_hash_set_sliding_window.cpp?raw';
+import javaa from '@solutions/Java/contains-duplicate-ii_hash_set_sliding_window.java?raw';
+import javascripta from '@solutions/JavaScript/contains-duplicate-ii_hash_set_sliding_window.js?raw';
+import rusta from '@solutions/Rust/contains-duplicate-ii_hash_set_sliding_window.rs?raw';
+import goa from '@solutions/Golang/contains-duplicate-ii_hash_set_sliding_window.go?raw';
+import pythonb from '@solutions/Python/contains-duplicate-ii_hashmap_index_tracking.py?raw';
+import c++b from '@solutions/C++/contains-duplicate-ii_hashmap_index_tracking.cpp?raw';
+import javab from '@solutions/Java/contains-duplicate-ii_hashmap_index_tracking.java?raw';
+import javascriptb from '@solutions/JavaScript/contains-duplicate-ii_hashmap_index_tracking.js?raw';
+import rustb from '@solutions/Rust/contains-duplicate-ii_hashmap_index_tracking.rs?raw';
+import gob from '@solutions/Golang/contains-duplicate-ii_hashmap_index_tracking.go?raw';
+import pythonc from '@solutions/Python/contains-duplicate-ii_tree_set.py?raw';
+import c++c from '@solutions/C++/contains-duplicate-ii_tree_set.cpp?raw';
+import javac from '@solutions/Java/contains-duplicate-ii_tree_set.java?raw';
+import javascriptc from '@solutions/JavaScript/contains-duplicate-ii_tree_set.js?raw';
+import rustc from '@solutions/Rust/contains-duplicate-ii_tree_set.rs?raw';
+import goc from '@solutions/Golang/contains-duplicate-ii_tree_set.go?raw';
+
+## Problem Statement
+
+Check if array has duplicates within k indices.
+
+<Aside type="tip" title="Key Insight">
+This problem requires dynamic programming or hash-based techniques to solve efficiently. Start by understanding the recurrence relation or the hash structure needed.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation here |
+| Example 2 | Result 2 | Explanation here |
+
+## Constraints
+
+- Constraints go here
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Database indexing and query optimization
+- Buffer management in system memory
+- Time-series data analysis and sliding windows
+- Image pixel manipulation and batch processing
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best For |
+| --- | --- | --- | --- |
+| Hash Set Sliding Window | HashMap Index Tracking | Tree Set | TBD | TBD | TBD |
+
+## Approach 1: Hash Set Sliding Window
+
+<ApproachTag tag="recommended" />
+
+Detailed explanation of approach 1.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Pseudocode
+
+```plaintext
+function solution():
+    // Pseudocode here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pya}} lang="python" title="contains-duplicate-ii_approach1.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppa}} lang="cpp" title="contains-duplicate-ii_approach1.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaa}} lang="java" title="contains-duplicate-ii_approach1.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsa}} lang="javascript" title="contains-duplicate-ii_approach1.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rusta}} lang="rust" title="contains-duplicate-ii_approach1.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goa}} lang="go" title="contains-duplicate-ii_approach1.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: HashMap Index Tracking
+
+<ApproachTag tag="interview" />
+
+Detailed explanation of approach 2.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="yellow" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyb}} lang="python" title="contains-duplicate-ii_approach2.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppb}} lang="cpp" title="contains-duplicate-ii_approach2.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javab}} lang="java" title="contains-duplicate-ii_approach2.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsb}} lang="javascript" title="contains-duplicate-ii_approach2.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustb}} lang="rust" title="contains-duplicate-ii_approach2.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{gob}} lang="go" title="contains-duplicate-ii_approach2.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Tree Set
+
+<ApproachTag tag="simple" />
+
+Detailed explanation of approach 3.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="red" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyc}} lang="python" title="contains-duplicate-ii_approach3.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppc}} lang="cpp" title="contains-duplicate-ii_approach3.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javac}} lang="java" title="contains-duplicate-ii_approach3.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsc}} lang="javascript" title="contains-duplicate-ii_approach3.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustc}} lang="rust" title="contains-duplicate-ii_approach3.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goc}} lang="go" title="contains-duplicate-ii_approach3.go" />
+  </TabItem>
+</Tabs>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs">
+- Discuss time/space trade-offs
+- Mention edge cases
+- Explain optimization steps
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

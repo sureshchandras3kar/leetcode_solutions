@@ -1,0 +1,123 @@
+---
+/**
+ * ApproachTabsFixed.astro
+ * Approach tab navigation component (replaces floating sticky tabs)
+ * Positioned below page title, scrolls with content
+ * Props: approaches array with id and title
+ */
+
+interface Approach {
+  id: string;
+  title: string;
+}
+
+interface Props {
+  approaches: Approach[];
+  activeApproach?: string; // ID of currently active approach
+}
+
+const { approaches = [], activeApproach } = Astro.props;
+---
+
+{approaches.length > 0 && (
+  <nav class="lc-approach-tabs" aria-label="Solution approaches">
+    {approaches.map((approach) => (
+      <button
+        class={`approach-tab ${activeApproach === approach.id ? "active" : ""}`}
+        data-approach-id={approach.id}
+        onclick={`document.getElementById('${approach.id}').scrollIntoView({ behavior: 'smooth', block: 'start' })`}
+        type="button"
+      >
+        {approach.title}
+      </button>
+    ))}
+  </nav>
+)}
+
+<style>
+  .lc-approach-tabs {
+    display: flex;
+    gap: 0.5rem;
+    position: relative;
+    background: var(--sl-color-bg-page);
+    border-bottom: 1px solid var(--sl-color-hairline);
+    padding: 1.25rem 0;
+    margin-top: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .approach-tab {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-2);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+  }
+
+  .approach-tab:hover {
+    color: var(--sl-color-accent-high);
+  }
+
+  .approach-tab.active {
+    color: var(--sl-color-accent-high);
+    border-bottom-color: var(--sl-color-accent);
+    font-weight: 600;
+  }
+
+  @media (max-width: 767px) {
+    .lc-approach-tabs {
+      overflow-x: auto;
+      display: flex;
+      gap: 0.25rem;
+      padding: 1rem 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .approach-tab {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .approach-tab {
+      padding: 0.4rem 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+</style>
+
+<script>
+  // Active tab highlighting based on scroll position
+  function updateActiveApproachTab() {
+    const sections = document.querySelectorAll("[data-approach-section]");
+    const tabs = document.querySelectorAll(".approach-tab");
+
+    let activeId = "";
+
+    sections.forEach((section) => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 300) {
+        activeId = section.getAttribute("data-approach-section");
+      }
+    });
+
+    tabs.forEach((tab) => {
+      tab.classList.remove("active");
+      if (tab.getAttribute("data-approach-id") === activeId) {
+        tab.classList.add("active");
+      }
+    });
+  }
+
+  window.addEventListener("scroll", updateActiveApproachTab, { passive: true });
+  updateActiveApproachTab(); // Call on page load
+</script>

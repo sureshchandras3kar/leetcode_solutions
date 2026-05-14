@@ -1,0 +1,328 @@
+---
+title: Word Search
+description: Search for a word in a 2D grid. Two approaches — backtracking O(N*M*4^L) and BFS O(N*M*4^L) — in six languages.
+leetcodeNumber: 79
+difficulty: Medium
+leetcodeSlug: word-search
+tags: [Array, Backtracking, Matrix]
+prev:
+  label: "#77 Combinations"
+  link: "../combinations/"
+next:
+  label: "#80 Remove Duplicates from Sorted Array II"
+  link: "../remove-duplicates-from-sorted-array-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+## Problem Statement
+
+Given an `m x n` grid of characters `board` and a string `word`, return `true` if the `word` exists in the grid.
+
+The word can be constructed from letters of sequentially adjacent cells, where "adjacent" cells are horizontally or vertically neighboring. The same letter cell may not be used more than once in one word.
+
+<Aside type="tip" title="What to notice first">
+- This is a backtracking problem on a 2D grid.
+- Mark visited cells during DFS to avoid revisiting.
+- Backtrack (unmark) when returning from recursive calls.
+- Early termination if first character doesn't match any cell.
+</Aside>
+
+### Examples
+
+| board | word | Output | Explanation |
+| --- | --- | --- | --- |
+| `[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]]` | "ABCCED" | true | Path exists following adjacent cells |
+| `[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]]` | "SEE" | true | Multiple valid paths exist |
+| `[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]]` | "ABCB" | false | Would need to reuse 'B' |
+| `[["a"]]` | "a" | true | Single cell matches |
+
+## Constraints
+
+- `m == board.length`
+- `n == board[i].length`
+- `1 <= m, n <= 6`
+- `1 <= word.length <= 15`
+- `board` and `word` consist of only lowercase and uppercase English letters
+
+import pyBacktracking  from '@solutions/Python/word_search_backtracking.py?raw';
+import cppBacktracking from '@solutions/C++/word_search_backtracking.cpp?raw';
+import javaBacktracking from '@solutions/Java/WordSearchBacktracking.java?raw';
+import jsBacktracking  from '@solutions/JavaScript/word_search_backtracking.js?raw';
+import rustBacktracking from '@solutions/Rust/word_search_backtracking.rs?raw';
+import goBacktracking  from '@solutions/Golang/word_search_backtracking.go?raw';
+import pySpaceOptimized from '@solutions/Python/word_search_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/word_search_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/WordSearchSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/word_search_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/word_search_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/word_search_space_optimized.go?raw';
+
+import pyBFS            from '@solutions/Python/word_search_bfs.py?raw';
+import cppBFS           from '@solutions/C++/word_search_bfs.cpp?raw';
+import javaBFS          from '@solutions/Java/WordSearchBFS.java?raw';
+import jsBFS            from '@solutions/JavaScript/word_search_bfs.js?raw';
+import rustBFS          from '@solutions/Rust/word_search_bfs.rs?raw';
+import goBFS            from '@solutions/Golang/word_search_bfs.go?raw';
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Text editor autocomplete** — find words in a dictionary with word search patterns.
+- **Word games** — find valid words in a letter grid (Boggle, Scrabble solvers).
+- **Spell checking** — validate word paths in cached dictionaries.
+- **Graph traversal** — general DFS/BFS on grids with visited tracking.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Backtracking (DFS) | O(N*M*4^L) | O(L) | Recursive; modifies board in-place |
+| BFS with Queue | O(N*M*4^L) | O(N*M) | Iterative; uses explicit visited set |
+
+N = rows, M = columns, L = word length. Both have exponential time due to 4 directions per cell.
+
+## Approach 1: Backtracking (DFS) (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use DFS with backtracking:
+1. Find a starting cell matching the first character.
+2. Recursively explore adjacent cells (up, down, left, right).
+3. Mark visited cells temporarily to avoid revisiting within a single path.
+4. Backtrack by restoring the cell's original character.
+
+This is efficient because it prunes branches immediately when a character doesn't match.
+
+<ComplexityBadges time="O(N*M*4^L)" space="O(L)" timeColor="red" spaceColor="green" timeNote="Exponential due to 4 directions" spaceNote="Recursion depth = word length" />
+
+### Step-by-step Example
+
+**Input:** `board = [["A","B","C"],["D","E","F"],["G","H","I"]]`, `word = "BED"`
+
+```
+Start: Find 'B' at (0, 1)
+├─ DFS(0, 1) → 'B'
+   ├─ Try (0, 0) → 'A' ✗ (not 'E')
+   ├─ Try (0, 2) → 'C' ✗
+   ├─ Try (1, 1) → 'E' ✓
+   │  ├─ DFS(1, 1) → 'E'
+   │     ├─ Try (0, 1) → marked, skip
+   │     ├─ Try (1, 0) → 'D' ✓
+   │     │  ├─ DFS(1, 0) → 'D'
+   │     │     ├─ Reached end of word → return True
+```
+
+### Pseudocode
+
+```plaintext
+function exist(board, word):
+    for row in range(len(board)):
+        for col in range(len(board[0])):
+            if board[row][col] == word[0]:
+                if dfs(board, word, row, col, 0):
+                    return True
+    return False
+
+function dfs(board, word, row, col, index):
+    if index == len(word):
+        return True
+    
+    if row < 0 or row >= len(board) or col < 0 or col >= len(board[0]):
+        return False
+    
+    if board[row][col] != word[index] or board[row][col] == '*':
+        return False
+    
+    // Mark as visited
+    original = board[row][col]
+    board[row][col] = '*'
+    
+    // Explore 4 directions
+    found = dfs(board, word, row+1, col, index+1) or
+            dfs(board, word, row-1, col, index+1) or
+            dfs(board, word, row, col+1, index+1) or
+            dfs(board, word, row, col-1, index+1)
+    
+    // Backtrack
+    board[row][col] = original
+    
+    return found
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBacktracking} lang="python" title="word_search_backtracking.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBacktracking} lang="cpp" title="word_search_backtracking.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBacktracking} lang="java" title="WordSearchBacktracking.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBacktracking} lang="javascript" title="word_search_backtracking.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBacktracking} lang="rust" title="word_search_backtracking.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBacktracking} lang="go" title="word_search_backtracking.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS with Queue
+
+<ApproachTag tag="simple" />
+
+Use BFS with an explicit visited set instead of modifying the board. Each queue entry contains (row, col, current index in word). Explore level by level, tracking visited states.
+
+This approach is cleaner for problems where you shouldn't modify the input, but uses O(N*M) extra space.
+
+<ComplexityBadges time="O(N*M*4^L)" space="O(N*M)" timeColor="red" spaceColor="yellow" timeNote="Same exponential search" spaceNote="Visited set for all cells" />
+
+### Step-by-step Example
+
+**Input:** `board = [["A","B"],["C","D"]]`, `word = "BA"`
+
+```
+Queue: [(0, 1, 0)]  // Start at 'B', index 0
+Visited: {(0,1)}
+
+Process (0, 1, 0):
+  Current: 'B', word[0] = 'B' ✓
+  Neighbors: (0,0)→'A', (1,1)→'D'
+  Add (0, 0, 1) to queue (matches word[1]='A')
+  Visited: {(0,1), (0,0)}
+
+Process (0, 0, 1):
+  Current: 'A', word[1] = 'A' ✓
+  Index 1 == word.length - 1 → return True
+```
+
+### Pseudocode
+
+```plaintext
+function exist(board, word):
+    for row in range(len(board)):
+        for col in range(len(board[0])):
+            if board[row][col] == word[0]:
+                if bfs(board, word, row, col):
+                    return True
+    return False
+
+function bfs(board, word, startRow, startCol):
+    queue = [(startRow, startCol, 0)]
+    visited = {(startRow, startCol)}
+    directions = [(0,1), (0,-1), (1,0), (-1,0)]
+    
+    while queue:
+        row, col, index = queue.pop(0)
+        
+        if index == len(word) - 1:
+            return True
+        
+        for dr, dc in directions:
+            newRow, newCol = row + dr, col + dc
+            state = (newRow, newCol)
+            
+            if 0 <= newRow < len(board) and 0 <= newCol < len(board[0]):
+                if board[newRow][newCol] == word[index+1] and state not in visited:
+                    visited.add(state)
+                    queue.append((newRow, newCol, index+1))
+    
+    return False
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="word_search_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="word_search_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="WordSearchBFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="word_search_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="word_search_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="word_search_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="word_search_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="word_search_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="WordSearchSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="word_search_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="word_search_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="word_search_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting to mark visited cells:** Without marking, the algorithm revisits cells and finds false paths.
+- **Not backtracking properly:** Restore the original character after recursion; don't leave it marked.
+- **Boundary checks:** Ensure `0 <= row < m` and `0 <= col < n` before accessing board[row][col].
+- **Off-by-one in word indexing:** The recursion index matches the character being checked, not the next character.
+</Aside>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Backtracking vs. BFS:** Backtracking is more space-efficient (O(L)) but modifies the board. BFS preserves input but uses O(N*M) space.
+- **Why mark visited in backtracking?** Within a single DFS path, you can't revisit the same cell; marking prevents this.
+- **Early termination:** If you find the word starting from any cell, return immediately—no need to check other starts.
+- **Follow-up:** Word Search II (find all words)—use a Trie for efficiency instead of checking each word separately.
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

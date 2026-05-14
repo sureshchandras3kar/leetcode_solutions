@@ -1,0 +1,351 @@
+---
+title: Palindrome Number
+description: Determine if an integer reads the same forwards and backwards. Two approaches — math-based O(log n) and string-based O(n) — in six languages.
+leetcodeNumber: 9
+difficulty: Easy
+leetcodeSlug: palindrome-number
+tags: [Math, Two Pointers]
+prev:
+  label: "#5 Longest Palindromic Substring"
+  link: "../longest-palindromic-substring/"
+next:
+  label: "#11 Container With Most Water"
+  link: "../container-with-most-water/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyWithout    from '@solutions/Python/palindrome_number_without_string.py?raw';
+import cppWithout   from '@solutions/C++/palindrome_number_without_string.cpp?raw';
+import javaWithout  from '@solutions/Java/palindrome_number_without_string.java?raw';
+import jsWithout    from '@solutions/JavaScript/palindrome_number_without_string.js?raw';
+import rustWithout  from '@solutions/Rust/palindrome_number_without_string.rs?raw';
+import goWithout    from '@solutions/Golang/palindrome_number_without_string.go?raw';
+import pyoptimized from '@solutions/Python/palindrome_number_optimized.py?raw';
+import cppoptimized from '@solutions/C++/palindrome_number_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/PalindromeNumberOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/palindrome_number_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/palindrome_number_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/palindrome_number_optimized.go?raw';
+
+import pyWith       from '@solutions/Python/palindrome_number_with_string.py?raw';
+import cppWith      from '@solutions/C++/palindrome_number_with_string.cpp?raw';
+import javaWith     from '@solutions/Java/palindrome_number_with_string.java?raw';
+import jsWith       from '@solutions/JavaScript/palindrome_number_with_string.js?raw';
+import rustWith     from '@solutions/Rust/palindrome_number_with_string.rs?raw';
+import goWith       from '@solutions/Golang/palindrome_number_with_string.go?raw';
+
+## Problem Statement
+
+Given an integer `x`, return `true` if `x` is a **palindrome**, and `false` otherwise.
+
+A palindrome reads the same forwards and backwards.
+
+<Aside type="tip" title="What to notice first">
+- Negative numbers are never palindromes because of the `-` sign.
+- A number like `10` is not a palindrome because reversing it gives `01`.
+- The follow-up most interviewers care about is whether you can solve it without converting to a string.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `121` | `true` | Reads as 121 from left to right and right to left |
+| `-121` | `false` | Reads as -121 forward but 121- backward |
+| `10` | `false` | Reads as 01 from right to left |
+
+## Constraints
+
+- `-2^31 <= x <= 2^31 - 1`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Database indexing and query optimization
+- Buffer management in system memory
+- Time-series data analysis and sliding windows
+- Image pixel manipulation and batch processing
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Without String (math) | O(log n) | O(1) | n = number of digits; no string allocation |
+| With String | O(n) | O(n) | Converts integer to string; straightforward but uses extra memory |
+
+## Which approach should you learn first?
+
+- Pick **Without String** if you want the strongest interview answer.
+- Pick **With String** if you want the easiest version to understand before optimizing.
+
+## Approach 1: Without String (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Reverse the entire integer mathematically and compare it to the original. Early-exit for negative numbers and numbers ending in zero (except 0 itself).
+
+Think of this as rebuilding the number from right to left. If the rebuilt number matches the original one, the digits were symmetrical.
+
+<ComplexityBadges time="O(log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="One pass per digit" spaceNote="Integer vars only" />
+
+### Step-by-step Example
+
+**Input:** `x = 121`
+
+| Iteration | originalX | lastDigit | numReversed |
+| --- | --- | --- | --- |
+| Start | 121 | — | 0 |
+| 1 | 12 | 1 | 1 |
+| 2 | 1 | 2 | 12 |
+| 3 | 0 | 1 | 121 |
+
+`121 == 121` → `true` ✓
+
+**Input:** `x = -121`
+
+Negative → return `false` immediately ✓
+
+**Input:** `x = 10`
+
+`10 % 10 == 0` (ends in zero, non-zero) → return `false` immediately ✓
+
+<LogicPlayer
+  title="How the math-based palindrome check works"
+  description="Use Next or Autoplay to watch digits move from the original number into the reversed number until both can be compared."
+  target="Compare original and reversed"
+  steps={[
+    {
+      title: 'Start with the original number',
+      note: 'We keep the original value and begin building a reversed version from right to left.',
+      formula: 'original = 121, reversed = 0',
+      callout: 'Nothing has been reversed yet, so the rebuilt number starts at 0.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['original = 121', 'reversed = 0'],
+    },
+    {
+      title: 'Take the last digit',
+      note: 'The last digit is 1. Append it to the reversed number, then remove it from the original number.',
+      formula: 'lastDigit = 121 % 10 = 1, reversed = 0 * 10 + 1 = 1',
+      callout: 'We peel off digits from the right side one by one.',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['remaining x = 12', 'reversed = 1'],
+    },
+    {
+      title: 'Take the next last digit',
+      note: 'Now the last digit is 2. Append it to the reversed number to get 12.',
+      formula: 'lastDigit = 12 % 10 = 2, reversed = 1 * 10 + 2 = 12',
+      callout: 'The reversed number is growing from left to right as we keep extracting digits.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['remaining x = 1', 'reversed = 12'],
+    },
+    {
+      title: 'Take the final digit',
+      note: 'The last remaining digit is 1. Append it and the reversed number becomes 121.',
+      formula: 'lastDigit = 1 % 10 = 1, reversed = 12 * 10 + 1 = 121',
+      callout: 'Now every digit has been processed, so we can compare the two numbers.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+      ],
+      memory: ['remaining x = 0', 'reversed = 121'],
+    },
+    {
+      title: 'Compare original and reversed',
+      note: 'The rebuilt number matches the original number, so 121 is a palindrome.',
+      formula: 'original == reversed -> 121 == 121 -> true',
+      callout: 'If both numbers are equal at the end, the digits read the same forward and backward.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+      ],
+      memory: ['result = true'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function isPalindrome(x):
+    if x < 0:
+        return false
+    if x == 0:
+        return true
+    if x % 10 == 0:
+        return false
+    original = x
+    reversed = 0
+    while x > 0:
+        lastDigit = x % 10
+        reversed = reversed * 10 + lastDigit
+        x = x / 10
+    return original == reversed
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyWithout} lang="python" title="palindrome_number_without_string.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppWithout} lang="cpp" title="palindrome_number_without_string.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaWithout} lang="java" title="palindrome_number_without_string.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsWithout} lang="javascript" title="palindrome_number_without_string.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustWithout} lang="rust" title="palindrome_number_without_string.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goWithout} lang="go" title="palindrome_number_without_string.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: With String
+
+<ApproachTag tag="simple" />
+
+Convert the integer to a string and compare it to its reverse.
+
+This version is easy to read because it turns the problem into a string comparison. The trade-off is extra memory.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Per digit" spaceNote="String storage" />
+
+### Step-by-step Example
+
+**Input:** `x = 121`
+
+`str(121)` → `"121"` → reversed → `"121"` → equal → `true` ✓
+
+**Input:** `x = -121`
+
+`str(-121)` → `"-121"` → reversed → `"121-"` → not equal → `false` ✓
+
+**Input:** `x = 10`
+
+`str(10)` → `"10"` → reversed → `"01"` → not equal → `false` ✓
+
+### Pseudocode
+
+```plaintext
+function isPalindrome(x):
+    str_x = str(x)
+    return str_x == reverse(str_x)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyWith} lang="python" title="palindrome_number_with_string.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppWith} lang="cpp" title="palindrome_number_with_string.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaWith} lang="java" title="palindrome_number_with_string.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsWith} lang="javascript" title="palindrome_number_with_string.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustWith} lang="rust" title="palindrome_number_with_string.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goWith} lang="go" title="palindrome_number_with_string.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="palindrome_number_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="palindrome_number_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="PalindromeNumberOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="palindrome_number_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="palindrome_number_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="palindrome_number_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- **Why avoid strings?** The problem statement hints at it: "could you solve it without converting the integer to a string?" The math approach is O(1) space vs O(n) for the string version.
+- **Why the early exit for `x % 10 == 0`?** If a non-zero number ends in 0, reversing it would place a 0 at the front — impossible for a valid positive integer palindrome.
+- **Overflow concern:** Reversing a large int can overflow a 32-bit integer. The C++ solution uses `long long` for the reversed value to handle this safely.
+- **Negative numbers:** Always false — the `-` sign breaks palindrome symmetry.
+</Aside>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Treating negative numbers as valid palindromes.
+- Forgetting the special case where a non-zero number ends in `0`.
+- Describing the string solution as O(1) space when it creates a new string.
+
+
+<PrevNextNav
+  prevProblem={ number: 5, title: "Longest Palindromic Substring", slug: "longest-palindromic-substring" }
+  nextProblem={ number: 11, title: "Container With Most Water", slug: "container-with-most-water" }
+/></Aside>
+
+<RelatedProblems problems={[
+  { number: 125, title: 'Valid Palindrome',            difficulty: 'Easy',   leetcodeSlug: 'valid-palindrome' },
+  { number: 234, title: 'Palindrome Linked List',      difficulty: 'Easy',   leetcodeSlug: 'palindrome-linked-list' },
+  { number: 1,   title: 'Two Sum',                     difficulty: 'Easy',   slug: 'problems/two-sum',             leetcodeSlug: 'two-sum' },
+  { number: 7,   title: 'Reverse Integer',             difficulty: 'Medium', leetcodeSlug: 'reverse-integer' },
+  { number: 680, title: 'Valid Palindrome II',         difficulty: 'Easy',   leetcodeSlug: 'valid-palindrome-ii' },
+]} />

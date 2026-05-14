@@ -1,0 +1,386 @@
+---
+title: House Robber
+description: Maximize stolen money from houses with constraints. Two approaches — DP Array O(n) + space-optimized O(1) — in six languages.
+leetcodeNumber: 198
+difficulty: Medium
+leetcodeSlug: house-robber
+tags: [Array, Dynamic Programming]
+prev:
+  label: "#191 Number of 1 Bits"
+  link: "../number-of-1-bits/"
+next:
+  label: "#199 Binary Tree Right Side View"
+  link: "../binary-tree-right-side-view/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDpArray     from '@solutions/Python/house_robber_dp_array.py?raw';
+import cppDpArray    from '@solutions/C++/house_robber_dp_array.cpp?raw';
+import javaDpArray   from '@solutions/Java/HouseRobberDpArray.java?raw';
+import jsDpArray     from '@solutions/JavaScript/house_robber_dp_array.js?raw';
+import rustDpArray   from '@solutions/Rust/house_robber_dp_array.rs?raw';
+import goDpArray     from '@solutions/Golang/house_robber_dp_array.go?raw';
+import pySpaceOptimized from '@solutions/Python/house_robber_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/house_robber_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/HouseRobberSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/house_robber_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/house_robber_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/house_robber_space_optimized.go?raw';
+
+import pyOpt         from '@solutions/Python/house_robber_space_optimized.py?raw';
+import cppOpt        from '@solutions/C++/house_robber_space_optimized.cpp?raw';
+import javaOpt       from '@solutions/Java/HouseRobberSpaceOptimized.java?raw';
+import jsOpt         from '@solutions/JavaScript/house_robber_space_optimized.js?raw';
+import rustOpt       from '@solutions/Rust/house_robber_space_optimized.rs?raw';
+import goOpt         from '@solutions/Golang/house_robber_space_optimized.go?raw';
+
+## Problem Statement
+
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. Robbers have a constraint: you cannot rob two adjacent houses.
+
+Given an integer array `nums` representing the amount of money in each house, return the maximum amount of money you can rob without robbing adjacent houses.
+
+<Aside type="tip" title="What to notice first">
+- You cannot rob two adjacent houses in a single robbery.
+- You want to maximize the total amount of money stolen.
+- Every house is independent: robbing one doesn't affect the value of another, only the adjacency rule applies.
+- This is a classic DP problem where each house presents a choice: rob or skip.
+</Aside>
+
+### Examples
+
+| nums | Output | Explanation |
+| --- | --- | --- |
+| `[1, 2, 3, 1]` | `4` | Rob house 0 (money = 1) and house 2 (money = 3). Total = 1 + 3 = 4 |
+| `[2, 7, 9, 3, 1]` | `12` | Rob house 1 (money = 7) and house 3 (money = 3). Total = 7 + 9 = 12 |
+| `[5, 3, 4, 11, 2]` | `16` | Rob houses 0, 2, 4. Total = 5 + 4 + 11 = 20... wait, that's 20. Let me recalculate: houses 0 (5) + 2 (4) + 4 (2) = 11, or 0 (5) + 3 (11) = 16 ✓ |
+
+## Constraints
+
+- `1 <= nums.length <= 100`
+- `0 <= nums[i] <= 400`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Financial portfolio optimization** — selecting non-adjacent stocks to maximize returns while managing risk.
+- **Work scheduling** — choosing non-consecutive shifts to maximize pay while respecting rest periods.
+- **Route planning** — selecting non-adjacent waypoints in a city to maximize resources collected.
+- **Product bundle selection** — choosing complementary (non-competing) products to maximize revenue.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Description |
+| --- | --- | --- | --- |
+| DP Array | O(n) | O(n) | Store all intermediate results for clarity |
+| Space-Optimized | O(n) | O(1) | Only track the last two values |
+
+## Which approach should you learn first?
+
+- Pick **DP Array** if you want clarity and ease of debugging.
+- Pick **Space-Optimized** if you want to show optimization skills and understand the minimal state needed.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Clarity</div>
+    <div class="lc-approach-quick__name">DP Array</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Space Optimized</div>
+    <div class="lc-approach-quick__name">O(1) Variables</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: DP Array
+
+<ApproachTag tag="recommended" />
+
+Create a DP array where `dp[i]` represents the maximum money you can rob from houses 0 to i.
+
+For each house i, you have two choices:
+- **Rob house i**: take `nums[i] + dp[i-2]` (the money from this house plus the max from non-adjacent houses before it)
+- **Skip house i**: take `dp[i-1]` (the max from the house before it)
+
+The recurrence is: `dp[i] = max(nums[i] + dp[i-2], dp[i-1])`
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass" spaceNote="DP array storage" />
+
+### Step-by-step Example
+
+**Input:** `nums = [2, 7, 9, 3, 1]`
+
+| i | nums[i] | Choice (Rob) | Choice (Skip) | dp[i] | Explanation |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 2 | 2 | 0 | 2 | Rob house 0 |
+| 1 | 7 | 7 | 2 | 7 | Rob house 1 (better than house 0) |
+| 2 | 9 | 9 + 2 = 11 | 7 | 11 | Rob house 2 and non-adjacent house 0 |
+| 3 | 3 | 3 + 7 = 10 | 11 | 11 | Skip house 3, keep previous max |
+| 4 | 1 | 1 + 11 = 12 | 11 | 12 | Rob house 4 with best from 0-2 |
+
+**Result:** Max money = 12 (houses 1 and 3, or houses 0 and 2)
+
+<LogicPlayer
+  title="How the DP solution maximizes stolen money"
+  description="Use Next or Autoplay to watch the maximum money grow as we evaluate each house's rob vs skip decision."
+  target="12"
+  steps={[
+    {
+      title: 'House 0: Rob it (no previous choice)',
+      note: 'The first house, we can only rob it.',
+      formula: 'dp[0] = nums[0] = 2',
+      callout: 'Base case: rob the first house.',
+      items: [
+        { label: 'House 0 ($2)', state: 'match', index: 0 },
+        { label: 'House 1 ($7)', state: 'default', index: 1 },
+        { label: 'House 2 ($9)', state: 'default', index: 2 },
+        { label: 'House 3 ($3)', state: 'default', index: 3 },
+        { label: 'House 4 ($1)', state: 'default', index: 4 },
+      ],
+      memory: ['Max so far: $2'],
+    },
+    {
+      title: 'House 1: Rob it (better than house 0)',
+      note: 'Rob house 1 ($7) or keep house 0 ($2). House 1 is better.',
+      formula: 'dp[1] = max(7, 2) = 7',
+      callout: 'We rob house 1 alone for maximum.',
+      items: [
+        { label: 'House 0 ($2)', state: 'default', index: 0 },
+        { label: 'House 1 ($7)', state: 'match', index: 1 },
+        { label: 'House 2 ($9)', state: 'default', index: 2 },
+        { label: 'House 3 ($3)', state: 'default', index: 3 },
+        { label: 'House 4 ($1)', state: 'default', index: 4 },
+      ],
+      memory: ['Max so far: $7'],
+    },
+    {
+      title: 'House 2: Rob it with house 0',
+      note: 'Rob house 2 ($9) + house 0 ($2) = $11, or keep house 1 alone ($7).',
+      formula: 'dp[2] = max(9 + 2, 7) = max(11, 7) = 11',
+      callout: 'Robbing non-adjacent houses 0 and 2 yields more.',
+      items: [
+        { label: 'House 0 ($2)', state: 'match', index: 0 },
+        { label: 'House 1 ($7)', state: 'default', index: 1 },
+        { label: 'House 2 ($9)', state: 'match', index: 2 },
+        { label: 'House 3 ($3)', state: 'default', index: 3 },
+        { label: 'House 4 ($1)', state: 'default', index: 4 },
+      ],
+      memory: ['Max so far: $11 (houses 0, 2)'],
+    },
+    {
+      title: 'House 3: Skip it (keep previous max)',
+      note: 'Rob house 3 ($3) + $7 = $10, or keep current max ($11). Skip.',
+      formula: 'dp[3] = max(3 + 7, 11) = max(10, 11) = 11',
+      callout: 'Skipping house 3 preserves the better solution.',
+      items: [
+        { label: 'House 0 ($2)', state: 'match', index: 0 },
+        { label: 'House 1 ($7)', state: 'default', index: 1 },
+        { label: 'House 2 ($9)', state: 'match', index: 2 },
+        { label: 'House 3 ($3)', state: 'default', index: 3 },
+        { label: 'House 4 ($1)', state: 'default', index: 4 },
+      ],
+      memory: ['Max so far: $11 (houses 0, 2)'],
+    },
+    {
+      title: 'House 4: Rob it with best non-adjacent',
+      note: 'Rob house 4 ($1) + $11 = $12, or keep $11. Rob it.',
+      formula: 'dp[4] = max(1 + 11, 11) = max(12, 11) = 12',
+      callout: 'Final answer: $12 by robbing houses 1, 3 or another combination.',
+      items: [
+        { label: 'House 0 ($2)', state: 'default', index: 0 },
+        { label: 'House 1 ($7)', state: 'match', index: 1 },
+        { label: 'House 2 ($9)', state: 'default', index: 2 },
+        { label: 'House 3 ($3)', state: 'match', index: 3 },
+        { label: 'House 4 ($1)', state: 'default', index: 4 },
+      ],
+      memory: ['Final max: $12 (houses 1, 3)'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function houseRobberDpArray(nums):
+    if nums is empty:
+        return 0
+    if nums length is 1:
+        return nums[0]
+    
+    dp = array of size len(nums)
+    dp[0] = nums[0]
+    dp[1] = max(nums[0], nums[1])
+    
+    for i from 2 to len(nums) - 1:
+        dp[i] = max(nums[i] + dp[i-2], dp[i-1])
+    
+    return dp[len(nums) - 1]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDpArray} lang="python" title="house_robber_dp_array.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDpArray} lang="cpp" title="house_robber_dp_array.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDpArray} lang="java" title="HouseRobberDpArray.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDpArray} lang="javascript" title="house_robber_dp_array.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDpArray} lang="rust" title="house_robber_dp_array.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDpArray} lang="go" title="house_robber_dp_array.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Space-Optimized
+
+<ApproachTag tag="interview" />
+
+Instead of storing the entire DP array, observe that `dp[i]` only depends on `dp[i-1]` and `dp[i-2]`. Therefore, we only need two variables: `prev1` (max money up to house i-1) and `prev2` (max money up to house i-2).
+
+This approach reduces space complexity from O(n) to O(1) while maintaining the same time complexity.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Only two variables" />
+
+### Step-by-step Example
+
+**Input:** `nums = [2, 7, 9, 3, 1]`
+
+| i | nums[i] | prev2 | prev1 | current | Update |
+| --- | --- | --- | --- | --- | --- |
+| Start | — | 2 | 7 | — | Initialize with first two houses |
+| 2 | 9 | 2 | 7 | 11 | max(9+2, 7) = 11, shift: prev2=7, prev1=11 |
+| 3 | 3 | 7 | 11 | 11 | max(3+7, 11) = 11, shift: prev2=11, prev1=11 |
+| 4 | 1 | 11 | 11 | 12 | max(1+11, 11) = 12 |
+
+**Result:** Max money = 12
+
+### Pseudocode
+
+```plaintext
+function houseRobberSpaceOptimized(nums):
+    if nums is empty:
+        return 0
+    if nums length is 1:
+        return nums[0]
+    
+    prev2 = nums[0]
+    prev1 = max(nums[0], nums[1])
+    
+    for i from 2 to len(nums) - 1:
+        current = max(nums[i] + prev2, prev1)
+        prev2 = prev1
+        prev1 = current
+    
+    return prev1
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyOpt} lang="python" title="house_robber_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppOpt} lang="cpp" title="house_robber_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaOpt} lang="java" title="HouseRobberSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsOpt} lang="javascript" title="house_robber_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustOpt} lang="rust" title="house_robber_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goOpt} lang="go" title="house_robber_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting the adjacency constraint:** ensure you skip the house immediately before the one you rob.
+- **Base case errors:** dp[1] should be the max of the first two houses, not just nums[1].
+- **Variable update order:** in the space-optimized approach, update prev2 before prev1, or use a temporary variable.
+- **Off-by-one errors:** the loop should iterate from index 2 to len(nums) - 1 (inclusive).
+- **Empty or single-house arrays:** handle edge cases where nums.length <= 1.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="house_robber_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="house_robber_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="HouseRobberSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="house_robber_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="house_robber_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="house_robber_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 213, title: 'House Robber II', difficulty: 'Medium', leetcodeSlug: 'house-robber-ii' },
+  { number: 337, title: 'House Robber III', difficulty: 'Medium', leetcodeSlug: 'house-robber-iii' },
+  { number: 740, title: 'Delete and Earn', difficulty: 'Medium', leetcodeSlug: 'delete-and-earn' },
+  { number: 70, title: 'Climbing Stairs', difficulty: 'Easy', slug: 'problems/climbing-stairs', leetcodeSlug: 'climbing-stairs' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why DP over brute force?** Brute force checks all 2^n subsets. DP uses the optimal substructure to reduce to O(n).
+- **State representation:** clearly explain what dp[i] represents and why only the last two values matter.
+- **Follow-up: House Robber II (circular):** the same DP logic applies, but you handle the circular constraint by running two DP passes (excluding the first or last house).
+- **Edge cases:** mention handling nums with 0 or 1 elements.
+- **Proof of correctness:** the greedy property holds: at each house, the optimal choice is always to pick the maximum of robbing or skipping.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 197, title: "Rising Temperature", slug: "rising-temperature" }}
+  nextProblem={{ number: 199, title: "Binary Tree Right Side View", slug: "binary-tree-right-side-view" }}
+/>

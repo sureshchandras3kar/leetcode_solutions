@@ -1,0 +1,365 @@
+---
+title: First Missing Positive
+description: Find the smallest missing positive integer in O(n) time and O(1) space. Two approaches — index as hash and cycle sort — in six languages.
+leetcodeNumber: 41
+difficulty: Hard
+leetcodeSlug: first-missing-positive
+tags: [Array, Hash Table]
+prev:
+  label: "#39 Combination Sum"
+  link: "../combination-sum/"
+next:
+  label: "#42 Trapping Rain Water"
+  link: "../trapping-rain-water/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyHash   from '@solutions/Python/first_missing_positive_index_hash.py?raw';
+import cppHash  from '@solutions/C++/first_missing_positive_index_hash.cpp?raw';
+import javaHash from '@solutions/Java/first_missing_positive_index_hash.java?raw';
+import jsHash   from '@solutions/JavaScript/first_missing_positive_index_hash.js?raw';
+import rustHash from '@solutions/Rust/first_missing_positive_index_hash.rs?raw';
+import goHash   from '@solutions/Golang/first_missing_positive_index_hash.go?raw';
+import pySpaceOptimized from '@solutions/Python/first_missing_positive_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/first_missing_positive_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/FirstMissingPositiveSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/first_missing_positive_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/first_missing_positive_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/first_missing_positive_space_optimized.go?raw';
+
+import pyCycle   from '@solutions/Python/first_missing_positive_cycle_sort.py?raw';
+import cppCycle  from '@solutions/C++/first_missing_positive_cycle_sort.cpp?raw';
+import javaCycle from '@solutions/Java/first_missing_positive_cycle_sort.java?raw';
+import jsCycle   from '@solutions/JavaScript/first_missing_positive_cycle_sort.js?raw';
+import rustCycle from '@solutions/Rust/first_missing_positive_cycle_sort.rs?raw';
+import goCycle   from '@solutions/Golang/first_missing_positive_cycle_sort.go?raw';
+
+## Problem Statement
+
+Given an unsorted integer array `nums`, return the **smallest missing positive integer**. You must implement an algorithm that runs in **O(n) time** and uses **O(1) auxiliary space**.
+
+<Aside type="caution" title="Two hard constraints">
+- O(n) time rules out sorting (O(n log n))
+- O(1) space rules out a hash set
+- The trick: use the input array itself as the hash table — it has n slots and the answer is in [1, n+1]
+</Aside>
+
+### Examples
+
+| Input | Output | Why |
+| --- | --- | --- |
+| `[1,2,0]` | `3` | 1 and 2 present, 3 missing |
+| `[3,4,-1,1]` | `2` | 1 present, 2 missing |
+| `[7,8,9,11,12]` | `1` | 1 missing immediately |
+
+## Constraints
+
+- `1 <= nums.length <= 10^5`
+- `-2^31 <= nums[i] <= 2^31 - 1`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **ID gap detection** — find the first unused user/order/ticket ID in a dense sequence
+- **Memory page allocation** — find the first unallocated page frame number
+- **Port assignment** — find the first unused network port in a range
+- **Sequence reconstruction** — find the first missing term in a recorded integer sequence
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Index as Hash | O(n) | O(1) | Uses negative marking; modifies input |
+| Cycle Sort | O(n) | O(1) | Places elements at correct positions |
+| Hash Set (not allowed) | O(n) | O(n) | Conceptually simple but violates constraint |
+
+## Approach 1: Index as Hash (Recommended)
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Three linear passes" spaceNote="In-place marking" />
+
+The key insight: the answer must be in the range [1, n+1]. This means the array's n slots are exactly enough to encode presence of every candidate value. We use **negative sign as a boolean flag** at the index corresponding to each value.
+
+**Three phases:**
+1. **Clean**: replace irrelevant values (≤0 or >n) with n+1 so they don't interfere with marking
+2. **Mark**: for each value v = abs(nums[i]) where 1 ≤ v ≤ n, negate nums[v-1] to mark "v is present"
+3. **Scan**: find first index i where nums[i] > 0 → return i+1
+
+### Step-by-step Example
+
+**Input:** `[3,4,-1,1]`, n = 4
+
+**Phase 1** — replace -1 (≤0) with n+1=5: `[3,4,5,1]`
+
+**Phase 2** — mark:
+
+| i | abs(nums[i]) | mark index | array after |
+| --- | --- | --- | --- |
+| 0 | 3 | 2 | [3,4,-5,1] |
+| 1 | 4 | 3 | [3,4,-5,-1] |
+| 2 | 5 > n | skip | [3,4,-5,-1] |
+| 3 | 1 | 0 | [-3,4,-5,-1] |
+
+**Phase 3** — scan `[-3,4,-5,-1]`: index 1 has positive 4 → **return 2** ✓
+
+<LogicPlayer
+  title="Index-as-Hash marking phase on [3,4,-1,1]"
+  description="Watch how each value's presence is encoded by negating the slot at index (value-1). Use Next or Autoplay."
+  steps={[
+    {
+      title: 'Phase 1: Clean — replace -1 with n+1=5',
+      note: 'Any value ≤0 or >n cannot be the answer, so we overwrite it with n+1 as a safe sentinel.',
+      formula: 'nums = [3, 4, 5, 1]  (−1 replaced by 5)',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '4', state: 'default', index: 1 },
+        { label: '5', state: 'active', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['n = 4', 'sentinel = n+1 = 5'],
+    },
+    {
+      title: 'Phase 2, i=0: abs(3)=3 → negate index 2',
+      note: 'Value 3 is present, so mark slot 2 (index = value-1) negative.',
+      formula: 'nums[2] = −|nums[2]| = −5',
+      items: [
+        { label: '3', state: 'active', index: 0 },
+        { label: '4', state: 'default', index: 1 },
+        { label: '-5', state: 'match', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['3 is present → mark index 2'],
+    },
+    {
+      title: 'Phase 2, i=1: abs(4)=4 → negate index 3',
+      note: 'Value 4 is present, so mark slot 3 negative.',
+      formula: 'nums[3] = −|nums[3]| = −1',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '4', state: 'active', index: 1 },
+        { label: '-5', state: 'match', index: 2 },
+        { label: '-1', state: 'match', index: 3 },
+      ],
+      memory: ['3 is present → index 2', '4 is present → mark index 3'],
+    },
+    {
+      title: 'Phase 2, i=2: abs(5)=5 > n=4 → skip',
+      note: 'Sentinel value 5 is out of range, so no marking.',
+      formula: 'abs(nums[2]) = 5 > 4, skip',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '4', state: 'default', index: 1 },
+        { label: '-5', state: 'active', index: 2 },
+        { label: '-1', state: 'match', index: 3 },
+      ],
+      memory: ['5 > n, skip'],
+    },
+    {
+      title: 'Phase 2, i=3: abs(1)=1 → negate index 0',
+      note: 'Value 1 is present, so mark slot 0 negative.',
+      formula: 'nums[0] = −|nums[0]| = −3',
+      items: [
+        { label: '-3', state: 'match', index: 0 },
+        { label: '4', state: 'default', index: 1 },
+        { label: '-5', state: 'match', index: 2 },
+        { label: '-1', state: 'active', index: 3 },
+      ],
+      memory: ['1 is present → mark index 0'],
+    },
+    {
+      title: 'Phase 3: scan — index 1 is positive → return 2',
+      note: 'Index 0 is negative (1 present). Index 1 is positive (2 NOT present). Return 1+1 = 2.',
+      formula: 'nums[1] = 4 > 0 → return 1+1 = 2',
+      callout: 'The positive slot at index 1 means value 2 was never marked — it is the first missing positive.',
+      items: [
+        { label: '-3', state: 'match', index: 0 },
+        { label: '4', state: 'active', index: 1 },
+        { label: '-5', state: 'match', index: 2 },
+        { label: '-1', state: 'match', index: 3 },
+      ],
+      memory: ['index 0: negative → 1 present', 'index 1: positive → 2 missing ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function firstMissingPositive(nums):
+    n = len(nums)
+    # Phase 1: replace non-positives and > n
+    for i in range(n):
+        if nums[i] <= 0 or nums[i] > n:
+            nums[i] = n + 1
+    # Phase 2: mark presence
+    for i in range(n):
+        v = abs(nums[i])
+        if 1 <= v <= n:
+            nums[v-1] = -abs(nums[v-1])
+    # Phase 3: find first unmarked
+    for i in range(n):
+        if nums[i] > 0:
+            return i + 1
+    return n + 1
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHash} lang="python" title="first_missing_positive_index_hash.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHash} lang="cpp" title="first_missing_positive_index_hash.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHash} lang="java" title="first_missing_positive_index_hash.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHash} lang="javascript" title="first_missing_positive_index_hash.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHash} lang="rust" title="first_missing_positive_index_hash.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHash} lang="go" title="first_missing_positive_index_hash.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Cycle Sort
+
+<ApproachTag tag="interview" />
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Each element moved at most once" spaceNote="In-place" />
+
+Place each number at its "correct" position: value v belongs at index v-1. Keep swapping until every element is either in its correct slot or out of range. Then scan for the first mismatch.
+
+### Step-by-step Example
+
+**Input:** `[3,4,-1,1]`
+
+| i | nums[i] | correct idx | action | array |
+| --- | --- | --- | --- | --- |
+| 0 | 3 | 2 | swap(0,2) | [-1,4,3,1] |
+| 0 | -1 | invalid | skip | [-1,4,3,1] |
+| 1 | 4 | 3 | swap(1,3) | [-1,1,3,4] |
+| 1 | 1 | 0 | swap(1,0) | [1,-1,3,4] |
+| 1 | -1 | invalid | skip | [1,-1,3,4] |
+| 2 | 3 | 2 ✓ | skip | [1,-1,3,4] |
+| 3 | 4 | 3 ✓ | skip | [1,-1,3,4] |
+
+**Scan:** index 0: nums[0]=1=1 ✓, index 1: nums[1]=-1≠2 → **return 2** ✓
+
+### Pseudocode
+
+```plaintext
+function firstMissingPositive(nums):
+    n = len(nums)
+    i = 0
+    while i < n:
+        j = nums[i] - 1  # correct index for nums[i]
+        if 1 <= nums[i] <= n and nums[j] != nums[i]:
+            swap(nums[i], nums[j])
+        else:
+            i += 1
+    for i in range(n):
+        if nums[i] != i + 1:
+            return i + 1
+    return n + 1
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyCycle} lang="python" title="first_missing_positive_cycle_sort.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppCycle} lang="cpp" title="first_missing_positive_cycle_sort.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaCycle} lang="java" title="first_missing_positive_cycle_sort.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsCycle} lang="javascript" title="first_missing_positive_cycle_sort.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustCycle} lang="rust" title="first_missing_positive_cycle_sort.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goCycle} lang="go" title="first_missing_positive_cycle_sort.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Common mistakes">
+- **Index-as-hash — skipping Phase 1**: negatives in the array would cause `abs()` to produce indices pointing at wrong slots or out-of-range indices
+- **Cycle sort — infinite loop on duplicates**: if `nums[i] == nums[nums[i]-1]`, swapping loops forever — always guard with `nums[j] != nums[i]` before swapping
+- **Off-by-one**: value v belongs at index v-1, not v
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="first_missing_positive_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="first_missing_positive_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="FirstMissingPositiveSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="first_missing_positive_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="first_missing_positive_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="first_missing_positive_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 268, title: 'Missing Number', difficulty: 'Easy', slug: 'problems/missing-number', leetcodeSlug: 'missing-number' },
+  { number: 287, title: 'Find the Duplicate Number', difficulty: 'Medium', leetcodeSlug: 'find-the-duplicate-number' },
+  { number: 128, title: 'Longest Consecutive Sequence', difficulty: 'Medium', slug: 'problems/longest-consecutive-sequence', leetcodeSlug: 'longest-consecutive-sequence' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to cover">
+- State both constraints up front (O(n) time, O(1) space) — they together rule out sorting and hash sets
+- The answer MUST be in [1, n+1] — use this bound to justify using the array as storage
+- The index-as-hash approach is more commonly expected; cycle sort is a nice variant to mention
+- For index-as-hash, emphasize that `abs()` in Phase 2 is necessary because earlier iterations may have already negated the value
+
+
+<PrevNextNav
+  prevProblem={ number: 39, title: "Combination Sum", slug: "combination-sum" }
+  nextProblem={ number: 42, title: "Trapping Rain Water", slug: "trapping-rain-water" }
+/></Aside>

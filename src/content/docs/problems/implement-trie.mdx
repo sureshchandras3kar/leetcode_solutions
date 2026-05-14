@@ -1,0 +1,304 @@
+---
+title: Implement Trie (Prefix Tree)
+description: Build a prefix tree data structure supporting insert, search, and prefix matching. Two approaches — recursive and iterative — in six languages.
+leetcodeNumber: 208
+difficulty: Medium
+leetcodeSlug: implement-trie-prefix-tree
+tags: [Trie, Hash Table, Design, String]
+prev:
+  label: "#207 Course Schedule"
+  link: "../course-schedule/"
+next:
+  label: "#209 Minimum Size Subarray Sum"
+  link: "../minimum-size-subarray-sum/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyRecursive     from '@solutions/Python/implement_trie_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/implement_trie_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/ImplementTrie_Recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/implement_trie_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/implement_trie_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/implement_trie_recursive.go?raw';
+import pySpaceOptimized from '@solutions/Python/implement_trie_prefix_tree_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/implement_trie_prefix_tree_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ImplementTriePrefixTreeSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/implement_trie_prefix_tree_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/implement_trie_prefix_tree_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/implement_trie_prefix_tree_space_optimized.go?raw';
+
+import pyIterative      from '@solutions/Python/implement_trie_iterative.py?raw';
+import cppIterative     from '@solutions/C++/implement_trie_iterative.cpp?raw';
+import javaIterative    from '@solutions/Java/ImplementTrie_Iterative.java?raw';
+import jsIterative      from '@solutions/JavaScript/implement_trie_iterative.js?raw';
+import rustIterative    from '@solutions/Rust/implement_trie_iterative.rs?raw';
+import goIterative      from '@solutions/Golang/implement_trie_iterative.go?raw';
+
+## Problem Statement
+
+Implement a **Trie** (also called prefix tree) with the following operations:
+- `insert(word)` — Insert a word into the trie.
+- `search(word)` — Search for an exact word in the trie and return whether it exists.
+- `startsWith(prefix)` — Return whether there is any word in the trie that starts with the given prefix.
+
+<Aside type="tip" title="What to notice first">
+- A Trie efficiently stores and retrieves strings by their prefixes.
+- Each node can have up to 26 children (for lowercase English letters).
+- The key insight is: a prefix doesn't need to be a complete word.
+- Both search and startsWith traverse the same path, differing only in their end-of-word check.
+</Aside>
+
+### Examples
+
+| Operation | Input | Output | Notes |
+| --- | --- | --- | --- |
+| Insert | `"apple"` | — | Tree now has path: a→p→p→l→e |
+| Search | `"apple"` | `true` | Complete word exists |
+| Search | `"app"` | `false` | Prefix exists but not marked as word |
+| StartsWith | `"app"` | `true` | Prefix exists in tree |
+| Insert | `"app"` | — | Now search("app") returns true |
+
+## Constraints
+
+- `1 <= word.length, prefix.length <= 2000`
+- `word` and `prefix` consist only of lowercase English letters.
+- At most `3 × 10^4` calls will be made to `insert`, `search`, and `startsWith`.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Autocomplete systems** — quickly find all words with a given prefix.
+- **Spell checkers** — validate words and suggest corrections by prefix.
+- **IP routing tables** — organize network prefixes for fast packet routing.
+- **Dictionary compression** — efficiently store and retrieve large word lists.
+- **Search engine indexing** — prefix matching for search suggestions.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Insert | Search | StartsWith | Space |
+| --- | --- | --- | --- | --- |
+| Recursive | O(m) | O(m) | O(m) | O(m × 26) |
+| Iterative | O(m) | O(m) | O(m) | O(m × 26) |
+
+*m = length of word/prefix, space = nodes × alphabet size*
+
+## Which approach should you learn first?
+
+- Pick **Iterative** for clarity and interviews — easier to explain and debug.
+- Pick **Recursive** if you want to practice the recursive tree traversal pattern.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Clear</div>
+    <div class="lc-approach-quick__name">Iterative</div>
+    <div class="lc-approach-quick__stats">O(m) time &middot; O(m×26) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Pattern Practice</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(m) time &middot; O(m×26) space</div>
+  </div>
+</div>
+
+## Approach 1: Iterative (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Build a tree of nodes where each node represents a character. For each operation, iterate through the characters, creating new nodes as needed during insertion. For search and prefix matching, follow the existing path and return whether it reaches the target or beyond.
+
+<ComplexityBadges time="O(m)" space="O(m×26)" timeColor="green" spaceColor="yellow" timeNote="Single pass per word" spaceNote="Trie nodes storage" />
+
+### Step-by-step Example
+
+**Insert "cat":**
+
+```
+Insert 'c': root → c (new node)
+Insert 'a': c → a (new node)
+Insert 't': a → t (new node, mark as end-of-word)
+```
+
+**Search "cat":**
+
+```
+Follow 'c' → 'a' → 't' → found and marked as end-of-word → return true
+```
+
+**Search "ca":**
+
+```
+Follow 'c' → 'a' → path exists but NOT marked as end-of-word → return false
+```
+
+**StartsWith "ca":**
+
+```
+Follow 'c' → 'a' → path exists → return true (doesn't care about end-of-word)
+```
+
+### Pseudocode
+
+```plaintext
+class TrieNode:
+    children = {}
+    is_end_of_word = False
+
+class Trie:
+    root = TrieNode()
+
+    function insert(word):
+        node = root
+        for each char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+
+    function search(word):
+        node = root
+        for each char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end_of_word
+
+    function startsWith(prefix):
+        node = root
+        for each char in prefix:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return True
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="implement_trie_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="implement_trie_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="ImplementTrie_Iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="implement_trie_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="implement_trie_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="implement_trie_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Helper Method (Recursive Pattern)
+
+<ApproachTag tag="interview" />
+
+Extract a helper method `findNode(prefix)` that recursively (or iteratively in the helper) searches for a node. Then `search` checks the end-of-word flag and `startsWith` only checks node existence. This reduces code duplication.
+
+<ComplexityBadges time="O(m)" space="O(m)" timeColor="green" spaceColor="yellow" timeNote="Single traversal" spaceNote="Call stack + nodes" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="implement_trie_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="implement_trie_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="ImplementTrie_Recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="implement_trie_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="implement_trie_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="implement_trie_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to mark the last node as `is_end_of_word` during insertion.
+- Returning `True` in `search` when the path exists but the word is not complete.
+- Mixing up `search` (must be exact word) and `startsWith` (prefix only).
+- In languages like Java, forgetting to initialize the HashMap in each node.
+- Off-by-one errors when iterating through characters.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="implement_trie_prefix_tree_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="implement_trie_prefix_tree_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ImplementTriePrefixTreeSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="implement_trie_prefix_tree_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="implement_trie_prefix_tree_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="implement_trie_prefix_tree_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 211, title: 'Design Add and Search Words Data Structure', difficulty: 'Medium', leetcodeSlug: 'add-and-search-word-data-structure-design' },
+  { number: 212, title: 'Word Search II', difficulty: 'Hard', leetcodeSlug: 'word-search-ii' },
+  { number: 14, title: 'Longest Common Prefix', difficulty: 'Easy', leetcodeSlug: 'longest-common-prefix' },
+  { number: 720, title: 'Longest Word in Dictionary', difficulty: 'Easy', leetcodeSlug: 'longest-word-in-dictionary' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Iterative vs. Recursive:** Iterative is clearer and avoids stack overflow; recursive uses helper methods to reduce duplication.
+- **Space optimization:** Using arrays instead of HashMaps for children (fixed size 26) saves space at the cost of memory per node.
+- **Extensions:** Discuss how to add deletion, counting words, or returning all words with a prefix.
+- **Follow-up:** How would you handle non-English characters? (Use larger alphabet or Unicode maps instead of fixed 26.)
+- **Edge cases:** Empty strings, single character words, and duplicate inserts.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 207, title: "Course Schedule II", slug: "course-schedule-ii" }}
+  nextProblem={{ number: 209, title: "Minimum Size Subarray Sum", slug: "minimum-size-subarray-sum" }}
+/>

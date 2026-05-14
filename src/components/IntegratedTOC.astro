@@ -1,0 +1,127 @@
+---
+/**
+ * IntegratedTOC.astro
+ * Inline, float-right table of contents for problem pages
+ * Replaces Starlight's right sidebar TOC
+ */
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+  title?: string;
+}
+
+const { headings = [], title = "On this page" } = Astro.props;
+
+// Filter to show only h2 and h3 headings
+const filteredHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+{filteredHeadings.length > 0 && (
+  <nav class="lc-toc-integrated">
+    <h3 style="margin: 0 0 0.75rem 0; font-size: 0.9rem; font-weight: 600;">
+      {title}
+    </h3>
+    <ul style="margin: 0; padding: 0; list-style: none;">
+      {filteredHeadings.map((heading) => (
+        <li style={`margin-left: ${(heading.depth - 2) * 1.25}rem;`}>
+          <a href={`#${heading.slug}`} class="toc-link">
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .lc-toc-integrated {
+    position: sticky;
+    top: 120px;
+    width: 200px;
+    font-size: 0.85rem;
+    float: right;
+    margin: 0 0 2rem 2rem;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .lc-toc-integrated a {
+    display: block;
+    padding: 0.35rem 0.5rem;
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+  }
+
+  .lc-toc-integrated a:hover {
+    color: var(--sl-color-accent-high);
+    border-left-color: var(--sl-color-accent);
+  }
+
+  .lc-toc-integrated a.active {
+    color: var(--sl-color-accent-high);
+    border-left-color: var(--sl-color-accent);
+    font-weight: 600;
+  }
+
+  /* Smooth scrollbar for TOC */
+  .lc-toc-integrated::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .lc-toc-integrated::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .lc-toc-integrated::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--sl-color-accent) 40%, transparent);
+    border-radius: 2px;
+  }
+
+  .lc-toc-integrated::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--sl-color-accent) 60%, transparent);
+  }
+
+  /* Desktop only - hide on smaller screens */
+  @media (max-width: 1023px) {
+    .lc-toc-integrated {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Highlight active TOC link based on scroll position
+  function updateActiveTOCLink() {
+    const headings = document.querySelectorAll("h2, h3");
+    const tocLinks = document.querySelectorAll(".lc-toc-integrated a");
+
+    let activeSlug = "";
+
+    headings.forEach((heading) => {
+      const rect = heading.getBoundingClientRect();
+      if (rect.top <= 200) {
+        activeSlug = heading.id;
+      }
+    });
+
+    tocLinks.forEach((link) => {
+      link.classList.remove("active");
+      if (link.getAttribute("href") === `#${activeSlug}`) {
+        link.classList.add("active");
+      }
+    });
+  }
+
+  window.addEventListener("scroll", updateActiveTOCLink, { passive: true });
+  updateActiveTOCLink(); // Call on page load
+</script>

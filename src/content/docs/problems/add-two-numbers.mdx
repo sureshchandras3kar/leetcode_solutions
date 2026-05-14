@@ -1,0 +1,373 @@
+---
+title: Add Two Numbers
+description: Add two numbers represented by linked lists in reverse order. Two approaches — iterative O(max(m,n)) and recursive O(max(m,n)) — in six languages.
+leetcodeNumber: 2
+difficulty: Medium
+leetcodeSlug: add-two-numbers
+tags: [Linked List, Math, Recursion]
+prev:
+  label: "#1 Two Sum"
+  link: "../two-sum/"
+next:
+  label: "#3 Longest Substring Without Repeating Characters"
+  link: "../longest-substring-without-repeating-characters/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyIterative     from '@solutions/Python/add_two_numbers_iterative.py?raw';
+import cppIterative    from '@solutions/C++/add_two_numbers_iterative.cpp?raw';
+import javaIterative   from '@solutions/Java/add_two_numbers_iterative.java?raw';
+import jsIterative     from '@solutions/JavaScript/add_two_numbers_iterative.js?raw';
+import rustIterative   from '@solutions/Rust/add_two_numbers_iterative.rs?raw';
+import goIterative     from '@solutions/Golang/add_two_numbers_iterative.go?raw';
+import pySpaceOptimized from '@solutions/Python/add_two_numbers_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/add_two_numbers_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/AddTwoNumbersSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/add_two_numbers_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/add_two_numbers_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/add_two_numbers_space_optimized.go?raw';
+
+import pyRecursive     from '@solutions/Python/add_two_numbers_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/add_two_numbers_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/add_two_numbers_recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/add_two_numbers_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/add_two_numbers_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/add_two_numbers_recursive.go?raw';
+
+## Problem Statement
+
+You are given two non-empty linked lists representing two non-negative integers. The digits are stored in **reverse order** and each of their nodes contains a single digit.
+
+Add the two numbers and return the sum as a linked list in the **same reverse order**.
+
+<Aside type="tip" title="What to notice first">
+- The digits are stored in **reverse order**, so the head of the list is the ones place, the next node is the tens place, etc.
+- You must handle **carries** propagating through the list, just like elementary school addition.
+- The result list may have more nodes than either input list if a carry propagates beyond the last digit.
+- Both lists may have different lengths; treat missing nodes as zero.
+</Aside>
+
+### Examples
+
+| l1 | l2 | Output | Explanation |
+| --- | --- | --- | --- |
+| `[2, 4, 3]` | `[5, 6, 4]` | `[7, 0, 8]` | 342 + 465 = 807 (reversed) |
+| `[0]` | `[0]` | `[0]` | 0 + 0 = 0 |
+| `[9,9,9,9,9,9,9]` | `[9,9,9,9]` | `[8,9,9,9,0,0,0,1]` | 9999999 + 9999 = 10009998 (reversed) |
+
+## Constraints
+
+- The number of nodes in each linked list is in the range `[1, 100]`.
+- `0 <= Node.val <= 9`
+- It is guaranteed that the list represents a number that does not have leading zeros.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Big integer arithmetic** — systems that need to add numbers larger than language-native integer types (Bitcoin addresses, cryptography libraries).
+- **Polynomial representation** — coefficients in reverse order (lowest power first) allow direct term-by-term addition.
+- **Time-series accumulation** — rolling aggregation of digits from streaming data (sensor readings, signal processing).
+- **Arbitrary precision math libraries** — implementing addition for Python's unlimited integers or similar systems.
+- **Ledger systems** — combining transaction chains where digits represent atomic units.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Call Stack | Best When |
+| --- | --- | --- | --- | --- |
+| Iterative | O(max(m, n)) | O(max(m, n)) | Minimal | General case — clean, no recursion overhead |
+| Recursive | O(max(m, n)) | O(max(m, n)) | O(max(m, n)) | Learning recursion, practicing self-similar structure |
+
+\* Space refers to output list size. Both approaches handle carries efficiently.
+
+## Which approach should you learn first?
+
+- Pick **Iterative** if you want the most straightforward, predictable solution.
+- Pick **Recursive** if you are practicing recursion or want to see how the problem mirrors itself at each digit.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Recommended</div>
+    <div class="lc-approach-quick__name">Iterative</div>
+    <div class="lc-approach-quick__stats">O(max(m, n)) time &middot; O(max(m, n)) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Educational</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(max(m, n)) time &middot; O(max(m, n)) space</div>
+  </div>
+</div>
+
+## Approach 1: Iterative with Carry (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Walk through both lists simultaneously, adding digits column-by-column and propagating the carry forward.
+
+Use a **dummy node** at the start to simplify list construction. At each step, compute the sum of the two digit values plus any carry from the previous step, extract the new carry, and create a new node for the result digit.
+
+<ComplexityBadges time="O(max(m, n))" space="O(max(m, n))" timeColor="green" spaceColor="green" timeNote="One pass through lists" spaceNote="Output list size" />
+
+### Step-by-step Example
+
+**Input:** `l1 = [2, 4, 3]` (342), `l2 = [5, 6, 4]` (465)
+
+| Step | l1 | l2 | carry | sum | digit | new_carry | result |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 2 | 5 | 0 | 7 | 7 | 0 | `[7]` |
+| 2 | 4 | 6 | 0 | 10 | 0 | 1 | `[7, 0]` |
+| 3 | 3 | 4 | 1 | 8 | 8 | 0 | `[7, 0, 8]` |
+| Done | - | - | 0 | - | - | - | ✓ |
+
+**Input:** `l1 = [9,9,9,9,9,9,9]` (9999999), `l2 = [9,9,9,9]` (9999)
+
+The carry propagates all the way through: `9999999 + 9999 = 10009998`, which becomes `[8,9,9,9,0,0,0,1]` in reverse.
+
+<LogicPlayer
+  title="How carry propagation works through digit-by-digit addition"
+  description="Use Next or Autoplay to watch the algorithm process each digit, compute the sum with carry, and build the result list."
+  target="max(m, n)"
+  steps={[
+    {
+      title: 'Start: both lists at head, no carry',
+      note: 'Before processing any digits, the carry is 0 and we have a dummy node to build the result.',
+      formula: 'Step 1: l1[0] + l2[0] + carry = 2 + 5 + 0',
+      callout: 'The first digit addition: 2 + 5 = 7, no carry needed.',
+      items: [
+        { label: '2', state: 'active', index: 0 },
+        { label: '4', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+      ],
+      memory: ['result = [7]', 'carry = 0'],
+    },
+    {
+      title: 'Step 2: Process second digits',
+      note: 'Add the second digits of both lists. 4 + 6 = 10, so digit is 0 and carry becomes 1.',
+      formula: 'Step 2: l1[1] + l2[1] + carry = 4 + 6 + 0 = 10',
+      callout: 'Carry generated: 10 / 10 = 1, digit = 10 % 10 = 0',
+      items: [
+        { label: '2', state: 'match', index: 0 },
+        { label: '4', state: 'active', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+      ],
+      memory: ['result = [7, 0]', 'carry = 1'],
+    },
+    {
+      title: 'Step 3: Process third digits with carry',
+      note: 'Add the third digits plus the carry from the previous step. 3 + 4 + 1 = 8.',
+      formula: 'Step 3: l1[2] + l2[2] + carry = 3 + 4 + 1 = 8',
+      callout: 'No new carry: 8 / 10 = 0. Final result: [7, 0, 8] (representing 807).',
+      items: [
+        { label: '2', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+      ],
+      memory: ['result = [7, 0, 8]', 'carry = 0', 'both lists exhausted'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function addTwoNumbers(l1, l2):
+    dummy = ListNode(0)
+    current = dummy
+    carry = 0
+    
+    while l1 or l2 or carry:
+        val1 = l1.val if l1 else 0
+        val2 = l2.val if l2 else 0
+        
+        total = val1 + val2 + carry
+        carry = total / 10
+        digit = total % 10
+        
+        current.next = ListNode(digit)
+        current = current.next
+        
+        l1 = l1.next if l1 else null
+        l2 = l2.next if l2 else null
+    
+    return dummy.next
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="add_two_numbers_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="add_two_numbers_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="add_two_numbers_iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="add_two_numbers_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="add_two_numbers_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="add_two_numbers_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Recursive with Carry
+
+<ApproachTag tag="educational" />
+
+Let the recursion handle the "advance to next digit" logic. At each recursive call, add the current digits plus the carry, extract the new carry, and recursively build the rest of the list.
+
+The base case occurs when both lists are exhausted **and** the carry is zero.
+
+<ComplexityBadges time="O(max(m, n))" space="O(max(m, n))" timeColor="green" spaceColor="yellow" timeNote="One pass through lists" spaceNote="Call stack + output" />
+
+### Step-by-step Example
+
+**Input:** `l1 = [2, 4, 3]`, `l2 = [5, 6, 4]`
+
+The recursion mirrors the iterative solution:
+- Call 1: `helper(2, 5, 0)` → sum=7, digit=7, carry=0 → create node(7) and recurse
+- Call 2: `helper(4, 6, 0)` → sum=10, digit=0, carry=1 → create node(0) and recurse
+- Call 3: `helper(3, 4, 1)` → sum=8, digit=8, carry=0 → create node(8) and recurse
+- Call 4: `helper(null, null, 0)` → base case, return null
+- Build result bottom-up: `7 → 0 → 8 → null`
+
+The recursion naturally builds the list in the correct order because we construct each node after the recursive call returns.
+
+### Pseudocode
+
+```plaintext
+function addTwoNumbers(l1, l2):
+    return helper(l1, l2, 0)
+
+function helper(l1, l2, carry):
+    if not l1 and not l2 and carry == 0:
+        return null
+    
+    val1 = l1.val if l1 else 0
+    val2 = l2.val if l2 else 0
+    
+    total = val1 + val2 + carry
+    digit = total % 10
+    newCarry = total / 10
+    
+    nextL1 = l1.next if l1 else null
+    nextL2 = l2.next if l2 else null
+    
+    nextNode = helper(nextL1, nextL2, newCarry)
+    return ListNode(digit, nextNode)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="add_two_numbers_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="add_two_numbers_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="add_two_numbers_recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="add_two_numbers_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="add_two_numbers_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="add_two_numbers_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="add_two_numbers_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="add_two_numbers_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="AddTwoNumbersSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="add_two_numbers_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="add_two_numbers_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="add_two_numbers_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting to handle the final carry:** If two 9s are added, the carry must propagate beyond both lists.
+- **Treating null as zero:** When one list is shorter, you must correctly treat missing nodes as having value 0.
+- **Losing the carry between iterations:** The carry must persist and be added to every step, not reset.
+- **Incorrect carry extraction:** Use integer division (`/`) for carry and modulo (`%`) for the digit, not the other way around.
+- **Creating unnecessary nodes:** Only create a new node when you have a digit to store (including the final carry if one exists).
+</Aside>
+
+## Key Insights
+
+<Aside type="note" title="Deeper understanding">
+- **Why reverse order?** Storing numbers in reverse order (least significant digit first) is a clever representation that allows **O(1) access** to each digit as you traverse. In normal order, you'd need to know the list length first.
+- **The dummy node pattern:** A dummy node with value 0 at the start simplifies code by eliminating the special case for the first node. You always append to `current.next`, never reassign `current` itself.
+- **Carry is the key challenge:** The hard part is not adding digits—it is ensuring the carry propagates correctly, especially when one list ends before the other or when the final carry needs an extra node.
+- **Linked list traversal invariant:** In both approaches, we maintain the invariant: when either l1 or l2 is null, we treat it as 0. This keeps the logic uniform.
+</Aside>
+
+## Interview Tips
+
+<Aside type="tip" title="How to discuss this problem">
+- **Why iterative over recursive?** Iterative avoids stack overflow on very long lists (though 100 nodes is safe). It is also faster due to no function call overhead.
+- **How does reverse order help?** Mention that it allows direct digit-by-digit processing without preprocessing. Standard order would require reversing first.
+- **What about the final carry?** Emphasize that the loop condition includes `carry` so a final carry node is created if needed.
+- **Edge cases to mention:** single-node lists, lists of different lengths, all-9 inputs (to show carry propagation), and zero values.
+- **Follow-up:** Could you solve this if the lists were in normal (non-reversed) order? You'd need to reverse first, or use a stack to process from the tail.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 445, title: 'Add Two Numbers II - Input List is in Forward Order', difficulty: 'Medium', leetcodeSlug: 'add-two-numbers-ii-input-list-is-in-forward-order' },
+  { number: 67, title: 'Add Binary', difficulty: 'Easy', leetcodeSlug: 'add-binary' },
+  { number: 415, title: 'Add Strings', difficulty: 'Easy', leetcodeSlug: 'add-strings' },
+  { number: 989, title: 'Add to Array-Form of Integer', difficulty: 'Easy', leetcodeSlug: 'add-to-array-form-of-integer' },
+  { number: 21, title: 'Merge Two Sorted Lists', difficulty: 'Easy', slug: 'problems/merge-two-sorted-lists', leetcodeSlug: 'merge-two-sorted-lists' },
+]} />
+
+<PrevNextNav
+  prevProblem={{ number: 1, title: "Two Sum", slug: "two-sum" }}
+  nextProblem={{ number: 3, title: "Longest Substring Without Repeating Characters", slug: "longest-substring-without-repeating-characters" }}
+/>

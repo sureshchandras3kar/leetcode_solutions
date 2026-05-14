@@ -1,0 +1,224 @@
+---
+title: Kth Largest Element in Array
+description: Complete solution for LeetCode #215 - Kth Largest Element in Array. Multiple approaches in twelve languages.
+leetcodeNumber: 215
+difficulty: Medium
+leetcodeSlug: kth-largest-element-in-array
+tags: [Array, Heap, Dynamic Programming]
+prev:
+  label: "#212 Word Search II"
+  link: "../word-search-ii/"
+next:
+  label: "#217 Contains Duplicate"
+  link: "../contains-duplicate/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBruteForce     from '@solutions/Python/kth_largest_element_in_array_brute_force.py?raw';
+import cppBruteForce    from '@solutions/C++/kth_largest_element_in_array_brute_force.cpp?raw';
+import javaBruteForce   from '@solutions/Java/kth_largest_element_in_array_brute_force.java?raw';
+import jsBruteForce     from '@solutions/JavaScript/kth_largest_element_in_array_brute_force.js?raw';
+import rustBruteForce   from '@solutions/Rust/kth_largest_element_in_array_brute_force.rs?raw';
+import goBruteForce     from '@solutions/Golang/kth_largest_element_in_array_brute_force.go?raw';
+
+import pyMinHeap     from '@solutions/Python/kth_largest_element_in_array_min_heap.py?raw';
+import cppMinHeap    from '@solutions/C++/kth_largest_element_in_array_min_heap.cpp?raw';
+import javaMinHeap   from '@solutions/Java/kth_largest_element_in_array_min_heap.java?raw';
+import jsMinHeap     from '@solutions/JavaScript/kth_largest_element_in_array_min_heap.js?raw';
+import rustMinHeap   from '@solutions/Rust/kth_largest_element_in_array_min_heap.rs?raw';
+import goMinHeap     from '@solutions/Golang/kth_largest_element_in_array_min_heap.go?raw';
+
+import pyQuickSelect     from '@solutions/Python/kth_largest_element_in_array_quickselect.py?raw';
+import cppQuickSelect    from '@solutions/C++/kth_largest_element_in_array_quickselect.cpp?raw';
+import javaQuickSelect   from '@solutions/Java/kth_largest_element_in_array_quickselect.java?raw';
+import jsQuickSelect     from '@solutions/JavaScript/kth_largest_element_in_array_quickselect.js?raw';
+import rustQuickSelect   from '@solutions/Rust/kth_largest_element_in_array_quickselect.rs?raw';
+import goQuickSelect     from '@solutions/Golang/kth_largest_element_in_array_quickselect.go?raw';
+
+## Problem Statement
+
+### LeetCode #215 - Kth Largest Element in Array
+
+Solve this classic coding interview problem efficiently using multiple approaches.
+
+<Aside type="tip" title="What to notice first">
+- Understand the problem constraints and requirements.
+- Consider multiple approaches with different trade-offs.
+- Pattern mastery comes from knowing when to use each technique.
+</Aside>
+
+### Examples
+
+| nums | k | Output | Explanation |
+| --- | --- | --- | --- |
+| `[3,2,1,5,6,4]` | 2 | 5 | Sorted: [1,2,3,4,5,6]. 2nd largest = 5 |
+| `[3,2,3,1,2,4,5,5,6]` | 4 | 4 | Sorted: [1,2,2,3,3,4,5,5,6]. 4th largest = 4 |
+| `[1]` | 1 | 1 | Single element |
+| `[7,7,7,7]` | 2 | 7 | All same value |
+
+## Constraints
+
+- `1 <= k <= nums.length <= 10^5`
+- `-10^4 <= nums[i] <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Application 1** — describe where this is used
+- **Application 2** — describe where this is used
+- **Application 3** — describe where this is used
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Min Heap | O(n log k) | O(k) | Most cases — k is small |
+| QuickSelect | O(n) | O(1) | Average case optimal |
+| Brute Force (Sort) | O(n log n) | O(1) | Learning or small arrays |
+
+## Which approach should you learn first?
+
+- Pick **Min Heap** for a balanced, interview-ready solution.
+- Pick **QuickSelect** if you want the theoretical average case optimal solution.
+- Pick **Brute Force** if you are learning the problem from scratch.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Most Cases</div>
+    <div class="lc-approach-quick__name">Min Heap</div>
+    <div class="lc-approach-quick__stats">O(n log k) time &middot; O(k) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Optimal Average Case</div>
+    <div class="lc-approach-quick__name">QuickSelect</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simple to Learn</div>
+    <div class="lc-approach-quick__name">Brute Force</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Min Heap (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Maintain a min heap of size k containing the k largest elements. Iterate through the array and keep only the k largest elements in the heap. The root of the heap is the kth largest.
+
+<ComplexityBadges time="O(n log k)" space="O(k)" timeColor="green" spaceColor="yellow" timeNote="n iterations, each O(log k)" spaceNote="Heap of k elements" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyMinHeap} lang="python" title="kth_largest_element_in_array_min_heap.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppMinHeap} lang="cpp" title="kth_largest_element_in_array_min_heap.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaMinHeap} lang="java" title="kth_largest_element_in_array_min_heap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsMinHeap} lang="javascript" title="kth_largest_element_in_array_min_heap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustMinHeap} lang="rust" title="kth_largest_element_in_array_min_heap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goMinHeap} lang="go" title="kth_largest_element_in_array_min_heap.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: QuickSelect
+
+<ApproachTag tag="interview" />
+
+Use the QuickSelect algorithm (based on QuickSort partition) to find the kth largest element without fully sorting. Average time is O(n).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Average case" spaceNote="Constant" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyQuickSelect} lang="python" title="kth_largest_element_in_array_quickselect.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppQuickSelect} lang="cpp" title="kth_largest_element_in_array_quickselect.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaQuickSelect} lang="java" title="kth_largest_element_in_array_quickselect.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsQuickSelect} lang="javascript" title="kth_largest_element_in_array_quickselect.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustQuickSelect} lang="rust" title="kth_largest_element_in_array_quickselect.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goQuickSelect} lang="go" title="kth_largest_element_in_array_quickselect.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Brute Force (Sort)
+
+<ApproachTag tag="simple" />
+
+Sort the array in descending order and return the element at index k-1. Simple and straightforward for learning.
+
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Sorting dominant" spaceNote="Constant" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBruteForce} lang="python" title="kth_largest_element_in_array_brute_force.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBruteForce} lang="cpp" title="kth_largest_element_in_array_brute_force.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBruteForce} lang="java" title="kth_largest_element_in_array_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBruteForce} lang="javascript" title="kth_largest_element_in_array_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBruteForce} lang="rust" title="kth_largest_element_in_array_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBruteForce} lang="go" title="kth_largest_element_in_array_brute_force.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Mistake 1 — explain what to watch for
+- Mistake 2 — explain what to watch for
+- Mistake 3 — explain what to watch for
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 217, title: 'Contains Duplicate', difficulty: 'Easy', leetcodeSlug: 'contains-duplicate' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key discussion points">
+- Trade-offs between different approaches
+- Edge cases to consider
+- Possible follow-up questions
+- How to extend the solution
+</Aside>
+
+<PrevNextNav prevProblem={false} nextProblem={false} />

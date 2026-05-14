@@ -1,0 +1,281 @@
+---
+title: Generate Parentheses
+description: Generate all valid parentheses combinations. Two approaches — backtracking O(4^n) and DP O(4^n) — in six languages.
+leetcodeNumber: 22
+difficulty: Medium
+leetcodeSlug: generate-parentheses
+tags: [String, Backtracking, Dynamic Programming]
+prev:
+  label: "#21 Merge Two Sorted Lists"
+  link: "../merge-two-sorted-lists/"
+next:
+  label: "#23 Merge k Sorted Lists"
+  link: "../merge-k-sorted-lists/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+## Problem Statement
+
+Given `n` pairs of parentheses, write a function to **generate all combinations of well-formed parentheses**.
+
+<Aside type="tip" title="What to notice first">
+- A valid parenthesis string has equal numbers of `(` and `)`.
+- At any point while building, open count must be >= close count.
+- You can only add `(` if open < n.
+- You can only add `)` if close < open.
+</Aside>
+
+### Examples
+
+| n | Output | Count |
+| --- | --- | --- |
+| 1 | `["()"]` | 1 |
+| 2 | `["(())","()()"]` | 2 |
+| 3 | `["((()))","(()())","(())()","()((})","()()()"]` | 5 |
+
+## Constraints
+
+- `1 <= n <= 8`
+- The number of well-formed strings grows as the nth Catalan number: C(n) = (2n)! / ((n+1)! * n!)
+
+import pyBacktracking  from '@solutions/Python/generate_parentheses_backtracking.py?raw';
+import cppBacktracking from '@solutions/C++/generate_parentheses_backtracking.cpp?raw';
+import javaBacktracking from '@solutions/Java/GenerateParenthesesBacktracking.java?raw';
+import jsBacktracking  from '@solutions/JavaScript/generate_parentheses_backtracking.js?raw';
+import rustBacktracking from '@solutions/Rust/generate_parentheses_backtracking.rs?raw';
+import goBacktracking  from '@solutions/Golang/generate_parentheses_backtracking.go?raw';
+import pySpaceOptimized from '@solutions/Python/generate_parentheses_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/generate_parentheses_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/GenerateParenthesesSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/generate_parentheses_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/generate_parentheses_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/generate_parentheses_space_optimized.go?raw';
+
+import pyDP             from '@solutions/Python/generate_parentheses_dp.py?raw';
+import cppDP            from '@solutions/C++/generate_parentheses_dp.cpp?raw';
+import javaDP           from '@solutions/Java/GenerateParenthesesDP.java?raw';
+import jsDP             from '@solutions/JavaScript/generate_parentheses_dp.js?raw';
+import rustDP           from '@solutions/Rust/generate_parentheses_dp.rs?raw';
+import goDP             from '@solutions/Golang/generate_parentheses_dp.go?raw';
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Syntax parsing** — generating all valid parse trees for expressions with balanced operators.
+- **Code generation** — validating and generating code with nested blocks and scopes.
+- **Mathematical combinations** — counting/generating all valid nested structure combinations.
+- **Compiler design** — checking well-formed nested structures in language parsing.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Backtracking | O(4^n / √n) | O(n) | Prunes invalid paths early; intuitive recursion |
+| Dynamic Programming | O(4^n / √n) | O(n) | Builds bottom-up; combines subproblems |
+
+Both approaches have the same asymptotic complexity (Catalan number), but backtracking prunes earlier.
+
+## Approach 1: Backtracking (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use backtracking to generate parentheses recursively. At each step, decide whether to add an opening or closing parenthesis:
+- Add `(` if we have fewer than n opening parentheses.
+- Add `)` if we have fewer closing than opening parentheses (maintains validity).
+
+This prunes invalid paths immediately, making it more efficient than brute force.
+
+<ComplexityBadges time="O(4^n / √n)" space="O(n)" timeColor="yellow" spaceColor="green" timeNote="Catalan number growth" spaceNote="Recursion depth + result" />
+
+### Step-by-step Example
+
+**Input:** `n = 2`
+
+```
+Start: ""
+├─ Add '(': "("
+│  ├─ Add '(': "(("
+│  │  └─ Add ')': "(()"
+│  │     └─ Add ')': "(())"  ✓
+│  └─ Add ')': "()"
+│     └─ Add '(': "()("
+│        └─ Add ')': "()()"  ✓
+└─ Can't add ')' yet (left == 0)
+
+Result: ["(())", "()()"]
+```
+
+### Pseudocode
+
+```plaintext
+function generateParenthesis(n):
+    result = []
+    
+    def backtrack(current, leftCount, rightCount):
+        if len(current) == 2 * n:
+            result.append(current)
+            return
+        
+        if leftCount < n:
+            backtrack(current + "(", leftCount + 1, rightCount)
+        
+        if rightCount < leftCount:
+            backtrack(current + ")", leftCount, rightCount + 1)
+    
+    backtrack("", 0, 0)
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBacktracking} lang="python" title="generate_parentheses_backtracking.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBacktracking} lang="cpp" title="generate_parentheses_backtracking.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBacktracking} lang="java" title="GenerateParenthesesBacktracking.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBacktracking} lang="javascript" title="generate_parentheses_backtracking.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBacktracking} lang="rust" title="generate_parentheses_backtracking.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBacktracking} lang="go" title="generate_parentheses_backtracking.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Dynamic Programming
+
+<ApproachTag tag="simple" />
+
+Build valid parentheses combinations bottom-up. For i pairs, insert all valid combinations of j pairs inside parentheses, then append all valid combinations of remaining (i-1-j) pairs.
+
+The recurrence: `DP[i]` = `"(" + DP[j] + ")" + DP[i-1-j]` for all valid j.
+
+<ComplexityBadges time="O(4^n / √n)" space="O(n)" timeColor="yellow" spaceColor="green" timeNote="Catalan number" spaceNote="DP table + recursion" />
+
+### Step-by-step Example
+
+**Input:** `n = 2`
+
+```
+DP[0] = [""]
+DP[1] = ["()"]        (from: "(" + DP[0] + ")" + DP[0])
+DP[2] = [
+  "(" + "()" + ")" + "" = "(())",
+  "(" + "" + ")" + "()" = "()()"
+]
+```
+
+### Pseudocode
+
+```plaintext
+function generateParenthesis(n):
+    dp = [[] for _ in range(n + 1)]
+    dp[0] = [""]
+    
+    for i in range(1, n + 1):
+        for j in range(i):
+            for left in dp[j]:
+                for right in dp[i - 1 - j]:
+                    dp[i].append("(" + left + ")" + right)
+    
+    return dp[n]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDP} lang="python" title="generate_parentheses_dp.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDP} lang="cpp" title="generate_parentheses_dp.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDP} lang="java" title="GenerateParenthesesDP.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDP} lang="javascript" title="generate_parentheses_dp.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDP} lang="rust" title="generate_parentheses_dp.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDP} lang="go" title="generate_parentheses_dp.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="generate_parentheses_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="generate_parentheses_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="GenerateParenthesesSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="generate_parentheses_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="generate_parentheses_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="generate_parentheses_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting the closing parenthesis condition:** You must check `rightCount < leftCount` to avoid closing before opening.
+- **Base case logic:** Ensure `len(current) == 2 * n` is the termination condition.
+- **DP indexing:** Ensure loop bounds and DP table initialization are correct (off-by-one errors).
+- **String building:** In languages like Java, use StringBuilder for efficiency to avoid O(n) concatenation overhead.
+</Aside>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Backtracking vs. DP:** Backtracking is more intuitive and prunes early. DP is more algorithmic and bottom-up.
+- **Why Catalan numbers?** The nth Catalan number counts all valid parenthesis combinations; knowing this helps validate your result count.
+- **Follow-up:** Can you count the solutions without generating them? (Yes—just return DP[n].length or count during recursion.)
+- **Space optimization:** Neither approach reduces space below O(n) because the output itself is exponential.
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

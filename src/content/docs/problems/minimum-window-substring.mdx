@@ -1,0 +1,393 @@
+---
+title: Minimum Window Substring
+description: Find the smallest substring in a string that contains all characters from another string. Two approaches — sliding window O(|S| + |T|) and brute force O(|S|² * |T|) — in six languages.
+leetcodeNumber: 76
+difficulty: Hard
+leetcodeSlug: minimum-window-substring
+tags: [String, Sliding Window, Hash Map]
+prev:
+  label: "#74 Search a 2D Matrix"
+  link: "../search-2d-matrix/"
+next:
+  label: "#77 Combinations"
+  link: "../combinations/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySlidingWindow     from '@solutions/Python/minimum_window_substring_sliding_window.py?raw';
+import cppSlidingWindow    from '@solutions/C++/minimum_window_substring_sliding_window.cpp?raw';
+import javaSlidingWindow   from '@solutions/Java/minimum_window_substring_sliding_window.java?raw';
+import jsSlidingWindow     from '@solutions/JavaScript/minimum_window_substring_sliding_window.js?raw';
+import rustSlidingWindow   from '@solutions/Rust/minimum_window_substring_sliding_window.rs?raw';
+import goSlidingWindow     from '@solutions/Golang/minimum_window_substring_sliding_window.go?raw';
+import pyoptimized from '@solutions/Python/minimum_window_substring_optimized.py?raw';
+import cppoptimized from '@solutions/C++/minimum_window_substring_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/MinimumWindowSubstringOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/minimum_window_substring_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/minimum_window_substring_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/minimum_window_substring_optimized.go?raw';
+
+import pyBrute             from '@solutions/Python/minimum_window_substring_brute_force.py?raw';
+import cppBrute            from '@solutions/C++/minimum_window_substring_brute_force.cpp?raw';
+import javaBrute           from '@solutions/Java/minimum_window_substring_brute_force.java?raw';
+import jsBrute             from '@solutions/JavaScript/minimum_window_substring_brute_force.js?raw';
+import rustBrute           from '@solutions/Rust/minimum_window_substring_brute_force.rs?raw';
+import goBrute             from '@solutions/Golang/minimum_window_substring_brute_force.go?raw';
+
+## Problem Statement
+
+Given two strings `s` and `t` of lengths `m` and `n` respectively, return the **minimum window substring** of `s` such that every character in `t` (including duplicates) is included in the window. If there is no such substring, return the empty string `""`.
+
+The testcases will be generated such that the answer is unique.
+
+<Aside type="tip" title="What to notice first">
+- You must match **all** characters from `t`, including their frequencies.
+- There may be extra characters in the result window beyond what `t` requires.
+- The answer is the shortest such window, not just any valid window.
+- The sliding window pattern: expand to include all required characters, then contract to find the minimum.
+</Aside>
+
+### Examples
+
+| s | t | Output | Explanation |
+| --- | --- | --- | --- |
+| `"ADOBECODEBANC"` | `"ABC"` | `"BANC"` | Substring `"BANC"` has length 4 and contains A, B, C once each |
+| `"a"` | `"a"` | `"a"` | The entire string is the answer |
+| `"a"` | `"aa"` | `""` | String `"a"` has only one `a`, but `t` requires two |
+
+## Constraints
+
+- `m == s.length`
+- `n == t.length`
+- `1 <= m, n <= 10^5`
+- `s` and `t` consist of uppercase and lowercase English letters.
+- It is guaranteed for each test case, there is a unique answer.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **DNA sequence matching** — find the shortest DNA fragment that contains all required genes for a specific trait.
+- **Language tokenization** — extract the shortest substring containing all required keywords for an index query.
+- **Network packet analysis** — locate the minimum frame window containing all required protocol headers.
+- **Text search optimization** — find the shortest text range that includes all query terms for relevance ranking.
+- **Billing records** — extract the shortest time window containing all transaction types required for a charge-back investigation.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Brute Force | O(\|S\|² \* \|T\|) | O(\|T\|) | Input is tiny, learning the basic logic |
+| Sliding Window | O(\|S\| + \|T\|) | O(\|S\| + \|T\|) | General case — optimal for interviews and production |
+
+## Which approach should you learn first?
+
+- Pick **Sliding Window** if you want to master a classic interview pattern that applies to many problems.
+- Pick **Brute Force** if you are still learning and want to understand the problem before optimizing.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Sliding Window</div>
+    <div class="lc-approach-quick__stats">O(|S| + |T|) time &middot; O(|S| + |T|) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Learning</div>
+    <div class="lc-approach-quick__name">Brute Force</div>
+    <div class="lc-approach-quick__stats">O(|S|² * |T|) time &middot; O(|T|) space</div>
+  </div>
+</div>
+
+## Approach 1: Sliding Window (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use two pointers to maintain a sliding window. Expand the right pointer to include characters until the window contains all required characters from `t`. Then contract the left pointer to find the minimum valid window. Track character frequencies using a hash map and maintain a count of how many distinct characters in `t` are satisfied.
+
+The key insight is that we only need to shrink the window when it becomes invalid (we've moved the left pointer too far), not after every step. This allows us to achieve linear time complexity.
+
+<ComplexityBadges time="O(|S| + |T|)" space="O(|S| + |T|)" timeColor="green" spaceColor="yellow" timeNote="Two passes, O(1) amortized per character" spaceColor="yellow" spaceNote="Hash maps for char frequency" />
+
+### Step-by-step Example
+
+**Input:** `s = "ADOBECODEBANC"`, `t = "ABC"`
+
+| Step | left | right | Window | Char Count | Formed | Valid? | Action |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 0 | "A" | {A:1} | 0/3 | ✗ | Expand right |
+| 2 | 0 | 3 | "ADOBEC" | {A:1,B:1,C:1} | 3/3 | ✓ | Contract left |
+| 3 | 5 | 12 | "BANC" | {B:1,A:1,N:1,C:1} | 3/3 | ✓ | Found minimum |
+
+<LogicPlayer
+  title="How the sliding window finds the minimum substring"
+  description="Watch the window expand (right pointer moves) to find valid substrings, then contract (left pointer moves) to minimize length while maintaining validity."
+  target="3"
+  steps={[
+    {
+      title: 'Start with an empty window',
+      note: 'Both pointers are at the start. We need to find characters A, B, C.',
+      formula: 'Window = empty, need 3 distinct chars',
+      callout: 'Expand right pointer to accumulate characters.',
+      items: [
+        { label: 'A', state: 'default', index: 0 },
+        { label: 'D', state: 'default', index: 1 },
+        { label: 'O', state: 'default', index: 2 },
+        { label: 'B', state: 'default', index: 3 },
+        { label: 'E', state: 'default', index: 4 },
+        { label: 'C', state: 'default', index: 5 },
+      ],
+      memory: ['Required: A, B, C', 'Window chars: none'],
+    },
+    {
+      title: 'Expand window to include A, B, C',
+      note: 'Right pointer reaches index 5 where C is found. Now window has all required characters.',
+      formula: 'Window = "ADOBEC", contains {A:1, D:1, O:1, B:1, E:1, C:1}',
+      callout: 'All three required characters found! Now contract to minimize.',
+      items: [
+        { label: 'A', state: 'active', index: 0 },
+        { label: 'D', state: 'active', index: 1 },
+        { label: 'O', state: 'active', index: 2 },
+        { label: 'B', state: 'active', index: 3 },
+        { label: 'E', state: 'active', index: 4 },
+        { label: 'C', state: 'active', index: 5 },
+      ],
+      memory: ['All required chars found', 'Window length: 6'],
+    },
+    {
+      title: 'Contract window from left',
+      note: 'Remove A, D, O, E from the left as they are either not needed or extra. Stop when removing the next char would break validity.',
+      formula: 'Window = "BANC", contains {B:1, A:1, N:1, C:1}',
+      callout: 'Minimum found: "BANC" with length 4 is our answer.',
+      items: [
+        { label: 'A', state: 'match', index: 9 },
+        { label: 'D', state: 'default', index: 1 },
+        { label: 'O', state: 'default', index: 2 },
+        { label: 'B', state: 'match', index: 3 },
+        { label: 'E', state: 'default', index: 4 },
+        { label: 'C', state: 'match', index: 5 },
+        { label: 'N', state: 'match', index: 10 },
+      ],
+      memory: ['Valid window found', 'Minimum length: 4', 'Result: "BANC"'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function minWindowSlidingWindow(s, t):
+    if s is empty or t is empty or len(s) < len(t):
+        return ""
+
+    dictT = frequency map of characters in t
+    required = number of unique characters in dictT that need to be satisfied
+    formed = number of unique characters in current window that are satisfied
+    windowCounts = frequency map of characters in current window
+
+    ansLen = infinity, ansLeft = 0, ansRight = 0
+    left = 0
+
+    for right in range(len(s)):
+        char = s[right]
+        windowCounts[char]++
+
+        // If frequency of char in window matches that in t, increment formed
+        if char in dictT and windowCounts[char] == dictT[char]:
+            formed++
+
+        // Contract window from left while it remains valid
+        while left <= right and formed == required:
+            char = s[left]
+
+            // Update answer if current window is smaller
+            if right - left + 1 < ansLen:
+                ansLen = right - left + 1
+                ansLeft = left
+                ansRight = right
+
+            windowCounts[char]--
+            if char in dictT and windowCounts[char] < dictT[char]:
+                formed--
+
+            left++
+
+    return "" if ansLen == infinity else s[ansLeft:ansRight + 1]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySlidingWindow} lang="python" title="minimum_window_substring_sliding_window.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSlidingWindow} lang="cpp" title="minimum_window_substring_sliding_window.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSlidingWindow} lang="java" title="minimum_window_substring_sliding_window.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSlidingWindow} lang="javascript" title="minimum_window_substring_sliding_window.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSlidingWindow} lang="rust" title="minimum_window_substring_sliding_window.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSlidingWindow} lang="go" title="minimum_window_substring_sliding_window.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Brute Force
+
+<ApproachTag tag="simple" />
+
+Check every possible substring of `s`. For each substring, count the frequency of characters and verify whether it contains all required characters from `t` with sufficient counts. Track the minimum valid substring found.
+
+This approach is straightforward but inefficient. It is useful for understanding the problem but impractical for large inputs.
+
+<ComplexityBadges time="O(|S|² * |T|)" space="O(|T|)" timeColor="red" spaceColor="green" timeNote="All substrings checked, each validated in O(|T|)" spaceNote="Character frequency maps" />
+
+### Step-by-step Example
+
+**Input:** `s = "ADOBECODEBANC"`, `t = "ABC"`
+
+| Start | End | Substring | Length | Contains A? | Contains B? | Contains C? | Valid? |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0 | 6 | "ADOBEC" | 6 | ✓ | ✓ | ✓ | ✓ |
+| 3 | 12 | "BECODEBANC" | 10 | ✓ | ✓ | ✓ | ✓ |
+| 9 | 13 | "BANC" | 4 | ✓ | ✓ | ✓ | ✓ → Minimum |
+
+### Pseudocode
+
+```plaintext
+function minWindowBruteForce(s, t):
+    if s is empty or t is empty or len(s) < len(t):
+        return ""
+
+    dictT = frequency map of characters in t
+    minLen = infinity
+    minStart = 0
+
+    for i in range(len(s)):
+        for j in range(i + 1, len(s) + 1):
+            substring = s[i:j]
+            substringCount = frequency map of characters in substring
+
+            // Check if substring contains all required characters
+            valid = true
+            for each char in dictT:
+                if substringCount[char] < dictT[char]:
+                    valid = false
+                    break
+
+            // Update minimum if this substring is valid
+            if valid and len(substring) < minLen:
+                minLen = len(substring)
+                minStart = i
+
+    return "" if minLen == infinity else s[minStart:minStart + minLen]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBrute} lang="python" title="minimum_window_substring_brute_force.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBrute} lang="cpp" title="minimum_window_substring_brute_force.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBrute} lang="java" title="minimum_window_substring_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBrute} lang="javascript" title="minimum_window_substring_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBrute} lang="rust" title="minimum_window_substring_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBrute} lang="go" title="minimum_window_substring_brute_force.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Not matching character frequencies** — checking if required characters *exist* instead of *matching their counts*. `"ADOBC"` is not valid for `"ABC"` if you need counts.
+- **Moving the right pointer before checking validity** — ensure you expand first, then contract, not in arbitrary order.
+- **Forgetting to track the minimum** — update your answer only when you find a *valid* window that is *shorter* than the previous best.
+- **Off-by-one errors** — the window is `[left, right]` inclusive; make sure substring extraction uses correct bounds.
+- **Not resetting state when left pointer moves** — always decrement the window frequency and check if validity is broken before moving left forward.
+- **Returning too early** — continue checking even after finding one valid window, as a shorter one may exist further in the string.
+</Aside>
+
+## Approach 3: Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="minimum_window_substring_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="minimum_window_substring_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="MinimumWindowSubstringOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="minimum_window_substring_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="minimum_window_substring_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="minimum_window_substring_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 30, title: 'Substring with Concatenation of All Words', difficulty: 'Hard', leetcodeSlug: 'substring-with-concatenation-of-all-words' },
+  { number: 3, title: 'Longest Substring Without Repeating Characters', difficulty: 'Medium', leetcodeSlug: 'longest-substring-without-repeating-characters' },
+  { number: 438, title: 'Find All Anagrams in a String', difficulty: 'Medium', leetcodeSlug: 'find-all-anagrams-in-a-string' },
+  { number: 567, title: 'Permutation in String', difficulty: 'Medium', leetcodeSlug: 'permutation-in-string' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Sliding window vs. brute force** — "We can't check all O(n²) substrings. Instead, we use two pointers: expand right to find valid windows, contract left to minimize length. Each character is visited at most twice."
+- **How to track validity** — "We maintain a frequency map of required characters and a counter of how many distinct characters have been satisfied. Once all are satisfied, we know the window is valid."
+- **When to contract** — "The inner while loop contracts only when we have a valid window. This ensures we don't miss the answer and keeps time complexity linear."
+- **Handling duplicates** — "If `t = 'AAB'`, we need to match the frequency count exactly, not just the presence of each unique character."
+- **Follow-ups to expect**:
+  - "What if `t` contains repeated characters?" (Already handled by our frequency map approach.)
+  - "Can you modify this to find *all* minimum windows?" (Track all windows of minimum length.)
+  - "What if you wanted the lexicographically smallest minimum window?" (Among all minimum windows, pick the one that comes first alphabetically.)
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 30, title: "Substring with Concatenation of All Words", slug: "substring-concatenation-all-words" }}
+  nextProblem={undefined}
+/>

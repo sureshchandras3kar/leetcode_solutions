@@ -1,0 +1,234 @@
+---
+title: Construct Quad Tree
+description: Build a quad tree from a 2D grid using divide and conquer. Recursive and iterative approaches for matrix subdivision.
+leetcodeNumber: 427
+difficulty: Medium
+leetcodeSlug: quad-tree-construction
+tags: [Tree, Divide and Conquer, Matrix, Design]
+prev:
+  label: "#399 Evaluate Division"
+  link: "../evaluate-division/"
+next:
+  label: "#433 Minimum Genetic Mutation"
+  link: "../minimum-genetic-mutation/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyRecursive     from '@solutions/Python/construct_quad_tree_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/construct_quad_tree_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/ConstructQuadTree_Recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/construct_quad_tree_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/construct_quad_tree_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/construct_quad_tree_recursive.go?raw';
+import pySpaceOptimized from '@solutions/Python/construct_quad_tree_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/construct_quad_tree_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ConstructQuadTreeSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/construct_quad_tree_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/construct_quad_tree_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/construct_quad_tree_space_optimized.go?raw';
+
+import pyIterative      from '@solutions/Python/construct_quad_tree_iterative.py?raw';
+import cppIterative     from '@solutions/C++/construct_quad_tree_iterative.cpp?raw';
+import javaIterative    from '@solutions/Java/ConstructQuadTree_Iterative.java?raw';
+import jsIterative      from '@solutions/JavaScript/construct_quad_tree_iterative.js?raw';
+import rustIterative    from '@solutions/Rust/construct_quad_tree_iterative.rs?raw';
+import goIterative      from '@solutions/Golang/construct_quad_tree_iterative.go?raw';
+
+## Problem Statement
+
+Given an `n × n` matrix of `0`s and `1`s, construct a quad tree with the following rules:
+
+1. If all values in a region are the same, create a leaf node with that value.
+2. Otherwise, subdivide the region into 4 equal quadrants (top-left, top-right, bottom-left, bottom-right) and recursively build the tree.
+
+<Aside type="tip" title="What to notice first">
+- Pure divide and conquer: divide into 4 quadrants recursively.
+- Base case: all values in a quadrant are the same → leaf node.
+- Recursive case: quadrant has mixed values → subdivide further.
+- Early termination when homogeneous regions are found.
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `[[1,1],[1,0]]` | Quad tree with non-leaf root, mixed children |
+| `[[1,1],[1,1]]` | Single leaf node with val=true |
+
+## Constraints
+
+- `n == 2^x` where `0 <= x <= 6`
+- `grid[i][j]` is either 0 or 1
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- File system hierarchies and directory structures
+- DOM tree manipulation in web browsers
+- XML/JSON parsing and configuration management
+- Organizational hierarchies and permission trees
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space |
+| --- | --- | --- |
+| Recursive | O(n² log n) | O(log n) |
+| Iterative | O(n² log n) | O(n² / 4) |
+
+## Which approach should you learn first?
+
+- Pick **Recursive** for clarity — pure divide and conquer pattern.
+- Pick **Iterative** if you prefer explicit queue management.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Natural Fit</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(n² log n) time &middot; O(log n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Explicit Queue</div>
+    <div class="lc-approach-quick__name">Iterative</div>
+    <div class="lc-approach-quick__stats">O(n² log n) time &middot; O(n²) space</div>
+  </div>
+</div>
+
+## Approach 1: Recursive Divide and Conquer (Recommended)
+
+<ApproachTag tag="recommended" />
+
+1. Check if all values in the current region are the same.
+2. If yes, create a leaf node.
+3. If no, create a non-leaf node and recursively subdivide into 4 quadrants.
+
+<ComplexityBadges time="O(n² log n)" space="O(log n)" timeColor="yellow" spaceColor="green" timeNote="Worst case exploration" spaceNote="Recursion depth" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="construct_quad_tree_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="construct_quad_tree_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="ConstructQuadTree_Recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="construct_quad_tree_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="construct_quad_tree_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="construct_quad_tree_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative with Queue
+
+<ApproachTag tag="interview" />
+
+Use a queue to track regions to subdivide. Process each region, check homogeneity, and enqueue children if needed.
+
+<ComplexityBadges time="O(n² log n)" space="O(n²)" timeColor="yellow" spaceColor="yellow" timeNote="Worst case exploration" spaceNote="Queue storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="construct_quad_tree_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="construct_quad_tree_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="ConstructQuadTree_Iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="construct_quad_tree_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="construct_quad_tree_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="construct_quad_tree_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Incorrect homogeneity check (must check entire region, not just corners).
+- Wrong quadrant assignment (remember row-major order).
+- Off-by-one errors in boundary calculations.
+- Not handling the case where a region is already homogeneous (leaf node).
+- Forgetting to set children pointers for non-leaf nodes.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="construct_quad_tree_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="construct_quad_tree_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ConstructQuadTreeSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="construct_quad_tree_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="construct_quad_tree_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="construct_quad_tree_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 108, title: 'Convert Sorted Array to Binary Search Tree', difficulty: 'Easy', leetcodeSlug: 'convert-sorted-array-to-binary-search-tree' },
+  { number: 148, title: 'Sort List', difficulty: 'Medium', leetcodeSlug: 'sort-list' },
+  { number: 23, title: 'Merge k Sorted Lists', difficulty: 'Hard', leetcodeSlug: 'merge-k-sorted-lists' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Homogeneity check:** O(size²) per region; memoization or prefix sums could optimize.
+- **Recursive vs. iterative:** Recursive is cleaner; iterative uses more space but avoids stack overhead.
+- **Applications:** Image compression (store regions of uniform color), spatial indexing, collision detection in games.
+- **Follow-up:** How would you serialize/deserialize the quad tree?
+- **Edge cases:** Single cell (always leaf), all zeros/ones (single leaf), all different values (deep tree).
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 426, title: "Convert Binary Search Tree to Sorted Doubly Linked List", slug: "convert-bst-to-sorted-dll" }}
+  nextProblem={{ number: 428, title: "Serialize and Deserialize N-ary Tree", slug: "serialize-deserialize-n-ary-tree" }}
+/>

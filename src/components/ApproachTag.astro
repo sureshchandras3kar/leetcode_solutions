@@ -1,0 +1,14 @@
+---
+interface Props {
+  tag: 'recommended' | 'interview' | 'space-optimal' | 'simple';
+}
+const { tag } = Astro.props;
+const tags: Record<string, { label: string; cls: string }> = {
+  recommended:     { label: '★ Recommended',         cls: 'recommended'   },
+  interview:       { label: '🎯 Interview Favourite', cls: 'interview'     },
+  'space-optimal': { label: '💾 Space-Optimal',       cls: 'space-optimal' },
+  simple:          { label: '✓ Simple',               cls: 'simple'        },
+};
+const { label, cls } = tags[tag] ?? { label: tag, cls: 'default' };
+---
+<span class={`lc-approach-tag lc-approach-tag--${cls}`}>{label}</span>

@@ -1,0 +1,222 @@
+---
+title: IPO
+description: Complete solution for LeetCode #502 - IPO. Multiple approaches in twelve languages.
+leetcodeNumber: 502
+difficulty: Hard
+leetcodeSlug: ipo
+tags: [Array, Heap, Dynamic Programming]
+prev:
+  label: "#452 Minimum Number of Arrows to Burst Balloons"
+  link: "../burst-balloons/"
+next:
+  label: "#525 Contiguous Array"
+  link: "../contiguous-array/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDP     from '@solutions/Python/ipo_dp.py?raw';
+import cppDP    from '@solutions/C++/ipo_dp.cpp?raw';
+import javaDP   from '@solutions/Java/ipo_dp.java?raw';
+import jsDP     from '@solutions/JavaScript/ipo_dp.js?raw';
+import rustDP   from '@solutions/Rust/ipo_dp.rs?raw';
+import goDP     from '@solutions/Golang/ipo_dp.go?raw';
+
+import pyGreedyMaxHeap     from '@solutions/Python/ipo_greedy_max_heap.py?raw';
+import cppGreedyMaxHeap    from '@solutions/C++/ipo_greedy_max_heap.cpp?raw';
+import javaGreedyMaxHeap   from '@solutions/Java/ipo_greedy_max_heap.java?raw';
+import jsGreedyMaxHeap     from '@solutions/JavaScript/ipo_greedy_max_heap.js?raw';
+import rustGreedyMaxHeap   from '@solutions/Rust/ipo_greedy_max_heap.rs?raw';
+import goGreedyMaxHeap     from '@solutions/Golang/ipo_greedy_max_heap.go?raw';
+
+import pyGreedySorted     from '@solutions/Python/ipo_greedy_sorted.py?raw';
+import cppGreedySorted    from '@solutions/C++/ipo_greedy_sorted.cpp?raw';
+import javaGreedySorted   from '@solutions/Java/ipo_greedy_sorted.java?raw';
+import jsGreedySorted     from '@solutions/JavaScript/ipo_greedy_sorted.js?raw';
+import rustGreedySorted   from '@solutions/Rust/ipo_greedy_sorted.rs?raw';
+import goGreedySorted     from '@solutions/Golang/ipo_greedy_sorted.go?raw';
+
+## Problem Statement
+
+### LeetCode #502 - IPO
+
+Solve this classic coding interview problem efficiently using multiple approaches.
+
+<Aside type="tip" title="What to notice first">
+- Understand the problem constraints and requirements.
+- Consider multiple approaches with different trade-offs.
+- Pattern mastery comes from knowing when to use each technique.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[example1]` | `result1` | Explanation goes here |
+| `[example2]` | `result2` | Explanation goes here |
+
+## Constraints
+
+- Standard LeetCode constraints
+- Refer to the official problem statement for exact details
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Application 1** — describe where this is used
+- **Application 2** — describe where this is used
+- **Application 3** — describe where this is used
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Greedy (Max Heap) | O(n log n) | O(n) | Interview — clear greedy logic |
+| Greedy (Sorted) | O(n log n) | O(n) | Alternative sorting approach |
+| Dynamic Programming | O(n²) | O(n) | Learning or analysis |
+
+## Which approach should you learn first?
+
+- Pick **Greedy (Max Heap)** for the best interview answer — it is intuitive and efficient.
+- Pick **Greedy (Sorted)** for a simpler greedy approach.
+- Pick **Dynamic Programming** if you want to understand the problem structure.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best Interview</div>
+    <div class="lc-approach-quick__name">Greedy (Max Heap)</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simpler Greedy</div>
+    <div class="lc-approach-quick__name">Greedy (Sorted)</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Educational</div>
+    <div class="lc-approach-quick__name">Dynamic Programming</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Greedy with Max Heap (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Greedily select projects with highest profit that we can afford. Use a max heap to track available projects by profit.
+
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Sorting + heap ops" spaceNote="Heap storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyGreedyMaxHeap} lang="python" title="ipo_greedy_max_heap.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppGreedyMaxHeap} lang="cpp" title="ipo_greedy_max_heap.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaGreedyMaxHeap} lang="java" title="ipo_greedy_max_heap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedyMaxHeap} lang="javascript" title="ipo_greedy_max_heap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedyMaxHeap} lang="rust" title="ipo_greedy_max_heap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedyMaxHeap} lang="go" title="ipo_greedy_max_heap.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Greedy with Sorting
+
+<ApproachTag tag="interview" />
+
+Sort projects by capital and select k projects with highest profits greedily.
+
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Sorting" spaceNote="Storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyGreedySorted} lang="python" title="ipo_greedy_sorted.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppGreedySorted} lang="cpp" title="ipo_greedy_sorted.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaGreedySorted} lang="java" title="ipo_greedy_sorted.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedySorted} lang="javascript" title="ipo_greedy_sorted.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedySorted} lang="rust" title="ipo_greedy_sorted.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedySorted} lang="go" title="ipo_greedy_sorted.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Dynamic Programming
+
+<ApproachTag tag="simple" />
+
+Use DP to explore all possible combinations of projects and track maximum profit.
+
+<ComplexityBadges time="O(n²)" space="O(n)" timeColor="red" spaceColor="yellow" timeNote="All subsets" spaceNote="DP table" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDP} lang="python" title="ipo_dp.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDP} lang="cpp" title="ipo_dp.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDP} lang="java" title="ipo_dp.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDP} lang="javascript" title="ipo_dp.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDP} lang="rust" title="ipo_dp.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDP} lang="go" title="ipo_dp.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Mistake 1 — explain what to watch for
+- Mistake 2 — explain what to watch for
+- Mistake 3 — explain what to watch for
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 217, title: 'Contains Duplicate', difficulty: 'Easy', leetcodeSlug: 'contains-duplicate' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key discussion points">
+- Trade-offs between different approaches
+- Edge cases to consider
+- Possible follow-up questions
+- How to extend the solution
+</Aside>
+
+<PrevNextNav prevProblem={false} nextProblem={false} />

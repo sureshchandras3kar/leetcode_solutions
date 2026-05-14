@@ -2,9 +2,13 @@
 *.iml
 out
 gen
-.venv
-venv
 
-.cache
-.markdownlint
-site
+# Astro build output
+dist/
+.astro/
+
+# Node
+node_modules/
+
+# macOS
+.DS_Store

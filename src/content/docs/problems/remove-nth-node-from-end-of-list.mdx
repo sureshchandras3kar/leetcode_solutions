@@ -1,0 +1,435 @@
+---
+title: Remove Nth Node From End of List
+description: Remove the nth node from the end of a linked list. Two approaches — two pass O(L) and two pointers one pass O(L) — in six languages.
+leetcodeNumber: 19
+difficulty: Medium
+leetcodeSlug: remove-nth-node-from-end-of-list
+tags: [Linked List, Two Pointers]
+prev:
+  label: "#17 Letter Combinations of a Phone Number"
+  link: "../letter-combinations-of-a-phone-number/"
+next:
+  label: "#20 Valid Parentheses"
+  link: "../valid-parentheses/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyTwoPass     from '@solutions/Python/remove_nth_node_from_end_of_list_two_pass.py?raw';
+import cppTwoPass    from '@solutions/C++/remove_nth_node_from_end_of_list_two_pass.cpp?raw';
+import javaTwoPass   from '@solutions/Java/remove_nth_node_from_end_of_list_two_pass.java?raw';
+import jsTwoPass     from '@solutions/JavaScript/remove_nth_node_from_end_of_list_two_pass.js?raw';
+import rustTwoPass   from '@solutions/Rust/remove_nth_node_from_end_of_list_two_pass.rs?raw';
+import goTwoPass     from '@solutions/Golang/remove_nth_node_from_end_of_list_two_pass.go?raw';
+import pyoptimized from '@solutions/Python/remove_nth_node_from_end_of_list_optimized.py?raw';
+import cppoptimized from '@solutions/C++/remove_nth_node_from_end_of_list_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/RemoveNthNodeFromEndOfListOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/remove_nth_node_from_end_of_list_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/remove_nth_node_from_end_of_list_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/remove_nth_node_from_end_of_list_optimized.go?raw';
+
+import pyTwoPtr      from '@solutions/Python/remove_nth_node_from_end_of_list_two_pointers.py?raw';
+import cppTwoPtr     from '@solutions/C++/remove_nth_node_from_end_of_list_two_pointers.cpp?raw';
+import javaTwoPtr    from '@solutions/Java/remove_nth_node_from_end_of_list_two_pointers.java?raw';
+import jsTwoPtr      from '@solutions/JavaScript/remove_nth_node_from_end_of_list_two_pointers.js?raw';
+import rustTwoPtr    from '@solutions/Rust/remove_nth_node_from_end_of_list_two_pointers.rs?raw';
+import goTwoPtr      from '@solutions/Golang/remove_nth_node_from_end_of_list_two_pointers.go?raw';
+
+## Problem Statement
+
+Given the `head` of a linked list, remove the `nth` node from the end of the list and return the head of the modified list.
+
+You must solve this **in one pass** when possible, but a two-pass solution is a good warm-up.
+
+<Aside type="tip" title="What to notice first">
+- The key challenge is identifying the node *before* the one you want to remove, not the node itself.
+- Removing the head is a special case — the result is `head.next`.
+- Using a dummy node elegantly handles the head removal case without branching.
+- The "one pass" constraint forces you to maintain a gap between two pointers.
+</Aside>
+
+### Examples
+
+| Input | n | Output | Explanation |
+| --- | --- | --- | --- |
+| `1 → 2 → 3 → 4 → 5` | 2 | `1 → 2 → 3 → 5` | The 4th node (value 4) is removed. |
+| `1` | 1 | (empty) | Single node is removed; result is empty. |
+| `1 → 2` | 1 | `1` | Remove the 2nd node (end); result is `[1]`. |
+| `1 → 2` | 2 | `2` | Remove the 1st node (head); result is `[2]`. |
+
+## Constraints
+
+- The number of nodes in the list is `sz`.
+- `1 <= sz <= 30`
+- `0 < n <= sz`
+- All node values are unique.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Circular buffer eviction** — remove the nth most recent element to implement an LRU cache.
+- **Audio playback** — skip the nth song from the end of a playlist queue.
+- **Undo/redo stacks** — remove the nth action from the end of the history when memory is limited.
+- **Log rotation** — discard the nth oldest log entry when the buffer is full.
+- **Packet processing** — drop the nth packet from the back of a transmission queue.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Passes | Best When |
+| --- | --- | --- | --- | --- |
+| Two Pass | O(L) | O(1) | 2 | Learning the basic algorithm or when clarity is prioritized |
+| Two Pointers (One Pass) | O(L) | O(1) | 1 | Interview setting or when single-pass constraint is required |
+
+## Which approach should you learn first?
+
+- Pick **Two Pass** if you are learning linked list concepts for the first time.
+- Pick **Two Pointers** if you want the optimal solution or are in an interview where "one pass" is mentioned.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Single Pass (Optimal)</div>
+    <div class="lc-approach-quick__name">Two Pointers</div>
+    <div class="lc-approach-quick__stats">O(L) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Easier to Understand</div>
+    <div class="lc-approach-quick__name">Two Pass</div>
+    <div class="lc-approach-quick__stats">O(L) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Two Pass
+
+<ApproachTag tag="simple" />
+
+Count the total number of nodes in the first pass, then find and skip the target node in the second pass.
+
+This approach is straightforward: first measure the list, then navigate to the node before the one to remove.
+
+<ComplexityBadges time="O(L)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Two passes" spaceColor="No extra memory" />
+
+### Step-by-step Example
+
+**Input:** `1 → 2 → 3 → 4 → 5`, `n = 2`
+
+**Pass 1 (Count):** Length = 5
+
+**Pass 2 (Remove):** We want to skip the node at position `5 - 2 = 3` from the start (0-indexed: position 3).
+- Navigate to position 2 (the node with value 3).
+- Set `node.next = node.next.next` (skip the 4).
+- Result: `1 → 2 → 3 → 5`
+
+**Another case:** `n = 1` (remove the last node)
+
+**Pass 1 (Count):** Length = 5
+
+**Pass 2 (Remove):** We want to skip the node at position `5 - 1 = 4` from the start.
+- Navigate to position 3 (the node with value 4).
+- Set `node.next = node.next.next` (skip the 5).
+- Result: `1 → 2 → 3 → 4`
+
+**Edge case:** `1`, `n = 1` (remove the only node)
+
+**Pass 1 (Count):** Length = 1
+
+Since `length == n`, return `head.next`, which is `null`.
+- Result: (empty list)
+
+### Pseudocode
+
+```plaintext
+function removeNthNodeTwoPass(head, n):
+    // First pass: count total nodes
+    length = 0
+    current = head
+    while current != null:
+        length++
+        current = current.next
+
+    // Edge case: removing the head
+    if length == n:
+        return head.next
+
+    // Second pass: find the node before the one to remove
+    current = head
+    for i from 0 to length - n - 2:
+        current = current.next
+
+    // Remove the nth node
+    current.next = current.next.next
+    return head
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPass} lang="python" title="remove_nth_node_from_end_of_list_two_pass.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPass} lang="cpp" title="remove_nth_node_from_end_of_list_two_pass.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPass} lang="java" title="remove_nth_node_from_end_of_list_two_pass.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPass} lang="javascript" title="remove_nth_node_from_end_of_list_two_pass.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPass} lang="rust" title="remove_nth_node_from_end_of_list_two_pass.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPass} lang="go" title="remove_nth_node_from_end_of_list_two_pass.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Two Pointers (One Pass - Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use a dummy node and two pointers (fast and slow) with a controlled gap. Move both pointers in lockstep; when the fast pointer reaches the end, the slow pointer will be at the node *before* the one to remove.
+
+The dummy node is the key: it cleanly handles the edge case of removing the head without special branching.
+
+<ComplexityBadges time="O(L)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceColor="No extra memory" />
+
+### Step-by-step Example
+
+**Input:** `1 → 2 → 3 → 4 → 5`, `n = 2`
+
+**Setup:** Create dummy: `0 → 1 → 2 → 3 → 4 → 5`
+- Slow = dummy, fast = dummy
+
+**Move fast pointer `n+1 = 3` steps ahead:**
+- Step 1: fast = `1`
+- Step 2: fast = `2`
+- Step 3: fast = `3`
+
+Now there is a gap of 2 nodes between slow (dummy) and fast (3).
+
+**Move both pointers until fast reaches the end:**
+- Move 1: slow = `1`, fast = `4`
+- Move 2: slow = `2`, fast = `5`
+- Move 3: slow = `3`, fast = `null`
+
+Fast is now `null`. Slow is at node `3`.
+
+**Remove the next node:** `slow.next = slow.next.next`
+- `3.next = 5` (skip 4)
+
+**Result:** `0 → 1 → 2 → 3 → 5`, return `dummy.next` = `1 → 2 → 3 → 5`
+
+**Edge case:** `1 → 2`, `n = 2` (remove the head)
+
+**Setup:** Create dummy: `0 → 1 → 2`
+- Slow = dummy, fast = dummy
+
+**Move fast pointer `n+1 = 3` steps ahead:**
+- Step 1: fast = `1`
+- Step 2: fast = `2`
+- Step 3: fast = `null`
+
+**Move both pointers until fast reaches the end:**
+- fast is already null, so the loop does not run.
+
+**Remove the next node:** `slow.next = slow.next.next`
+- dummy.next = 2 (skip 1)
+
+**Result:** `0 → 2`, return `dummy.next` = `2`
+
+### Pseudocode
+
+```plaintext
+function removeNthNodeTwoPointers(head, n):
+    dummy = new Node(0)
+    dummy.next = head
+    slow = dummy
+    fast = dummy
+
+    // Move fast pointer n+1 steps ahead
+    for i from 0 to n:
+        if fast == null:
+            return head
+        fast = fast.next
+
+    // Move both pointers until fast reaches the end
+    while fast != null:
+        slow = slow.next
+        fast = fast.next
+
+    // Remove the nth node
+    slow.next = slow.next.next
+    return dummy.next
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPtr} lang="python" title="remove_nth_node_from_end_of_list_two_pointers.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPtr} lang="cpp" title="remove_nth_node_from_end_of_list_two_pointers.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPtr} lang="java" title="remove_nth_node_from_end_of_list_two_pointers.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPtr} lang="javascript" title="remove_nth_node_from_end_of_list_two_pointers.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPtr} lang="rust" title="remove_nth_node_from_end_of_list_two_pointers.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPtr} lang="go" title="remove_nth_node_from_end_of_list_two_pointers.go" />
+  </TabItem>
+</Tabs>
+
+## Interactive Visualization
+
+<LogicPlayer
+  title="Two-pointer gap maintains the distance to the target"
+  description="Watch how the fast and slow pointers maintain a gap of exactly n nodes. When fast reaches the end, slow is perfectly positioned to remove the target node."
+  target="gap"
+  steps={[
+    {
+      title: 'Create dummy node pointing to head',
+      note: 'A dummy node (value 0) simplifies head removal. Both pointers start at dummy.',
+      formula: 'dummy = [0] → [1] → [2] → [3] → [4] → [5]',
+      callout: 'Starting position: slow = dummy, fast = dummy',
+      items: [
+        { label: 'dummy', state: 'active', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['slow → dummy', 'fast → dummy', 'gap = 0'],
+    },
+    {
+      title: 'Move fast pointer n+1 steps (gap-building phase)',
+      note: 'We move fast 3 steps (n+1 where n=2) to create a gap of exactly n nodes.',
+      formula: 'fast moves 3 times: dummy → 1 → 2 → 3',
+      callout: 'After this, the gap between slow and fast is exactly n=2 nodes.',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['slow → dummy', 'fast → 3', 'gap = 2 nodes'],
+    },
+    {
+      title: 'Move both pointers in lockstep',
+      note: 'Now both pointers move together. The gap is maintained at 2 nodes.',
+      formula: 'Step 1: slow → 1, fast → 4; Step 2: slow → 2, fast → 5; Step 3: slow → 3, fast → null',
+      callout: 'When fast reaches null, slow is exactly at the node before the target.',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'match', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['slow → 3 (node before target)', 'fast → null', 'gap maintained = 2'],
+    },
+    {
+      title: 'Skip the target node',
+      note: 'Slow is at node 3. The target (node 4, n=2 from the end) is slow.next. We bypass it.',
+      formula: 'slow.next = slow.next.next → 3.next = 5',
+      callout: 'Node 4 is removed from the chain. The list is now 0 → 1 → 2 → 3 → 5.',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'removed', index: 3 },
+        { label: '5', state: 'active', index: 4 },
+      ],
+      memory: ['3.next now points to 5', 'Node 4 is removed', 'Result: 1 → 2 → 3 → 5'],
+    },
+  ]}
+/>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="remove_nth_node_from_end_of_list_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="remove_nth_node_from_end_of_list_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="RemoveNthNodeFromEndOfListOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="remove_nth_node_from_end_of_list_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="remove_nth_node_from_end_of_list_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="remove_nth_node_from_end_of_list_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Not handling the head removal case** — if n equals the list length, you must return `head.next`, not attempt to navigate before it.
+- **Off-by-one errors in the loop** — forgetting to move to `length - n - 1` instead of `length - n` in the two-pass approach.
+- **Not using a dummy node** — the dummy node elegantly avoids the head case without extra branching; omitting it often leads to bugs.
+- **Breaking the loop early** — in the two-pointer approach, iterating `n` times instead of `n+1` times will misalign the pointers.
+- **Null pointer dereferences** — always check that the node and its next pointer exist before accessing them.
+</Aside>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why two pointers over two pass?** The single-pass solution is more elegant and shows mastery of pointer manipulation. Interviewers often explicitly ask for one-pass solutions.
+- **Why the dummy node?** It eliminates the need for a special case when removing the head. Discuss how dummy nodes simplify edge cases in linked list operations.
+- **Gap maintenance:** The key insight is that by moving fast `n+1` steps ahead, we naturally create a gap of exactly `n` nodes. This gap is preserved as both pointers move together.
+- **Edge cases to mention:** single-node lists, removing the head, removing the tail, and very small lists (n=1, length=1 vs. length=2).
+- **Follow-up — General Node Removal:** Can extend to remove all occurrences of a value, or remove every kth node. The dummy node pattern is reusable.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 21, title: 'Merge Two Sorted Lists', difficulty: 'Easy', leetcodeSlug: 'merge-two-sorted-lists' },
+  { number: 24, title: 'Swap Nodes in Pairs', difficulty: 'Medium', leetcodeSlug: 'swap-nodes-in-pairs' },
+  { number: 61, title: 'Rotate List', difficulty: 'Medium', leetcodeSlug: 'rotate-list' },
+  { number: 82, title: 'Remove Duplicates from Sorted List II', difficulty: 'Medium', leetcodeSlug: 'remove-duplicates-from-sorted-list-ii' },
+  { number: 18, title: '4Sum', difficulty: 'Medium', slug: 'problems/4sum', leetcodeSlug: '4sum' },
+  { number: 20, title: 'Valid Parentheses', difficulty: 'Easy', slug: 'problems/valid-parentheses', leetcodeSlug: 'valid-parentheses' },
+]} />
+
+<PrevNextNav
+  prevProblem={{ number: 18, title: "4Sum", slug: "4sum" }}
+  nextProblem={{ number: 20, title: "Valid Parentheses", slug: "valid-parentheses" }}
+/>

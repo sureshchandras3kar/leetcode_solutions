@@ -1,0 +1,363 @@
+---
+title: Longest Consecutive Sequence
+description: Find the length of the longest sequence of consecutive integers in an unsorted array. Two approaches — hash set O(n) and sort O(n log n) — in six languages.
+leetcodeNumber: 128
+difficulty: Medium
+leetcodeSlug: longest-consecutive-sequence
+tags: [Array, Hash Table, Union Find]
+prev:
+  label: "#127 Word Ladder"
+  link: "../word-ladder/"
+next:
+  label: "#129 Sum Root to Leaf Numbers"
+  link: "../sum-root-to-leaf-numbers/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyHashSet   from '@solutions/Python/longest_consecutive_hash_set.py?raw';
+import cppHashSet  from '@solutions/C++/longest_consecutive_hash_set.cpp?raw';
+import javaHashSet from '@solutions/Java/longest_consecutive_hash_set.java?raw';
+import jsHashSet   from '@solutions/JavaScript/longest_consecutive_hash_set.js?raw';
+import rustHashSet from '@solutions/Rust/longest_consecutive_hash_set.rs?raw';
+import goHashSet   from '@solutions/Golang/longest_consecutive_hash_set.go?raw';
+import pySpaceOptimized from '@solutions/Python/longest_consecutive_sequence_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/longest_consecutive_sequence_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/LongestConsecutiveSequenceSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/longest_consecutive_sequence_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/longest_consecutive_sequence_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/longest_consecutive_sequence_space_optimized.go?raw';
+
+import pySort   from '@solutions/Python/longest_consecutive_sort.py?raw';
+import cppSort  from '@solutions/C++/longest_consecutive_sort.cpp?raw';
+import javaSort from '@solutions/Java/longest_consecutive_sort.java?raw';
+import jsSort   from '@solutions/JavaScript/longest_consecutive_sort.js?raw';
+import rustSort from '@solutions/Rust/longest_consecutive_sort.rs?raw';
+import goSort   from '@solutions/Golang/longest_consecutive_sort.go?raw';
+
+## Problem Statement
+
+Given an unsorted array of integers `nums`, return the length of the longest consecutive elements sequence.
+
+You must write an algorithm that runs in **O(n)** time.
+
+<Aside type="tip" title="What to notice first">
+- "Consecutive" means 1, 2, 3, 4 — not sorted by position, but by value.
+- The O(n) constraint rules out sorting — you need a hash set.
+- Key insight: only start counting from the beginning of a sequence (where n-1 is NOT in the set).
+</Aside>
+
+### Examples
+
+| Input | Output | Longest sequence |
+| --- | --- | --- |
+| `[100,4,200,1,3,2]` | `4` | `[1,2,3,4]` |
+| `[0,3,7,2,5,8,4,6,0,1]` | `9` | `[0,1,2,3,4,5,6,7,8]` |
+
+## Constraints
+
+- `0 <= nums.length <= 10^5`
+- `-10^9 <= nums[i] <= 10^9`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Session analysis** — find the longest unbroken streak of consecutive daily logins.
+- **Version range detection** — find the longest consecutive set of version numbers present.
+- **Scheduling** — find the longest block of consecutive available time slots.
+- **Genomics** — longest uninterrupted run of positions in a chromosome that all have coverage.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Hash Set | O(n) | O(n) | Required by problem, optimal |
+| Sort First | O(n log n) | O(1)* | Sorting allowed, simpler to implement |
+
+## Approach 1: Hash Set (Recommended)
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Each number visited at most twice" spaceNote="Set stores all numbers" />
+
+Put all numbers in a hash set. For each number `n`, only start counting if `n-1` is **not** in the set — that means `n` is the beginning of a sequence. Then count `n, n+1, n+2, ...` as long as they're in the set. Track the maximum streak found.
+
+Despite the nested loop appearance this is O(n) total because each number is visited at most twice: once as a candidate start, and at most once as part of a sequence expansion.
+
+### Step-by-step Example
+
+**Input:** `[100,4,200,1,3,2]`
+
+Set = `{100, 4, 200, 1, 3, 2}`
+
+| num | n-1 in set? | Action | Streak | Max |
+| --- | --- | --- | --- | --- |
+| 100 | 99 ✗ | count: 100 → streak 1 | 1 | 1 |
+| 4 | 3 ✓ | skip (not start) | — | 1 |
+| 200 | 199 ✗ | count: 200 → streak 1 | 1 | 1 |
+| 1 | 0 ✗ | count: 1,2,3,4 → streak 4 | 4 | 4 |
+| 3 | 2 ✓ | skip | — | 4 |
+| 2 | 1 ✓ | skip | — | 4 |
+
+<LogicPlayer
+  title="Hash set: finding the longest consecutive sequence"
+  description="Use Next or Autoplay to see how we build the set, identify sequence starts, and expand each sequence rightward."
+  steps={[
+    {
+      title: 'Build the hash set from nums',
+      note: 'Load every number into a set for O(1) membership checks. Duplicates are automatically removed.',
+      formula: 'num_set = {1, 2, 3, 4, 100, 200}',
+      items: [
+        { label: '100', state: 'default', index: 0 },
+        { label: '4',   state: 'default', index: 1 },
+        { label: '200', state: 'default', index: 2 },
+        { label: '1',   state: 'default', index: 3 },
+        { label: '3',   state: 'default', index: 4 },
+        { label: '2',   state: 'default', index: 5 },
+      ],
+      memory: ['num_set = {1, 2, 3, 4, 100, 200}', 'best = 0'],
+    },
+    {
+      title: 'Check 100 — is 99 in set?',
+      note: '99 is not in the set, so 100 is a sequence start. We count: 100. 101 is not in set, so streak = 1.',
+      formula: '99 ∉ set → start at 100 → streak = 1',
+      items: [
+        { label: '100', state: 'active', index: 0 },
+        { label: '4',   state: 'default', index: 1 },
+        { label: '200', state: 'default', index: 2 },
+        { label: '1',   state: 'default', index: 3 },
+        { label: '3',   state: 'default', index: 4 },
+        { label: '2',   state: 'default', index: 5 },
+      ],
+      memory: ['num_set = {1, 2, 3, 4, 100, 200}', 'best = 1'],
+    },
+    {
+      title: 'Check 4 — is 3 in set?',
+      note: '3 is in the set, so 4 is NOT a sequence start. Skip it — we will count it when we process 1.',
+      formula: '3 ∈ set → skip 4 (not a start)',
+      items: [
+        { label: '100', state: 'default', index: 0 },
+        { label: '4',   state: 'inactive', index: 1 },
+        { label: '200', state: 'default', index: 2 },
+        { label: '1',   state: 'default', index: 3 },
+        { label: '3',   state: 'default', index: 4 },
+        { label: '2',   state: 'default', index: 5 },
+      ],
+      memory: ['num_set = {1, 2, 3, 4, 100, 200}', 'best = 1'],
+    },
+    {
+      title: 'Check 1 — is 0 in set?',
+      note: '0 is not in the set, so 1 is a sequence start. Expand: 1 → 2 → 3 → 4. 5 is not in set.',
+      formula: '0 ∉ set → start at 1 → count 1,2,3,4 → streak = 4',
+      items: [
+        { label: '100', state: 'default', index: 0 },
+        { label: '4',   state: 'match',   index: 1 },
+        { label: '200', state: 'default', index: 2 },
+        { label: '1',   state: 'match',   index: 3 },
+        { label: '3',   state: 'match',   index: 4 },
+        { label: '2',   state: 'match',   index: 5 },
+      ],
+      memory: ['num_set = {1, 2, 3, 4, 100, 200}', 'best = 4', 'sequence: 1 → 2 → 3 → 4'],
+    },
+    {
+      title: 'Check 3 and 2 — both skipped',
+      note: 'Both 3 and 2 have a predecessor in the set (2 and 1 respectively). Neither is a sequence start.',
+      formula: '2 ∈ set → skip 3 | 1 ∈ set → skip 2',
+      items: [
+        { label: '100', state: 'default',  index: 0 },
+        { label: '4',   state: 'default',  index: 1 },
+        { label: '200', state: 'default',  index: 2 },
+        { label: '1',   state: 'default',  index: 3 },
+        { label: '3',   state: 'inactive', index: 4 },
+        { label: '2',   state: 'inactive', index: 5 },
+      ],
+      memory: ['num_set = {1, 2, 3, 4, 100, 200}', 'best = 4'],
+    },
+    {
+      title: 'Answer: 4',
+      note: 'The longest consecutive sequence is [1, 2, 3, 4] with length 4.',
+      formula: 'return best = 4',
+      callout: 'Each number was visited at most twice — once as a start check, once inside a sequence expansion.',
+      items: [
+        { label: '100', state: 'default', index: 0 },
+        { label: '4',   state: 'match',   index: 1 },
+        { label: '200', state: 'default', index: 2 },
+        { label: '1',   state: 'match',   index: 3 },
+        { label: '3',   state: 'match',   index: 4 },
+        { label: '2',   state: 'match',   index: 5 },
+      ],
+      memory: ['Answer: 4'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function longestConsecutive(nums):
+    num_set = set(nums)
+    best = 0
+    for n in num_set:
+        if (n - 1) not in num_set:   # start of sequence
+            length = 1
+            while (n + length) in num_set:
+                length += 1
+            best = max(best, length)
+    return best
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHashSet} lang="python" title="longest_consecutive_hash_set.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHashSet} lang="cpp" title="longest_consecutive_hash_set.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHashSet} lang="java" title="longest_consecutive_hash_set.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHashSet} lang="javascript" title="longest_consecutive_hash_set.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHashSet} lang="rust" title="longest_consecutive_hash_set.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHashSet} lang="go" title="longest_consecutive_hash_set.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Sort First
+
+<ApproachTag tag="simple" />
+
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Sort-dominated" spaceNote="In-place sort" />
+
+Sort the array. Iterate through it, skipping duplicates. Reset the streak when a gap greater than 1 appears. Simple to implement but does not meet the O(n) requirement.
+
+### Step-by-step Example
+
+**Input:** `[100,4,200,1,3,2]`
+
+Sorted: `[1, 2, 3, 4, 100, 200]`
+
+| i | nums[i] | nums[i-1] | Action | Streak | Max |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 2 | 1 | consecutive | 2 | 2 |
+| 2 | 3 | 2 | consecutive | 3 | 3 |
+| 3 | 4 | 3 | consecutive | 4 | 4 |
+| 4 | 100 | 4 | gap → reset | 1 | 4 |
+| 5 | 200 | 100 | gap → reset | 1 | 4 |
+
+### Pseudocode
+
+```plaintext
+function longestConsecutive(nums):
+    if not nums: return 0
+    nums.sort()
+    best = 1; streak = 1
+    for i in 1..len(nums)-1:
+        if nums[i] == nums[i-1]: continue  # skip duplicate
+        if nums[i] == nums[i-1] + 1:
+            streak += 1
+            best = max(best, streak)
+        else:
+            streak = 1
+    return best
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySort} lang="python" title="longest_consecutive_sort.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSort} lang="cpp" title="longest_consecutive_sort.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSort} lang="java" title="longest_consecutive_sort.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSort} lang="javascript" title="longest_consecutive_sort.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSort} lang="rust" title="longest_consecutive_sort.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSort} lang="go" title="longest_consecutive_sort.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Common mistakes">
+- Iterating over `nums` instead of `num_set` in the hash set approach — duplicates cause false "start" checks and inflate the streak count.
+- Forgetting to handle the empty array — both approaches should return `0` for empty input.
+- In the sort approach, not skipping duplicates before comparing gaps — `nums[i] == nums[i-1]` should `continue`, not reset the streak.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="longest_consecutive_sequence_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="longest_consecutive_sequence_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="LongestConsecutiveSequenceSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="longest_consecutive_sequence_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="longest_consecutive_sequence_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="longest_consecutive_sequence_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 217, title: 'Contains Duplicate', difficulty: 'Easy', slug: 'problems/contains-duplicate', leetcodeSlug: 'contains-duplicate' },
+  { number: 525, title: 'Contiguous Array', difficulty: 'Medium', leetcodeSlug: 'contiguous-array' },
+  { number: 300, title: 'Longest Increasing Subsequence', difficulty: 'Medium', leetcodeSlug: 'longest-increasing-subsequence' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- The O(n) requirement is a direct hint to use a hash set — mention this observation explicitly.
+- The "only start at sequence beginnings" trick is the key insight — explain why it avoids redundant work.
+- The while loop looks like O(n²) but it is amortised O(n) because each element is counted at most once across all sequence expansions.
+- Common follow-up: "What if values can be negative?" — the algorithm handles it fine since the set membership check works for any integer.
+
+
+<PrevNextNav
+  prevProblem={ number: 127, title: "Word Ladder", slug: "word-ladder" }
+  nextProblem={ number: 129, title: "Sum Root to Leaf Numbers", slug: "sum-root-to-leaf-numbers" }
+/></Aside>

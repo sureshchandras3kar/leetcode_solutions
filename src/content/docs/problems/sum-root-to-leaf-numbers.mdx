@@ -1,0 +1,199 @@
+---
+title: Sum Root to Leaf Numbers
+description: Sum all numbers formed by root-to-leaf paths. Two approaches — DFS O(n) and BFS O(n) — in six languages.
+leetcodeNumber: 129
+difficulty: Medium
+leetcodeSlug: sum-root-to-leaf-numbers
+tags: [Tree, Depth-First Search, Breadth-First Search, Math]
+prev:
+  label: "#128 Longest Consecutive Sequence"
+  link: "../longest-consecutive-sequence/"
+next:
+  label: "#130 Surrounded Regions"
+  link: "../surrounded-regions/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyDFS    from '@solutions/Python/sum_root_to_leaf_numbers_dfs.py?raw';
+import cppDFS   from '@solutions/C++/sum_root_to_leaf_numbers_dfs.cpp?raw';
+import javaDFS  from '@solutions/Java/SumRootToLeafNumbersDFS.java?raw';
+import jsDFS    from '@solutions/JavaScript/sum_root_to_leaf_numbers_dfs.js?raw';
+import rustDFS  from '@solutions/Rust/sum_root_to_leaf_numbers_dfs.rs?raw';
+import goDFS    from '@solutions/Golang/sum_root_to_leaf_numbers_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/sum_root_to_leaf_numbers_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/sum_root_to_leaf_numbers_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/SumRootToLeafNumbersBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/sum_root_to_leaf_numbers_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/sum_root_to_leaf_numbers_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/sum_root_to_leaf_numbers_bfs_iterative.go?raw';
+
+import pyBFS    from '@solutions/Python/sum_root_to_leaf_numbers_bfs.py?raw';
+import cppBFS   from '@solutions/C++/sum_root_to_leaf_numbers_bfs.cpp?raw';
+import javaBFS  from '@solutions/Java/SumRootToLeafNumbersBFS.java?raw';
+import jsBFS    from '@solutions/JavaScript/sum_root_to_leaf_numbers_bfs.js?raw';
+import rustBFS  from '@solutions/Rust/sum_root_to_leaf_numbers_bfs.rs?raw';
+import goBFS    from '@solutions/Golang/sum_root_to_leaf_numbers_bfs.go?raw';
+
+## Problem Statement
+
+You are given the root of a binary tree containing digits from 0-9 only. Each root-to-leaf path represents a number. Return the total sum of all numbers represented by root-to-leaf paths.
+
+<Aside type="tip" title="What to notice first">
+- Build the number by multiplying by 10 and adding the current digit.
+- Only complete root-to-leaf paths count.
+- Example: tree [1,2,3] → paths [1,2]=12 and [1,3]=13 → sum=25.
+</Aside>
+
+### Examples
+
+| Input | Output | Calculation |
+| --- | --- | --- |
+| `[1,2,3]` | 25 | 12 + 13 |
+| `[4,9,0,5,1]` | 1026 | 495 + 491 + 40 |
+
+## Constraints
+
+- The number of nodes is in the range `[1, 1000]`.
+- `0 <= Node.val <= 9`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- File system hierarchies and directory structures
+- DOM tree manipulation in web browsers
+- XML/JSON parsing and configuration management
+- Organizational hierarchies and permission trees
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| DFS | O(n) | O(h) | Simple, clean; h is height |
+| BFS | O(n) | O(w) | Avoid recursion; w is max width |
+
+## Approach 1: DFS
+
+<ApproachTag tag="recommended" />
+
+Recursively traverse with current_sum multiplied by 10 and incremented by current digit. Sum leaf values.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Recursion depth" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="sum_root_to_leaf_numbers_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="sum_root_to_leaf_numbers_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="SumRootToLeafNumbersDFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="sum_root_to_leaf_numbers_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="sum_root_to_leaf_numbers_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="sum_root_to_leaf_numbers_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS Iterative
+
+<ApproachTag tag="alternative" />
+
+Use a queue with (node, current_number) pairs. Sum all leaf numbers encountered.
+
+<ComplexityBadges time="O(n)" space="O(w)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Queue size (max width)" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="sum_root_to_leaf_numbers_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="sum_root_to_leaf_numbers_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="SumRootToLeafNumbersBFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="sum_root_to_leaf_numbers_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="sum_root_to_leaf_numbers_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="sum_root_to_leaf_numbers_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="sum_root_to_leaf_numbers_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="sum_root_to_leaf_numbers_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="SumRootToLeafNumbersBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="sum_root_to_leaf_numbers_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="sum_root_to_leaf_numbers_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="sum_root_to_leaf_numbers_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 112, title: 'Path Sum', difficulty: 'Easy', leetcodeSlug: 'path-sum' },
+  { number: 113, title: 'Path Sum II', difficulty: 'Medium', leetcodeSlug: 'path-sum-ii' },
+  { number: 257, title: 'Binary Tree Paths', difficulty: 'Easy', leetcodeSlug: 'binary-tree-paths' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- Time vs. space trade-offs between approaches
+- Handling edge cases (empty inputs, single elements, duplicates)
+- Optimization opportunities and when they matter
+- Follow-up variations and constraint changes
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

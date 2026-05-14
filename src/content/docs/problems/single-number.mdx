@@ -1,0 +1,200 @@
+---
+title: Single Number
+description: Given a non-empty array of integers where every element appears twice except for one, find that single element.
+leetcodeNumber: 136
+difficulty: Easy
+leetcodeSlug: single-number
+tags: [Array, BitManipulation]
+prev:
+  label: "#133 Clone Graph"
+  link: "../clone-graph/"
+next:
+  label: "#137 Single Number II"
+  link: "../single-number-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyXor from '@solutions/Python/single_number_xor.py?raw';
+import cppXor from '@solutions/C++/single_number_xor.cpp?raw';
+import javaXor from '@solutions/Java/single_number_xor.java?raw';
+import jsXor from '@solutions/JavaScript/single_number_xor.js?raw';
+import rustXor from '@solutions/Rust/single_number_xor.rs?raw';
+import goXor from '@solutions/Golang/single_number_xor.go?raw';
+
+import pyHashmap from '@solutions/Python/single_number_hashmap.py?raw';
+import cppHashmap from '@solutions/C++/single_number_hashmap.cpp?raw';
+import javaHashmap from '@solutions/Java/single_number_hashmap.java?raw';
+import jsHashmap from '@solutions/JavaScript/single_number_hashmap.js?raw';
+import rustHashmap from '@solutions/Rust/single_number_hashmap.rs?raw';
+import goHashmap from '@solutions/Golang/single_number_hashmap.go?raw';
+
+import pyMath from '@solutions/Python/single_number_math.py?raw';
+import cppMath from '@solutions/C++/single_number_math.cpp?raw';
+import javaMath from '@solutions/Java/single_number_math.java?raw';
+import jsMath from '@solutions/JavaScript/single_number_math.js?raw';
+import rustMath from '@solutions/Rust/single_number_math.rs?raw';
+import goMath from '@solutions/Golang/single_number_math.go?raw';
+
+
+
+## Problem Statement
+
+Given a non-empty array of integers where every element appears twice except for one, find that single element.
+
+You need to solve this problem efficiently.
+
+<Aside type="tip" title="What to notice first">
+- Key insight 1 for Single Number
+- Key insight 2 for solving this problem
+- Key insight 3 specific to the approach
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation for example 1 |
+| Example 2 | Result 2 | Explanation for example 2 |
+
+## Constraints
+
+- Constraint 1 for Single Number
+- Constraint 2
+- Constraint 3
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Database indexing and query optimization
+- Buffer management in system memory
+- Time-series data analysis and sliding windows
+- Image pixel manipulation and batch processing
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Xor | O(n) | O(1) | When applicable |
+| Hashmap | O(n) | O(1) | When applicable |
+| Math | O(n) | O(1) | When applicable |
+
+
+## Approach 1: Xor
+
+<ApproachTag tag="recommended" />
+
+This approach provides an efficient solution for single number.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyXor}} lang="python" title="single_number_xor.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppXor}} lang="cpp" title="single_number_xor.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaXor}} lang="java" title="single_number_xor.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsXor}} lang="javascript" title="single_number_xor.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustXor}} lang="rust" title="single_number_xor.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goXor}} lang="go" title="single_number_xor.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Hashmap
+
+<ApproachTag tag="interview" />
+
+This approach provides an efficient solution for single number.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyHashmap}} lang="python" title="single_number_hashmap.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppHashmap}} lang="cpp" title="single_number_hashmap.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaHashmap}} lang="java" title="single_number_hashmap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsHashmap}} lang="javascript" title="single_number_hashmap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustHashmap}} lang="rust" title="single_number_hashmap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goHashmap}} lang="go" title="single_number_hashmap.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Math
+
+<ApproachTag tag="simple" />
+
+This approach provides an efficient solution for single number.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyMath}} lang="python" title="single_number_math.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppMath}} lang="cpp" title="single_number_math.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaMath}} lang="java" title="single_number_math.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsMath}} lang="javascript" title="single_number_math.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustMath}} lang="rust" title="single_number_math.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goMath}} lang="go" title="single_number_math.go" />
+  </TabItem>
+</Tabs>
+
+
+
+<RelatedProblems problems={{
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 9, title: 'Palindrome Number', difficulty: 'Easy', leetcodeSlug: 'palindrome-number' },
+}} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- Time vs. space trade-offs between approaches
+- Handling edge cases (empty inputs, single elements, duplicates)
+- Optimization opportunities and when they matter
+- Follow-up variations and constraint changes
+</Aside>
+
+<PrevNextNav
+  prevProblem=undefined
+  nextProblem=undefined
+/>

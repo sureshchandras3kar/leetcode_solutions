@@ -1,0 +1,311 @@
+---
+title: Combinations
+description: Generate all combinations of k numbers from 1 to n. Two approaches — backtracking recursive O(C(n,k)) and iterative nextPermutation O(C(n,k)) — in six languages.
+leetcodeNumber: 77
+difficulty: Medium
+leetcodeSlug: combinations
+tags: [Backtracking, Recursion]
+prev:
+  label: "#76 Minimum Window Substring"
+  link: "../minimum-window-substring/"
+next:
+  label: "#79 Word Search"
+  link: "../word-search/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBacktracking    from '@solutions/Python/combinations_backtracking.py?raw';
+import cppBacktracking   from '@solutions/C++/combinations_backtracking.cpp?raw';
+import javaBacktracking  from '@solutions/Java/CombinationsBacktracking.java?raw';
+import jsBacktracking    from '@solutions/JavaScript/combinations_backtracking.js?raw';
+import rustBacktracking  from '@solutions/Rust/combinations_backtracking.rs?raw';
+import goBacktracking    from '@solutions/Golang/combinations_backtracking.go?raw';
+import pySpaceOptimized from '@solutions/Python/combinations_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/combinations_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/CombinationsSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/combinations_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/combinations_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/combinations_space_optimized.go?raw';
+
+import pyIterative        from '@solutions/Python/combinations_iterative.py?raw';
+import cppIterative       from '@solutions/C++/combinations_iterative.cpp?raw';
+import javaIterative      from '@solutions/Java/CombinationsIterative.java?raw';
+import jsIterative        from '@solutions/JavaScript/combinations_iterative.js?raw';
+import rustIterative      from '@solutions/Rust/combinations_iterative.rs?raw';
+import goIterative        from '@solutions/Golang/combinations_iterative.go?raw';
+
+## Problem Statement
+
+Given two integers `n` and `k`, return all possible combinations of `k` numbers chosen from the range `[1, n]`.
+
+You may return the combinations in any order.
+
+<Aside type="tip" title="What to notice first">
+- A combination is a selection where order does not matter: [1,2] and [2,1] are the same.
+- The total number of combinations is C(n,k) = n! / (k!(n-k)!).
+- You must generate all possible ways to choose exactly k items from n items without repetition.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `n=4, k=2` | `[[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]]` | 6 unique combinations of 2 from 4 |
+| `n=1, k=1` | `[[1]]` | Only one way to choose 1 from 1 |
+| `n=5, k=3` | 10 combinations | C(5,3) = 10 total combinations |
+
+## Constraints
+
+- `1 <= n <= 20`
+- `1 <= k <= n`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Lottery number selection** — finding all possible lottery ticket combinations from a pool of numbers.
+- **Course scheduling** — selecting k electives from n available courses.
+- **Team formation** — choosing k people from a group of n candidates where roles don't matter.
+- **Testing combinations** — generating all possible feature flag combinations for testing or A/B testing strategies.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Implementation | Best When |
+| --- | --- | --- | --- | --- |
+| Backtracking | O(C(n,k) * k) | O(C(n,k) * k) | Recursive, intuitive | Want clear, readable recursive solution |
+| Iterative | O(C(n,k) * k) | O(C(n,k) * k) | Iterative, uses state machine | Prefer avoiding recursion overhead |
+
+## Which approach should you learn first?
+
+- Pick **Backtracking** if you are learning the decision tree pattern.
+- Pick **Iterative** if you prefer avoiding recursion or want to understand the next-permutation technique.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Common</div>
+    <div class="lc-approach-quick__name">Backtracking</div>
+    <div class="lc-approach-quick__stats">O(C(n,k) * k) time &middot; O(C(n,k) * k) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Iterative</div>
+    <div class="lc-approach-quick__name">Next Combination</div>
+    <div class="lc-approach-quick__stats">O(C(n,k) * k) time &middot; O(C(n,k) * k) space</div>
+  </div>
+</div>
+
+## Approach 1: Backtracking (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use a decision tree where at each level we choose whether to include a number or not. Start from 1, and at each number decide whether to include it in the current combination. If we include it, recursively build combinations for the remaining k-1 slots from the remaining numbers.
+
+The key insight is **choose, explore, unchoose** — this allows us to explore all possibilities without managing a separate "used" set.
+
+<ComplexityBadges time="O(C(n,k) * k)" space="O(C(n,k) * k)" timeColor="red" spaceColor="red" timeNote="C(n,k) combos, k per combo" spaceNote="Result storage" />
+
+### Step-by-step Example
+
+**Input:** `n = 4, k = 2`
+
+| Level | Current | Explore | Decision |
+| --- | --- | --- | --- |
+| 0 | `[]` | Start from 1 | Choose 1? |
+| 1 | `[1]` | Continue from 2 | Choose from [2,3,4]? |
+| 2 | `[1,2]` | k=2 reached | Save `[1,2]` ✓ |
+| 2 | `[1,3]` | k=2 reached | Save `[1,3]` ✓ |
+| 2 | `[1,4]` | k=2 reached | Save `[1,4]` ✓ |
+| 1 | `[2]` | Continue from 3 | Choose from [3,4]? |
+| 2 | `[2,3]` | k=2 reached | Save `[2,3]` ✓ |
+| 2 | `[2,4]` | k=2 reached | Save `[2,4]` ✓ |
+| 1 | `[3]` | Continue from 4 | Choose 4? |
+| 2 | `[3,4]` | k=2 reached | Save `[3,4]` ✓ |
+
+### Pseudocode
+
+```plaintext
+function combinationsBacktracking(n, k):
+    result = []
+    
+    function backtrack(start, current):
+        if len(current) == k:
+            result.append(copy of current)
+            return
+        
+        for i from start to n:
+            current.append(i)
+            backtrack(i + 1, current)
+            current.pop()
+    
+    backtrack(1, [])
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBacktracking} lang="python" title="combinations_backtracking.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBacktracking} lang="cpp" title="combinations_backtracking.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBacktracking} lang="java" title="CombinationsBacktracking.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBacktracking} lang="javascript" title="combinations_backtracking.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBacktracking} lang="rust" title="combinations_backtracking.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBacktracking} lang="go" title="combinations_backtracking.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative (Next Combination)
+
+<ApproachTag tag="interview" />
+
+Generate combinations iteratively using a state machine approach. Start with the first k numbers `[1, 2, ..., k]`. At each step, find the rightmost number that can be incremented (one that is not yet at its maximum value), increment it, and reset all numbers to its right.
+
+This approach mimics the "next combination" concept, similar to how you would manually enumerate combinations on paper.
+
+<ComplexityBadges time="O(C(n,k) * k)" space="O(C(n,k) * k)" timeColor="red" spaceColor="red" timeNote="C(n,k) combos, k per combo" spaceNote="Result storage" />
+
+### Step-by-step Example
+
+**Input:** `n = 4, k = 2`
+
+| Combo | Action | Next |
+| --- | --- | --- |
+| `[1,2]` | Save, then find rightmost incrementable: index 1 | Increment combo[1] from 2 to 3 |
+| `[1,3]` | Save, then find rightmost incrementable: index 1 | Increment combo[1] from 3 to 4 |
+| `[1,4]` | Save, then find rightmost incrementable: index 1, but 4 is max | Backtrack to index 0 |
+| `[2,3]` | Increment combo[0] from 1 to 2, reset combo[1] to 3 | Save, find rightmost |
+| `[2,4]` | Save, then find rightmost incrementable: index 1 | Done after processing all |
+| `[3,4]` | Continue until rightmost element reaches n |
+
+### Pseudocode
+
+```plaintext
+function combinationsIterative(n, k):
+    result = []
+    combo = [1, 2, ..., k]
+    
+    while true:
+        result.append(copy of combo)
+        
+        # Find the rightmost number that can be incremented
+        i = k - 1
+        while i >= 0 and combo[i] == n - k + i + 1:
+            i--
+        
+        if i < 0:
+            break
+        
+        # Increment and reset
+        combo[i]++
+        for j from i+1 to k:
+            combo[j] = combo[j-1] + 1
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="combinations_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="combinations_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="CombinationsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="combinations_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="combinations_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="combinations_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to save a copy in backtracking; pushing a reference instead of a copy will result in all results pointing to the same list.
+- Off-by-one errors in the iterative approach; the condition `combo[i] == n - k + i + 1` checks whether combo[i] is at its maximum valid value.
+- Failing to increment `i` correctly when finding the next incrementable position; it should be `i + 1`, not `i`.
+- Not resetting the rest of the combination after incrementing; the `combo[j] = combo[j-1] + 1` step is essential.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="combinations_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="combinations_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="CombinationsSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="combinations_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="combinations_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="combinations_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 46, title: 'Permutations', difficulty: 'Medium', leetcodeSlug: 'permutations' },
+  { number: 78, title: 'Subsets', difficulty: 'Medium', leetcodeSlug: 'subsets' },
+  { number: 39, title: 'Combination Sum', difficulty: 'Medium', leetcodeSlug: 'combination-sum' },
+  { number: 17, title: 'Letter Combinations of a Phone Number', difficulty: 'Medium', leetcodeSlug: 'letter-combinations-of-a-phone-number' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Backtracking vs Iterative:** Backtracking is easier to understand and code correctly; iterative is good if you want to show mastery of state machines.
+- **Time complexity awareness:** C(n,k) grows very large; for n=20 and k=10, it's about 184,756 combinations, so mentioning this in an interview shows awareness.
+- **Space optimization:** The result list itself uses O(C(n,k) * k) space, which is unavoidable since we need to return all results.
+- **Follow-up — Combinations with Replacement:** If asked to allow repeated elements, the approach is similar but the loop should start from `i` instead of `i+1`.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 76, title: "Minimum Window Substring", slug: "minimum-window-substring" }}
+  nextProblem={{ number: 78, title: "Subsets", slug: "subsets" }}
+/>

@@ -1,0 +1,140 @@
+---
+/**
+ * PrevNextNav.astro
+ * Previous/Next problem navigation at bottom of page
+ * Props: prevProblem, nextProblem (objects with title, slug, number)
+ */
+
+interface ProblemLink {
+  number?: number;
+  title: string;
+  slug: string;
+}
+
+interface Props {
+  prevProblem?: ProblemLink;
+  nextProblem?: ProblemLink;
+}
+
+const { prevProblem, nextProblem } = Astro.props;
+---
+
+<nav class="lc-prev-next-nav" aria-label="Problem navigation">
+  {prevProblem && (
+    <a
+      href={`/leetcode_solutions/problems/${prevProblem.slug}/`}
+      class="lc-prev-next-nav__prev"
+      title={`Previous: ${prevProblem.title}`}
+    >
+      <span class="lc-prev-next-nav__arrow">←</span>
+      <span>
+        <strong>Previous</strong>
+        <br />
+        <small>{prevProblem.number && `#${prevProblem.number} `}{prevProblem.title}</small>
+      </span>
+    </a>
+  )}
+
+  {!prevProblem && <div class="lc-prev-next-nav__prev"></div>}
+
+  {nextProblem && (
+    <a
+      href={`/leetcode_solutions/problems/${nextProblem.slug}/`}
+      class="lc-prev-next-nav__next"
+      title={`Next: ${nextProblem.title}`}
+    >
+      <span>
+        <strong>Next</strong>
+        <br />
+        <small>{nextProblem.number && `#${nextProblem.number} `}{nextProblem.title}</small>
+      </span>
+      <span class="lc-prev-next-nav__arrow">→</span>
+    </a>
+  )}
+
+  {!nextProblem && <div class="lc-prev-next-nav__next"></div>}
+</nav>
+
+<style>
+  .lc-prev-next-nav {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--sl-color-hairline);
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--lc-radius-md);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: color-mix(in srgb, var(--sl-color-accent) 10%, transparent);
+    color: var(--sl-color-accent-high);
+    border: 1px solid color-mix(in srgb, var(--sl-color-accent) 30%, transparent);
+    flex: 1;
+  }
+
+  a:hover {
+    background: color-mix(in srgb, var(--sl-color-accent) 20%, transparent);
+    border-color: var(--sl-color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--sl-color-accent) 20%, transparent);
+  }
+
+  .lc-prev-next-nav__prev {
+    order: 1;
+  }
+
+  .lc-prev-next-nav__next {
+    order: 2;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+
+  .lc-prev-next-nav__arrow {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  strong {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+
+  small {
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: block;
+  }
+
+  @media (max-width: 767px) {
+    .lc-prev-next-nav {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    a {
+      width: 100%;
+      justify-content: center;
+      padding: 0.6rem 1rem;
+    }
+
+    .lc-prev-next-nav__prev {
+      order: 1;
+    }
+
+    .lc-prev-next-nav__next {
+      order: 2;
+      margin-left: 0;
+      justify-content: center;
+    }
+  }
+</style>

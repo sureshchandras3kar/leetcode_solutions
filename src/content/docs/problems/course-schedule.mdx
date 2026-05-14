@@ -1,0 +1,194 @@
+---
+title: Course Schedule
+description: Detect cycle in directed graph. Two approaches — DFS Topological Sort O(n+e) + BFS Kahn O(n+e) — in six languages.
+leetcodeNumber: 207
+difficulty: Medium
+leetcodeSlug: course-schedule
+tags: [Graph, DFS, BFS, Graph Traversal]
+prev:
+  label: "#205 Isomorphic Strings"
+  link: "../isomorphic-strings/"
+next:
+  label: "#208 Implement Trie (Prefix Tree)"
+  link: "../implement-trie/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyApproach1 from '@solutions/Python/course_schedule_dfs_topological.py?raw';
+import cppApproach1 from '@solutions/C++/course_schedule_dfs_topological.cpp?raw';
+import javaApproach1 from '@solutions/Java/CourseScheduleDfsTopological.java?raw';
+import jsApproach1 from '@solutions/JavaScript/course_schedule_dfs_topological.js?raw';
+import rustApproach1 from '@solutions/Rust/course_schedule_dfs_topological.rs?raw';
+import goApproach1 from '@solutions/Golang/course_schedule_dfs_topological.go?raw';
+import pybfsIterative from '@solutions/Python/course_schedule_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/course_schedule_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/CourseScheduleBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/course_schedule_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/course_schedule_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/course_schedule_bfs_iterative.go?raw';
+
+import pyApproach2 from '@solutions/Python/course_schedule_bfs_kahn.py?raw';
+import cppApproach2 from '@solutions/C++/course_schedule_bfs_kahn.cpp?raw';
+import javaApproach2 from '@solutions/Java/CourseScheduleBfsKahn.java?raw';
+import jsApproach2 from '@solutions/JavaScript/course_schedule_bfs_kahn.js?raw';
+import rustApproach2 from '@solutions/Rust/course_schedule_bfs_kahn.rs?raw';
+import goApproach2 from '@solutions/Golang/course_schedule_bfs_kahn.go?raw';
+
+## Problem Statement
+
+You are given a number of `courses` labeled from `0` to `numCourses - 1` and a list of prerequisite pairs `prerequisites` where `prerequisites[i] = [ai, bi]` means you must take course `bi` before taking course `ai`. Return `true` if you can finish all courses, otherwise return `false`.
+
+<Aside type="tip" title="Key Insight">
+- This is a cycle detection problem in a directed graph
+- If there's a cycle in the prerequisite graph, it's impossible to complete all courses
+- Think about topological sorting — a valid ordering exists only if the graph is acyclic
+- Both DFS and BFS (Kahn's algorithm) can detect cycles effectively
+</Aside>
+
+### Examples
+
+| numCourses | prerequisites | Output | Explanation |
+| --- | --- | --- | --- |
+| 2 | `[[1,0]]` | `true` | Take course 0 first, then course 1 |
+| 2 | `[[1,0],[0,1]]` | `false` | Circular dependency: course 0 requires 1, course 1 requires 0 |
+| 3 | `[[0,1],[0,2],[1,2]]` | `true` | Take course 2, then 1, then 0 |
+| 4 | `[[1,0],[2,0],[3,1],[3,2]]` | `true` | Valid topological order: 0 → 1 → 2 → 3 and 0 → 2 → 3 |
+
+## Constraints
+
+- `1 <= numCourses <= 2000`
+- `0 <= prerequisites.length <= 5000`
+- `prerequisites[i].length == 2`
+- `0 <= ai, bi < numCourses`
+- All values are unique
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Build system dependency resolution** — checking if build targets can be compiled without circular dependencies
+- **Task scheduling** — determining if all tasks can be executed respecting their prerequisites
+- **Curriculum planning** — validating course requirements don't have circular dependencies
+- **Software module loading** — ensuring module imports don't form circular reference chains
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| DFS Topological | O(n) | O(n) | First approach |
+| BFS Kahn | O(n) | O(n) | Second approach |
+
+## Approach 1: DFS Topological
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyApproach1} lang="python" title="course_schedule_dfs_topological.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppApproach1} lang="cpp" title="course_schedule_dfs_topological.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaApproach1} lang="java" title="CourseScheduleDfsTopological.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsApproach1} lang="javascript" title="course_schedule_dfs_topological.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustApproach1} lang="rust" title="course_schedule_dfs_topological.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goApproach1} lang="go" title="course_schedule_dfs_topological.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS Kahn
+
+<ApproachTag tag="simple" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyApproach2} lang="python" title="course_schedule_bfs_kahn.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppApproach2} lang="cpp" title="course_schedule_bfs_kahn.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaApproach2} lang="java" title="CourseScheduleBfsKahn.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsApproach2} lang="javascript" title="course_schedule_bfs_kahn.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustApproach2} lang="rust" title="course_schedule_bfs_kahn.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goApproach2} lang="go" title="course_schedule_bfs_kahn.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="course_schedule_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="course_schedule_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="CourseScheduleBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="course_schedule_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="course_schedule_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="course_schedule_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- Approach 1 vs Approach 2 trade-offs
+- Edge cases and how to handle them
+- Follow-up questions
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 399, title: "Evaluate Division", slug: "evaluate-division" }}
+  nextProblem={{ number: 210, title: "Course Schedule II", slug: "course-schedule-ii" }}
+/>

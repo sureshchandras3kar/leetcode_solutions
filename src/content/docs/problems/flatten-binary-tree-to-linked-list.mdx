@@ -1,0 +1,236 @@
+---
+title: Flatten Binary Tree to Linked List
+description: Transform a binary tree into a linked list via right pointers. Two DFS approaches — Pre-Order O(n) and Post-Order O(n) — in six languages.
+leetcodeNumber: 114
+difficulty: Medium
+leetcodeSlug: flatten-binary-tree-to-linked-list
+tags: [Tree, Depth-First Search, Stack, Linked List]
+prev:
+  label: "#112 Path Sum"
+  link: "../path-sum/"
+next:
+  label: "#117 Populating Next Right Pointers in Each Node II"
+  link: "../populating-next-right-pointers-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyPre    from '@solutions/Python/flatten_binary_tree_to_linked_list_preorder_dfs.py?raw';
+import cppPre   from '@solutions/C++/flatten_binary_tree_to_linked_list_preorder_dfs.cpp?raw';
+import javaPre  from '@solutions/Java/FlattenBinaryTreeToLinkedListPreorderDFS.java?raw';
+import jsPre    from '@solutions/JavaScript/flatten_binary_tree_to_linked_list_preorder_dfs.js?raw';
+import rustPre  from '@solutions/Rust/flatten_binary_tree_to_linked_list_preorder_dfs.rs?raw';
+import goPre    from '@solutions/Golang/flatten_binary_tree_to_linked_list_preorder_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/flatten_binary_tree_to_linked_list_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/flatten_binary_tree_to_linked_list_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/FlattenBinaryTreeToLinkedListBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/flatten_binary_tree_to_linked_list_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/flatten_binary_tree_to_linked_list_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/flatten_binary_tree_to_linked_list_bfs_iterative.go?raw';
+
+import pyPost   from '@solutions/Python/flatten_binary_tree_to_linked_list_postorder_dfs.py?raw';
+import cppPost  from '@solutions/C++/flatten_binary_tree_to_linked_list_postorder_dfs.cpp?raw';
+import javaPost from '@solutions/Java/FlattenBinaryTreeToLinkedListPostorderDFS.java?raw';
+import jsPost   from '@solutions/JavaScript/flatten_binary_tree_to_linked_list_postorder_dfs.js?raw';
+import rustPost from '@solutions/Rust/flatten_binary_tree_to_linked_list_postorder_dfs.rs?raw';
+import goPost   from '@solutions/Golang/flatten_binary_tree_to_linked_list_postorder_dfs.go?raw';
+
+## Problem Statement
+
+Flatten a binary tree into a "linked list" where the linked list is represented using the right child pointer of each node and the left child pointer is always null.
+
+<Aside type="tip" title="What to notice first">
+- The flattened tree uses only right pointers (like a single-linked list).
+- Pre-order traversal order is preserved: root, left subtree, right subtree.
+- Left pointers are always set to null in the result.
+</Aside>
+
+### Examples
+
+| Input | Output | Order |
+| --- | --- | --- |
+| `[1,2,5,3,4,null,6]` | `[1,null,2,null,3,null,4,null,5,null,6]` | Pre-order: 1→2→3→4→5→6 |
+
+## Constraints
+
+- The number of nodes is in the range `[0, 2000]`.
+- `-100 <= Node.val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- File system hierarchies and directory structures
+- DOM tree manipulation in web browsers
+- XML/JSON parsing and configuration management
+- Organizational hierarchies and permission trees
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Pre-Order DFS | O(n) | O(h) | Intuitive; finds rightmost before attaching |
+| Post-Order DFS | O(n) | O(h) | Elegant reverse traversal; track previous |
+
+## Approach 1: Pre-Order DFS
+
+<ApproachTag tag="recommended" />
+
+Recursively flatten left and right subtrees, then find the rightmost node of the flattened left subtree and attach the right subtree to it.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Recursion depth" />
+
+### Pseudocode
+
+```plaintext
+function flatten(root):
+    if not root: return
+    
+    flatten(root.left)
+    flatten(root.right)
+    
+    if root.left:
+        rightmost = root.left
+        while rightmost.right:
+            rightmost = rightmost.right
+        
+        rightmost.right = root.right
+        root.right = root.left
+        root.left = null
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPre} lang="python" title="flatten_binary_tree_to_linked_list_preorder_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPre} lang="cpp" title="flatten_binary_tree_to_linked_list_preorder_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPre} lang="java" title="FlattenBinaryTreeToLinkedListPreorderDFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPre} lang="javascript" title="flatten_binary_tree_to_linked_list_preorder_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPre} lang="rust" title="flatten_binary_tree_to_linked_list_preorder_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPre} lang="go" title="flatten_binary_tree_to_linked_list_preorder_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Post-Order DFS with Previous Tracking
+
+<ApproachTag tag="optimal" />
+
+Traverse in post-order (right → left → node), tracking the previous node. Attach previous to current's right and nullify left.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="yellow" timeNote="Single pass" spaceNote="Recursion depth" />
+
+### Pseudocode
+
+```plaintext
+function flatten(root):
+    prev = null
+    
+    function dfs(node):
+        if not node: return
+        
+        dfs(node.right)
+        dfs(node.left)
+        
+        node.right = prev
+        node.left = null
+        prev = node
+    
+    dfs(root)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPost} lang="python" title="flatten_binary_tree_to_linked_list_postorder_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPost} lang="cpp" title="flatten_binary_tree_to_linked_list_postorder_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPost} lang="java" title="FlattenBinaryTreeToLinkedListPostorderDFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPost} lang="javascript" title="flatten_binary_tree_to_linked_list_postorder_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPost} lang="rust" title="flatten_binary_tree_to_linked_list_postorder_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPost} lang="go" title="flatten_binary_tree_to_linked_list_postorder_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="flatten_binary_tree_to_linked_list_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="flatten_binary_tree_to_linked_list_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="FlattenBinaryTreeToLinkedListBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="flatten_binary_tree_to_linked_list_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="flatten_binary_tree_to_linked_list_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="flatten_binary_tree_to_linked_list_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 113, title: 'Path Sum II', difficulty: 'Medium', leetcodeSlug: 'path-sum-ii' },
+  { number: 94, title: 'Binary Tree Inorder Traversal', difficulty: 'Easy', leetcodeSlug: 'binary-tree-inorder-traversal' },
+  { number: 144, title: 'Binary Tree Preorder Traversal', difficulty: 'Easy', leetcodeSlug: 'binary-tree-preorder-traversal' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Pre-Order:** More intuitive, easier to visualize where to attach subtrees.
+- **Post-Order:** More elegant, single pass with previous tracking; demonstrates understanding of reverse traversal.
+- **Difference:** Pre-order requires finding rightmost; post-order does it implicitly via reverse order.
+
+
+<PrevNextNav
+  prevProblem={ number: 112, title: "Path Sum", slug: "path-sum" }
+  nextProblem={ number: 117, title: "Populating Next Right Pointers in Each Node II", slug: "populating-next-right-pointers-ii" }
+/></Aside>

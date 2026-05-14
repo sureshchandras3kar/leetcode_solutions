@@ -1,0 +1,374 @@
+---
+title: Best Time to Buy and Sell Stock II
+description: Maximize profit from unlimited transactions. Two approaches — Greedy Peak Valley O(n) and Dynamic Programming O(n) — in six languages.
+leetcodeNumber: 122
+difficulty: Medium
+leetcodeSlug: best-time-to-buy-and-sell-stock-ii
+tags: [Array, Greedy, Dynamic Programming]
+prev:
+  label: "#121 Best Time to Buy and Sell Stock"
+  link: "../best-time-to-buy-and-sell-stock/"
+next:
+  label: "#123 Best Time to Buy and Sell Stock III"
+  link: "../best-time-to-buy-and-sell-stock-iii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyGreedy    from '@solutions/Python/best_time_to_buy_and_sell_stock_ii_greedy.py?raw';
+import cppGreedy   from '@solutions/C++/best_time_to_buy_and_sell_stock_ii_greedy.cpp?raw';
+import javaGreedy  from '@solutions/Java/best_time_to_buy_and_sell_stock_ii_greedy.java?raw';
+import jsGreedy    from '@solutions/JavaScript/best_time_to_buy_and_sell_stock_ii_greedy.js?raw';
+import rustGreedy  from '@solutions/Rust/best_time_to_buy_and_sell_stock_ii_greedy.rs?raw';
+import goGreedy    from '@solutions/Golang/best_time_to_buy_and_sell_stock_ii_greedy.go?raw';
+import pySpaceOptimized from '@solutions/Python/best_time_to_buy_and_sell_stock_ii_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/best_time_to_buy_and_sell_stock_ii_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/BestTimeToBuyAndSellStockIiSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/best_time_to_buy_and_sell_stock_ii_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/best_time_to_buy_and_sell_stock_ii_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/best_time_to_buy_and_sell_stock_ii_space_optimized.go?raw';
+
+import pyDP        from '@solutions/Python/best_time_to_buy_and_sell_stock_ii_dp.py?raw';
+import cppDP       from '@solutions/C++/best_time_to_buy_and_sell_stock_ii_dp.cpp?raw';
+import javaDP      from '@solutions/Java/best_time_to_buy_and_sell_stock_ii_dp.java?raw';
+import jsDP        from '@solutions/JavaScript/best_time_to_buy_and_sell_stock_ii_dp.js?raw';
+import rustDP      from '@solutions/Rust/best_time_to_buy_and_sell_stock_ii_dp.rs?raw';
+import goDP        from '@solutions/Golang/best_time_to_buy_and_sell_stock_ii_dp.go?raw';
+
+## Problem Statement
+
+Given an integer array `prices` where `prices[i]` is the price of a given stock on the i-th day, find the **maximum profit** you can achieve. You may complete as many transactions as you like (buy one and sell one share of the stock multiple times) with the following restrictions:
+
+- After you sell your stock, you cannot buy stock on the same day (you must cool down for one day).
+- You may not engage in multiple transactions simultaneously (you must sell before you buy again).
+
+<Aside type="tip" title="What to notice first">
+- You can make **unlimited transactions**, unlike problem #121 where you get only one transaction.
+- The key insight is that you don't need to pick a single peak — you can capture **every local upward movement**.
+- This is a classic greedy problem because every rise is an opportunity to profit.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[7, 1, 5, 3, 6, 4]` | `7` | Buy at 1, sell at 5 (+4); buy at 3, sell at 6 (+3). Total profit = 7. |
+| `[1, 2, 3, 4, 5]` | `4` | Buy at 1, sell at 5 (profit = 4). Or buy/sell at each step: (2-1) + (3-2) + (4-3) + (5-4) = 4. |
+| `[7, 6, 4, 3, 1]` | `0` | Prices only decrease, no profit possible. |
+
+## Constraints
+
+- `1 <= prices.length <= 3 * 10^4`
+- `0 <= prices[i] <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Ride-sharing surge pricing** — driver accepts every surge window to maximize earnings across the day.
+- **Cryptocurrency day trading** — trader buys and sells on every uptick, capturing small gains throughout the day.
+- **Warehouse inventory arbitrage** — buy when prices dip, immediately sell when they recover; repeat for each dip-recovery cycle.
+- **Currency exchange optimization** — exchange foreign currency every time the exchange rate moves favorably, then exchange back.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Key Insight | Best When |
+| --- | --- | --- | --- | --- |
+| Greedy (Peak Valley) | O(n) | O(1) | Capture every upward movement | General case — simplest to implement |
+| Dynamic Programming | O(n) | O(1) | Track holding/non-holding states | Interview deep dive / follow-up practice |
+
+## Which approach should you learn first?
+
+- Pick **Greedy** if you want the intuitive, elegant solution.
+- Pick **Dynamic Programming** if you want to understand the general state-machine pattern.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Simplicity</div>
+    <div class="lc-approach-quick__name">Greedy Peak Valley</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Advanced Pattern</div>
+    <div class="lc-approach-quick__name">Dynamic Programming</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Greedy Peak Valley (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Whenever the price goes up from one day to the next, add that difference to the profit. This captures every local upward movement without explicitly identifying peaks and valleys.
+
+**Why it works:** Any mountain can be broken into a series of small uphill steps. Summing all the steps equals the total climb.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="No extra memory" />
+
+### Step-by-step Example
+
+**Input:** `prices = [7, 1, 5, 3, 6, 4]`
+
+| Day | Price | Previous | Difference | Action | Cumulative Profit |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 7 | — | — | Start | 0 |
+| 1 | 1 | 7 | 1-7 = -6 | Price down, skip | 0 |
+| 2 | 5 | 1 | 5-1 = 4 | Price up, add 4 | 0 + 4 = 4 |
+| 3 | 3 | 5 | 3-5 = -2 | Price down, skip | 4 |
+| 4 | 6 | 3 | 6-3 = 3 | Price up, add 3 | 4 + 3 = 7 |
+| 5 | 4 | 6 | 4-6 = -2 | Price down, skip | 7 |
+
+**Result:** max_profit = 7
+
+This is equivalent to: Buy at 1, sell at 5 (profit 4) + Buy at 3, sell at 6 (profit 3) = 7 total.
+
+<LogicPlayer
+  title="How the greedy peak-valley solution finds the answer"
+  description="Watch how every upward price movement is captured and summed to find the total maximum profit."
+  steps={[
+    {
+      title: 'Start: examine day 0 to day 1',
+      note: 'Price drops from 7 to 1. No upward movement to capture.',
+      formula: 'prices[1] < prices[0]: skip',
+      callout: 'When price goes down, we do nothing. We are looking for upward movements.',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'active', index: 1 },
+        { label: '5', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['profit = 0'],
+    },
+    {
+      title: 'Day 1 to day 2: price rises',
+      note: 'Price goes from 1 to 5. That is a gain of 4. We capture it.',
+      formula: 'prices[2] - prices[1] = 5 - 1 = 4',
+      callout: 'Every upward step is a transaction opportunity. Add the difference to profit.',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'active', index: 1 },
+        { label: '5', state: 'match', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['profit = 0 + 4 = 4'],
+    },
+    {
+      title: 'Day 2 to day 3: price drops',
+      note: 'Price goes from 5 to 3. No upward movement.',
+      formula: 'prices[3] < prices[2]: skip',
+      callout: 'Downward movement means we do nothing.',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '5', state: 'active', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['profit = 4'],
+    },
+    {
+      title: 'Day 3 to day 4: price rises again',
+      note: 'Price goes from 3 to 6. That is a gain of 3. Add it.',
+      formula: 'prices[4] - prices[3] = 6 - 3 = 3',
+      callout: 'Another upward movement. We capture the difference.',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '5', state: 'default', index: 2 },
+        { label: '3', state: 'active', index: 3 },
+        { label: '6', state: 'match', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['profit = 4 + 3 = 7'],
+    },
+    {
+      title: 'Day 4 to day 5: price drops to 4',
+      note: 'Price goes from 6 to 4. No upward movement.',
+      formula: 'prices[5] < prices[4]: skip',
+      callout: 'Final downward move. We are done iterating.',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '5', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '6', state: 'active', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+      ],
+      memory: ['profit = 7 (final answer)'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function bestTimeToBuyAndSellStockIIGreedy(prices):
+    maxProfit = 0
+    for i in range(1, len(prices)):
+        if prices[i] > prices[i-1]:
+            maxProfit += prices[i] - prices[i-1]
+    return maxProfit
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyGreedy} lang="python" title="best_time_to_buy_and_sell_stock_ii_greedy.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppGreedy} lang="cpp" title="best_time_to_buy_and_sell_stock_ii_greedy.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaGreedy} lang="java" title="best_time_to_buy_and_sell_stock_ii_greedy.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedy} lang="javascript" title="best_time_to_buy_and_sell_stock_ii_greedy.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedy} lang="rust" title="best_time_to_buy_and_sell_stock_ii_greedy.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedy} lang="go" title="best_time_to_buy_and_sell_stock_ii_greedy.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Dynamic Programming
+
+<ApproachTag tag="interview" />
+
+Track two states: holding a stock and not holding a stock. For each day, decide whether to buy, sell, or hold based on which decision maximizes profit.
+
+This approach generalizes to problems with cooldown periods or transaction limits (e.g., problem #309 and #123).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Two variables" />
+
+### Step-by-step Example
+
+**Input:** `prices = [7, 1, 5, 3, 6, 4]`
+
+| Day | Price | hold | no_hold | Interpretation |
+| --- | --- | --- | --- | --- |
+| Init | — | -7 | 0 | Start with price 7: either bought at -7 or nothing at 0 |
+| 1 | 1 | max(-7, 0-1) = -1 | max(0, -7+1) = 0 | Better to buy today at 1 than before |
+| 2 | 5 | max(-1, 0-5) = -1 | max(0, -1+5) = 4 | Sell today for profit 4 |
+| 3 | 3 | max(-1, 4-3) = 1 | max(4, -1+3) = 4 | Option to buy again at 3 |
+| 4 | 6 | max(1, 4-6) = 1 | max(4, 1+6) = 7 | Sell at 6 for total profit 7 |
+| 5 | 4 | max(1, 7-4) = 3 | max(7, 1+4) = 7 | Could buy again, but profit stays 7 |
+
+**Result:** max_profit = no_hold at the end = 7
+
+### Pseudocode
+
+```plaintext
+function bestTimeToBuyAndSellStockIIDP(prices):
+    hold = -prices[0]
+    no_hold = 0
+    for i in range(1, len(prices)):
+        hold = max(hold, no_hold - prices[i])
+        no_hold = max(no_hold, hold + prices[i])
+    return no_hold
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDP} lang="python" title="best_time_to_buy_and_sell_stock_ii_dp.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDP} lang="cpp" title="best_time_to_buy_and_sell_stock_ii_dp.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDP} lang="java" title="best_time_to_buy_and_sell_stock_ii_dp.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDP} lang="javascript" title="best_time_to_buy_and_sell_stock_ii_dp.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDP} lang="rust" title="best_time_to_buy_and_sell_stock_ii_dp.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDP} lang="go" title="best_time_to_buy_and_sell_stock_ii_dp.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Thinking you need to identify explicit buy/sell pairs. The greedy approach skips this; it just sums all rises.
+- In the DP approach, forgetting to update `hold` before `no_hold`. The order matters because you reuse the updated `hold` value.
+- Assuming you must hold overnight. You can buy and sell on any consecutive days.
+- Not handling the empty array or single-element edge case in DP (the greedy approach naturally handles it because the loop never runs).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="best_time_to_buy_and_sell_stock_ii_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="best_time_to_buy_and_sell_stock_ii_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="BestTimeToBuyAndSellStockIiSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="best_time_to_buy_and_sell_stock_ii_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="best_time_to_buy_and_sell_stock_ii_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="best_time_to_buy_and_sell_stock_ii_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 121, title: 'Best Time to Buy and Sell Stock I', difficulty: 'Easy', leetcodeSlug: 'best-time-to-buy-and-sell-stock' },
+  { number: 123, title: 'Best Time to Buy and Sell Stock III', difficulty: 'Hard', leetcodeSlug: 'best-time-to-buy-and-sell-stock-iii' },
+  { number: 188, title: 'Best Time to Buy and Sell Stock IV', difficulty: 'Hard', leetcodeSlug: 'best-time-to-buy-and-sell-stock-iv' },
+  { number: 309, title: 'Best Time to Buy and Sell Stock with Cooldown', difficulty: 'Medium', leetcodeSlug: 'best-time-to-buy-and-sell-stock-with-cooldown' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why greedy over DP?** It's simpler, requires no state tracking, and is more memorable in an interview setting.
+- **Why learn the DP version?** It generalizes to problems with constraints: transaction limits (#188), cooldown periods (#309), or multiple transactions with fees (#714).
+- **The mountain analogy:** Explain that you are summing all the uphill climbs. It makes the greedy approach intuitive even to interviewers unfamiliar with it.
+- **Edge cases to mention:** Empty array, single price (profit = 0), monotonic increase (sum all differences), monotonic decrease (profit = 0), and duplicate prices.
+- **Follow-up — Cooldown:** If your greedy solution impresses, expect a follow-up asking for a cooldown constraint between buy and sell. The DP approach extends naturally; greedy breaks down.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 121, title: "Best Time to Buy and Sell Stock I", slug: "best-time-to-buy-and-sell-stock" }}
+  nextProblem={{ number: 123, title: "Best Time to Buy and Sell Stock III", slug: "best-time-to-buy-and-sell-stock-iii" }}
+/>

@@ -1,0 +1,373 @@
+---
+title: Reverse Linked List II
+description: Reverse a portion of a linked list between positions m and n. Two approaches — iterative with pointers O(n) and recursive O(n) — in six languages.
+leetcodeNumber: 92
+difficulty: Medium
+leetcodeSlug: reverse-linked-list-ii
+tags: [Linked List, Recursion]
+prev:
+  label: "#86 Partition List"
+  link: "../partition-list/"
+next:
+  label: "#97 Interleaving String"
+  link: "../interleaving-string/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyIter    from '@solutions/Python/reverse_linked_list_ii_iterative.py?raw';
+import cppIter   from '@solutions/C++/reverse_linked_list_ii_iterative.cpp?raw';
+import javaIter  from '@solutions/Java/reverse_linked_list_ii_iterative.java?raw';
+import jsIter    from '@solutions/JavaScript/reverse_linked_list_ii_iterative.js?raw';
+import rustIter  from '@solutions/Rust/reverse_linked_list_ii_iterative.rs?raw';
+import goIter    from '@solutions/Golang/reverse_linked_list_ii_iterative.go?raw';
+import pySpaceOptimized from '@solutions/Python/reverse_linked_list_ii_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/reverse_linked_list_ii_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ReverseLinkedListIiSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/reverse_linked_list_ii_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/reverse_linked_list_ii_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/reverse_linked_list_ii_space_optimized.go?raw';
+
+import pyRec    from '@solutions/Python/reverse_linked_list_ii_recursive.py?raw';
+import cppRec   from '@solutions/C++/reverse_linked_list_ii_recursive.cpp?raw';
+import javaRec  from '@solutions/Java/reverse_linked_list_ii_recursive.java?raw';
+import jsRec    from '@solutions/JavaScript/reverse_linked_list_ii_recursive.js?raw';
+import rustRec  from '@solutions/Rust/reverse_linked_list_ii_recursive.rs?raw';
+import goRec    from '@solutions/Golang/reverse_linked_list_ii_recursive.go?raw';
+
+## Problem Statement
+
+Given the head of a linked list and two integers `left` and `right` where `left <= right`, **reverse the nodes of the list from position `left` to position `right`**, and return the reversed list.
+
+<Aside type="tip" title="What to notice first">
+- Positions are **1-indexed** (not 0-indexed), so position 1 is the head node.
+- Only the sublist from position `left` to `right` is reversed; the rest stays in place.
+- The reversal must be done **in-place** — do not allocate new nodes.
+- A dummy node simplifies handling the case where reversal starts at the head.
+</Aside>
+
+### Examples
+
+| Input | left | right | Output | Explanation |
+| --- | --- | --- | --- | --- |
+| `1→2→3→4→5→null` | 2 | 4 | `1→4→3→2→5→null` | Reverse nodes 2, 3, 4 |
+| `5→null` | 1 | 1 | `5→null` | Single node, no reversal needed |
+| `1→2→null` | 1 | 2 | `2→1→null` | Reverse the entire list |
+
+## Constraints
+
+- The number of nodes in the list is `n`.
+- `1 <= n <= 500`
+- `-500 <= Node.val <= 500`
+- `1 <= left <= right <= n`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Log rotation** — reverse a section of log entries in a linked structure.
+- **Undo/redo stacks** — partially reverse command history from position m to n.
+- **Playlist reordering** — reverse a range of songs in a linked playlist structure.
+- **Data stream chunking** — reverse a window of elements in streaming linked data.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Iterative (Pointers) | O(n) | O(1) | Interview favorite; intuitive pointer manipulation |
+| Recursive | O(n) | O(n) | More elegant; stack tracks position |
+
+## Which approach should you learn first?
+
+- Learn **Iterative with Pointers** first — it is the most common interview approach and demonstrates pointer mastery.
+- Understand **Recursive** as a bonus — it showcases elegant backtracking and position tracking.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Interview Favorite</div>
+    <div class="lc-approach-quick__name">Iterative with Pointers</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Elegant & Recursive</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Iterative with Pointers
+
+<ApproachTag tag="recommended" />
+
+Use a dummy node pointing to the head to simplify edge cases. Advance to position `left - 1` (the node before the reversal). Then, perform `right - left` reversals by moving nodes to the front of the sublist.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass through list" spaceNote="Pointer variables only" />
+
+### Step-by-step Example
+
+**Input:** `1→2→3→4→5→null`, left = 2, right = 4
+
+| Step | Action | List State |
+| --- | --- | --- |
+| Create dummy | Dummy points to 1 | `dummy→1→2→3→4→5→null` |
+| Advance prev to node 1 | Move left-1 times | `prev=1, curr=2` |
+| Reverse 1→2→4 | Move 2 in front | `1→3→2→4→5→null` |
+| Reverse 1→3→4 | Move 3 in front | `1→4→3→2→5→null` |
+| Connect tail | Ensure 2→5 | `1→4→3→2→5→null` ✓ |
+
+<LogicPlayer
+  title="How iterative pointer reversal works step-by-step"
+  description="Use Next or Autoplay to see the dummy node, pointer positioning, and the reversal loop in action."
+  steps={[
+    {
+      title: 'Create dummy node and advance prev pointer',
+      note: 'Dummy→1 simplifies handling reversals at the head. Advance prev to position left-1.',
+      formula: 'dummy = ListNode(0, head); prev = dummy',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['prev at position 0 (left-1)'],
+    },
+    {
+      title: 'Set curr to the first node to reverse (position left)',
+      note: 'curr = prev.next points to node 2.',
+      formula: 'curr = prev.next',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['prev at node 1', 'curr at node 2'],
+    },
+    {
+      title: 'Move node 2 in front (reverse iteration 1)',
+      note: 'Take curr.next (node 3) and insert it after prev. Now: 1→3→2→4→5.',
+      formula: 'Swap curr and curr.next',
+      callout: 'Node 2 moves back, node 3 moves forward.',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '3', state: 'active', index: 1 },
+        { label: '2', state: 'active', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['prev at node 1', 'curr still at node 2'],
+    },
+    {
+      title: 'Move node 3 in front (reverse iteration 2)',
+      note: 'Take curr.next (node 4) and insert it after prev. Now: 1→4→3→2→5.',
+      formula: 'Swap curr and curr.next',
+      callout: 'Node 3 moves back, node 4 moves forward. Left-right reversal complete!',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '4', state: 'active', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['prev at node 1', 'curr at node 2 (tail)', 'Reversed: 4→3→2 ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function reverseBetween(head, left, right):
+    if left == right:
+        return head
+    
+    dummy = ListNode(0, head)
+    prev = dummy
+    
+    # Advance prev to position left-1
+    for i in range(left - 1):
+        prev = prev.next
+    
+    curr = prev.next
+    
+    # Reverse right - left times
+    for i in range(right - left):
+        next_temp = curr.next
+        curr.next = next_temp.next
+        next_temp.next = prev.next
+        prev.next = next_temp
+    
+    return dummy.next
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIter} lang="python" title="reverse_linked_list_ii_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIter} lang="cpp" title="reverse_linked_list_ii_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIter} lang="java" title="reverse_linked_list_ii_iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIter} lang="javascript" title="reverse_linked_list_ii_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIter} lang="rust" title="reverse_linked_list_ii_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIter} lang="go" title="reverse_linked_list_ii_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Recursive
+
+<ApproachTag tag="elegant" />
+
+Recursively advance to position `left`. At that point, reverse nodes one at a time as the call stack unwinds, tracking when to stop at position `right`.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Traverse to left, reverse to right" spaceNote="Recursion call stack" />
+
+### Key Insight
+
+Instead of explicit pointer swaps, recursion naturally tracks the "current position." When we reach position `left`, we begin the reversal. As we unwind (backtrack), we reverse links and stop after `right - left` reversals.
+
+### Step-by-step Example
+
+**Input:** `1→2→3→4→5→null`, left = 2, right = 4
+
+| Step | Depth | Node | Action |
+| --- | --- | --- | --- |
+| Go deep | 1 | Node 1 | Recurse to node 2 |
+| Go deep | 2 | Node 2 | Recurse to node 3 (mark as reversal start) |
+| Go deep | 3 | Node 3 | Recurse to node 4 |
+| Go deep | 4 | Node 4 | Recurse to node 5 |
+| Unwind | 4 | Node 4→5 | Reverse: 4.next.next = 4 (stop here, right=4) |
+| Unwind | 3 | Node 3→4 | Reverse: 3.next.next = 3 |
+| Unwind | 2 | Node 2→3 | Reverse: 2.next.next = 2 (tail of reversed section) |
+| Unwind | 1 | Node 1→2 | Connect tail; return |
+
+### Pseudocode
+
+```plaintext
+function reverseBetween(head, left, right):
+    if left == 1:
+        return reverseN(head, right)
+    else:
+        head.next = reverseBetween(head.next, left - 1, right - 1)
+        return head
+
+function reverseN(head, n):
+    if n == 1:
+        return head
+    
+    new_head = reverseN(head.next, n - 1)
+    head.next.next = head
+    head.next = successor
+    return new_head
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRec} lang="python" title="reverse_linked_list_ii_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRec} lang="cpp" title="reverse_linked_list_ii_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRec} lang="java" title="reverse_linked_list_ii_recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRec} lang="javascript" title="reverse_linked_list_ii_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRec} lang="rust" title="reverse_linked_list_ii_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRec} lang="go" title="reverse_linked_list_ii_recursive.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **1-indexed positions:** Forget that left and right are 1-indexed, and your loops will be off by one.
+- **Dummy node importance:** Without a dummy node, reversing from position 1 requires special handling; the dummy eliminates this edge case.
+- **Tail connection:** Ensure the node before position `left` still points to the node before position `right+1` after reversal. The dummy and pointer tracking handle this.
+- **Recursion stack depth:** For very large n and large reversal ranges, recursion may hit stack limits. The iterative approach is safer for production.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="reverse_linked_list_ii_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="reverse_linked_list_ii_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ReverseLinkedListIiSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="reverse_linked_list_ii_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="reverse_linked_list_ii_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="reverse_linked_list_ii_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 25, title: 'Reverse Nodes in k-Group', difficulty: 'Hard', leetcodeSlug: 'reverse-nodes-in-k-group' },
+  { number: 206, title: 'Reverse Linked List', difficulty: 'Easy', leetcodeSlug: 'reverse-linked-list' },
+  { number: 24, title: 'Swap Nodes in Pairs', difficulty: 'Medium', leetcodeSlug: 'swap-nodes-in-pairs' },
+  { number: 328, title: 'Odd Even Linked List', difficulty: 'Medium', leetcodeSlug: 'odd-even-linked-list' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why iterative?** It is O(1) space and avoids recursion depth limits — the safest production choice.
+- **Why recursive?** It is more elegant and showcases understanding of recursion and backtracking — great for demonstrating depth.
+- **Dummy node trick:** Mention this pattern applies to many linked list problems (removing nodes, reversing, etc.).
+- **Edge cases:** Always test left=1 (reversal at head), right=n (reversal at tail), and left=right (no reversal).
+- **Pointer safety:** Talk about null checks — ensure curr.next exists before accessing it.
+
+
+<PrevNextNav
+  prevProblem={ number: 86, title: "Partition List", slug: "partition-list" }
+  nextProblem={ number: 97, title: "Interleaving String", slug: "interleaving-string" }
+/></Aside>

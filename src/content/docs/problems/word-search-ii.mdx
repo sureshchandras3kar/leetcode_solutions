@@ -1,0 +1,269 @@
+---
+title: Word Search II
+description: Find all words from a list that exist on a 2D board. Trie with DFS and backtracking for efficient grid traversal.
+leetcodeNumber: 212
+difficulty: Hard
+leetcodeSlug: word-search-ii
+tags: [Trie, Depth-First Search, Backtracking, Board]
+prev:
+  label: "#211 Design Add and Search Words Data Structure"
+  link: "../design-add-search-words/"
+next:
+  label: "#215 Kth Largest Element in Array"
+  link: "../kth-largest-element-in-array/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyRecursive     from '@solutions/Python/word_search_ii_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/word_search_ii_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/WordSearchII_Recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/word_search_ii_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/word_search_ii_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/word_search_ii_recursive.go?raw';
+import pySpaceOptimized from '@solutions/Python/word_search_ii_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/word_search_ii_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/WordSearchIiSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/word_search_ii_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/word_search_ii_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/word_search_ii_space_optimized.go?raw';
+
+import pyBacktrack      from '@solutions/Python/word_search_ii_backtrack.py?raw';
+import cppBacktrack     from '@solutions/C++/word_search_ii_backtrack.cpp?raw';
+import javaBacktrack    from '@solutions/Java/WordSearchII_Backtrack.java?raw';
+import jsBacktrack      from '@solutions/JavaScript/word_search_ii_backtrack.js?raw';
+import rustBacktrack    from '@solutions/Rust/word_search_ii_backtrack.rs?raw';
+import goBacktrack      from '@solutions/Golang/word_search_ii_backtrack.go?raw';
+
+## Problem Statement
+
+Given an `m × n` board of characters and a list of strings `words`, return all words on the board.
+
+Each word must be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once in one word.
+
+<Aside type="tip" title="What to notice first">
+- Build a Trie from all words for efficient prefix matching.
+- Use DFS to explore the board and Trie simultaneously.
+- Mark visited cells to avoid reusing them in one path.
+- Early termination when no matching prefix exists in the Trie.
+</Aside>
+
+### Examples
+
+| Board | Words | Output |
+| --- | --- | --- |
+| `[["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]]` | `["oath","pea","eat","rain"]` | `["eat","oath"]` |
+| `[["a","b"],["c","d"]]` | `["abcb"]` | `[]` |
+
+## Constraints
+
+- `m == board.length`, `n == board[i].length`
+- `1 <= m, n <= 12`
+- `board[i][j]` is a lowercase English letter.
+- `1 <= words.length <= 3 × 10^4`
+- `1 <= words[i].length <= 10`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Spell checkers** — find words from dictionary on a board of letters.
+- **Word games** — validate words in Scrabble or Boggle.
+- **DNA sequence matching** — find genetic patterns in sequences.
+- **Crossword puzzles** — verify words on a grid.
+- **Text editors** — multi-string find-and-replace.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space |
+| --- | --- | --- |
+| Recursive DFS | O(n × m × 4^l) | O(w × l) |
+| Iterative Backtrack | O(n × m × 4^l) | O(w × l) |
+
+*n,m = board dims, l = max word len, w = word count*
+
+## Which approach should you learn first?
+
+- Pick **Recursive DFS** for simplicity — natural for tree/graph traversal.
+- Pick **Iterative Backtrack** if you prefer explicit state management.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Natural Fit</div>
+    <div class="lc-approach-quick__name">Recursive DFS</div>
+    <div class="lc-approach-quick__stats">O(n×m×4^l) time &middot; O(w×l) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Explicit State</div>
+    <div class="lc-approach-quick__name">Backtrack with Visited Set</div>
+    <div class="lc-approach-quick__stats">O(n×m×4^l) time &middot; O(w×l) space</div>
+  </div>
+</div>
+
+## Approach 1: Recursive DFS with Trie
+
+<ApproachTag tag="recommended" />
+
+1. Build a Trie from all words.
+2. For each cell on the board, start a DFS.
+3. Traverse the board following the Trie structure.
+4. Mark visited cells by temporarily changing the board.
+5. Restore the board during backtracking.
+
+<ComplexityBadges time="O(n×m×4^l)" space="O(w×l)" timeColor="red" spaceColor="yellow" timeNote="Board × word length" spaceNote="Trie size" />
+
+### Pseudocode
+
+```plaintext
+function findWords(board, words):
+    root = buildTrie(words)
+    result = []
+    
+    for i, j in board:
+        dfs(board, i, j, root, result)
+    
+    return result
+
+function dfs(board, i, j, node, result):
+    char = board[i][j]
+    if char not in node.children:
+        return
+    
+    nextNode = node.children[char]
+    if nextNode.word exists:
+        result.add(nextNode.word)
+        nextNode.word = null  // Avoid duplicates
+    
+    board[i][j] = '#'  // Mark visited
+    for each neighbor (ni, nj):
+        dfs(board, ni, nj, nextNode, result)
+    board[i][j] = char  // Restore
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="word_search_ii_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="word_search_ii_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="WordSearchII_Recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="word_search_ii_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="word_search_ii_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="word_search_ii_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Backtracking with Visited Set
+
+<ApproachTag tag="interview" />
+
+Instead of modifying the board, track visited cells in a separate set. Useful when board is read-only.
+
+<ComplexityBadges time="O(n×m×4^l)" space="O(n×m+w×l)" timeColor="red" spaceColor="yellow" timeNote="Board exploration" spaceNote="Visited set + Trie" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBacktrack} lang="python" title="word_search_ii_backtrack.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBacktrack} lang="cpp" title="word_search_ii_backtrack.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBacktrack} lang="java" title="WordSearchII_Backtrack.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBacktrack} lang="javascript" title="word_search_ii_backtrack.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBacktrack} lang="rust" title="word_search_ii_backtrack.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBacktrack} lang="go" title="word_search_ii_backtrack.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to restore the board during backtracking (DFS approach).
+- Reusing a cell multiple times in one word.
+- Not checking if the character exists in the Trie before recursing.
+- Adding duplicate words to the result (set `word = null` after adding).
+- Not handling boundary checks before recursing.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="word_search_ii_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="word_search_ii_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="WordSearchIiSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="word_search_ii_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="word_search_ii_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="word_search_ii_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 208, title: 'Implement Trie (Prefix Tree)', difficulty: 'Medium', leetcodeSlug: 'implement-trie-prefix-tree' },
+  { number: 211, title: 'Design Add and Search Words Data Structure', difficulty: 'Medium', leetcodeSlug: 'add-and-search-word-data-structure-design' },
+  { number: 79, title: 'Word Search', difficulty: 'Medium', leetcodeSlug: 'word-search' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Trie vs. HashSet:** Trie enables early termination when prefix doesn't match; HashSet requires checking all words.
+- **Board modification:** Modifying the board saves space but violates immutability; use visited set if needed.
+- **Optimization:** Prune the Trie after each word is found to reduce search space.
+- **Follow-up:** How would you handle a very large word list? (Stream processing, lazy Trie building.)
+- **Edge cases:** Board with one cell, single-letter words, words not on board, overlapping words.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 211, title: "Design Add and Search Words", slug: "design-add-search-words" }}
+  nextProblem={{ number: 213, title: "House Robber II", slug: "house-robber-ii" }}
+/>

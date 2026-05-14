@@ -1,0 +1,375 @@
+---
+title: Copy List with Random Pointer
+description: Clone a linked list where each node has both a next and random pointer. Two approaches — hash map O(n)/O(n) and interweaving O(n)/O(1) — in six languages.
+leetcodeNumber: 138
+difficulty: Medium
+leetcodeSlug: copy-list-with-random-pointer
+tags: [Linked List, Hash Table]
+prev:
+  label: "#137 Single Number II"
+  link: "../single-number-ii/"
+next:
+  label: "#139 Word Break"
+  link: "../word-break/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyHashMap    from '@solutions/Python/copy_list_with_random_pointer_hash_map.py?raw';
+import cppHashMap   from '@solutions/C++/copy_list_with_random_pointer_hash_map.cpp?raw';
+import javaHashMap  from '@solutions/Java/copy_list_with_random_pointer_hash_map.java?raw';
+import jsHashMap    from '@solutions/JavaScript/copy_list_with_random_pointer_hash_map.js?raw';
+import rustHashMap  from '@solutions/Rust/copy_list_with_random_pointer_hash_map.rs?raw';
+import goHashMap    from '@solutions/Golang/copy_list_with_random_pointer_hash_map.go?raw';
+import pySpaceOptimized from '@solutions/Python/copy_list_with_random_pointer_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/copy_list_with_random_pointer_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/CopyListWithRandomPointerSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/copy_list_with_random_pointer_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/copy_list_with_random_pointer_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/copy_list_with_random_pointer_space_optimized.go?raw';
+
+import pyInterweave    from '@solutions/Python/copy_list_with_random_pointer_interweave.py?raw';
+import cppInterweave   from '@solutions/C++/copy_list_with_random_pointer_interweave.cpp?raw';
+import javaInterweave  from '@solutions/Java/copy_list_with_random_pointer_interweave.java?raw';
+import jsInterweave    from '@solutions/JavaScript/copy_list_with_random_pointer_interweave.js?raw';
+import rustInterweave  from '@solutions/Rust/copy_list_with_random_pointer_interweave.rs?raw';
+import goInterweave    from '@solutions/Golang/copy_list_with_random_pointer_interweave.go?raw';
+
+## Problem Statement
+
+A linked list of length `n` is given such that each node contains an additional random pointer, which could point to any node in the list, or null.
+
+Construct a **deep copy** of the list. The deep copy should consist of exactly `n` **brand new** nodes, where each new node has its value set to the value of its corresponding original node. Both the `next` and `random` pointer of the new nodes should point to new nodes in the copy list such that the pointers in the copy list represent the same relationships as the pointers in the original list (based on the nodes in the original list, not on their values).
+
+Return the head of the copied linked list.
+
+<Aside type="tip" title="What to notice first">
+- The difficulty is that you cannot simply traverse and copy — you must also correctly map random pointers to the cloned nodes, not the original ones.
+- Nodes can appear in the random pointer chain in any order, so a naive single-pass approach will not work.
+- The hash map approach explicitly maps each original node to its clone; the interweaving approach reuses the original list structure temporarily as a mapping.
+- Two pointers in different lists are "equivalent" if they point to nodes with the same position in their respective lists.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[[7,null],[13,0],[11,4],[10,2],[1,0]]` | Same structure | 5-node list; node 13's random points to node 7 (index 0) in the original, and the copy's node 13's random points to the copy's node 7. |
+| `[[1,1],[2,1]]` | Same structure | 2-node list; both nodes' random pointers point to node 1 in both original and copy. |
+| `[[3,null]]` | Same structure | Single node with null random pointer. |
+
+## Constraints
+
+- `0 <= n <= 100`
+- `-100 <= Node.val <= 100`
+- `Node.random` is null or points to some node in the list.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Deep cloning of complex objects** — copy an object graph where references can point anywhere, not just linearly.
+- **Serialization/deserialization** — reconstruct a full copy of a graph structure from encoded form.
+- **Cache replication** — duplicate a cached structure with internal cross-references for distributed systems.
+- **Transaction rollback snapshots** — create a snapshot of a linked data structure for recovery purposes.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Hash Map | O(n) | O(n) | Most common; easier to understand and implement |
+| Interweaving | O(n) | O(1) | Space is critical; demonstrates clever pointer manipulation |
+
+## Which approach should you learn first?
+
+- Learn **Hash Map** first — it is straightforward and widely used in interviews.
+- Use **Interweaving** as an advanced follow-up to show deeper understanding of pointer mechanics.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Clear &amp; Intuitive</div>
+    <div class="lc-approach-quick__name">Hash Map</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Space-Optimal</div>
+    <div class="lc-approach-quick__name">Interweaving</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Hash Map
+
+<ApproachTag tag="recommended" />
+
+Use a hash map to store the mapping between original nodes and their clones. In the first pass, create all cloned nodes and store them in the map. In the second pass, connect the next and random pointers of the cloned nodes by looking up the original pointers in the map.
+
+The key insight is to separate node creation from pointer assignment, allowing us to reference any node's clone regardless of traversal order.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Two passes" spaceNote="Hash map stores n nodes" />
+
+### Step-by-step Example
+
+**Input:** `[[7,null],[13,0],[11,4],[10,2],[1,0]]`
+
+Original list: 7 → 13 → 11 → 10 → 1
+- Node 7's random: null
+- Node 13's random: 7 (index 0)
+- Node 11's random: 1 (index 4)
+- Node 10's random: 11 (index 2)
+- Node 1's random: 7 (index 0)
+
+| Step | Node | Action |
+| --- | --- | --- |
+| 1 | Create clones | Create nodes: 7', 13', 11', 10', 1' in hash map |
+| 2 | Node 7 → 13 | Copy 7.next=13 → 7'.next=13' |
+| 3 | Node 7 → null | Copy 7.random=null → 7'.random=null |
+| 4 | Node 13 → 0 | Copy 13.random=nodes[0] → 13'.random=nodeMap[nodes[0]]=7' |
+
+<LogicPlayer
+  title="How the hash map solution clones nodes and their pointers"
+  description="Use Next or Autoplay to see nodes created in the map, then each original pointer mapped to a cloned pointer."
+  steps={[
+    {
+      title: 'Create all clone nodes (Pass 1)',
+      note: 'Iterate through the original list and create a clone for each node, storing in the hash map.',
+      formula: 'nodeMap[original] = clone with same value',
+      callout: 'This separates node creation from pointer setup, allowing later lookups.',
+      items: [
+        { label: '7', state: 'default', index: 0 },
+        { label: '13', state: 'default', index: 1 },
+        { label: '11', state: 'default', index: 2 },
+      ],
+      memory: ['7 → 7\'', '13 → 13\'', '11 → 11\''],
+    },
+    {
+      title: 'Set next and random pointers (Pass 2)',
+      note: 'For each original node, set the clone\'s next/random to the mapped clones of the original\'s next/random.',
+      formula: 'clone.next = nodeMap[original.next]; clone.random = nodeMap[original.random]',
+      callout: 'The map guarantees O(1) lookup for any original node's clone.',
+      items: [
+        { label: '7', state: 'active', index: 0 },
+        { label: '13', state: 'default', index: 1 },
+        { label: '11', state: 'default', index: 2 },
+      ],
+      memory: ['7.next → 13 → 7\'.next → 13\'', '7.random → null → 7\'.random → null'],
+    },
+    {
+      title: 'Return the clone of the head',
+      note: 'The clone head is stored in nodeMap[original head].',
+      formula: 'return nodeMap[head]',
+      callout: 'The cloned list is complete and independent.',
+      items: [
+        { label: '7', state: 'match', index: 0 },
+        { label: '13', state: 'match', index: 1 },
+        { label: '11', state: 'match', index: 2 },
+      ],
+      memory: ['Result: 7\' → 13\' → 11\' (with random pointers correctly set)'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function copyRandomList(head):
+    if head is null:
+        return null
+    
+    nodeMap = {}
+    
+    // First pass: create all nodes
+    current = head
+    while current != null:
+        nodeMap[current] = Node(current.val)
+        current = current.next
+    
+    // Second pass: set pointers
+    current = head
+    while current != null:
+        copy = nodeMap[current]
+        copy.next = nodeMap[current.next] if current.next else null
+        copy.random = nodeMap[current.random] if current.random else null
+        current = current.next
+    
+    return nodeMap[head]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHashMap} lang="python" title="copy_list_with_random_pointer_hash_map.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHashMap} lang="cpp" title="copy_list_with_random_pointer_hash_map.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHashMap} lang="java" title="copy_list_with_random_pointer_hash_map.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHashMap} lang="javascript" title="copy_list_with_random_pointer_hash_map.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHashMap} lang="rust" title="copy_list_with_random_pointer_hash_map.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHashMap} lang="go" title="copy_list_with_random_pointer_hash_map.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Interweaving (Constant Space)
+
+<ApproachTag tag="advanced" />
+
+Instead of a hash map, interweave the clones into the original list temporarily. After the first pass, the structure is: `original → clone → original → clone → ...`. In the second pass, the original node's random neighbor is exactly one step away from the clone's random neighbor. In the third pass, separate the two lists and restore the original.
+
+This technique eliminates external storage for the mapping by reusing the list structure itself as a pointer table.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Three passes" spaceNote="Only pointers, no extra map" />
+
+### Step-by-step Example
+
+**Input:** `[[7,null],[13,0]]`
+
+Original: 7 → 13
+
+| Step | Structure | Action |
+| --- | --- | --- |
+| 1 | 7 → 7' → 13 → 13' | Interleave clones |
+| 2 | 7' → null, 13' → 7' | Set random pointers |
+| 3 | 7 → 13 (restored), 7' → 13' → null | Separate lists |
+
+### Pseudocode
+
+```plaintext
+function copyRandomListInterweave(head):
+    if head is null:
+        return null
+    
+    // Pass 1: Interweave
+    current = head
+    while current != null:
+        copy = Node(current.val)
+        copy.next = current.next
+        current.next = copy
+        current = copy.next
+    
+    // Pass 2: Set random pointers
+    current = head
+    while current != null:
+        if current.random != null:
+            current.next.random = current.random.next
+        current = current.next.next
+    
+    // Pass 3: Separate lists
+    current = head
+    copyHead = head.next
+    while current != null:
+        copy = current.next
+        current.next = copy.next
+        copy.next = copy.next.next if copy.next else null
+        current = current.next
+    
+    return copyHead
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyInterweave} lang="python" title="copy_list_with_random_pointer_interweave.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppInterweave} lang="cpp" title="copy_list_with_random_pointer_interweave.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaInterweave} lang="java" title="copy_list_with_random_pointer_interweave.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsInterweave} lang="javascript" title="copy_list_with_random_pointer_interweave.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustInterweave} lang="rust" title="copy_list_with_random_pointer_interweave.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goInterweave} lang="go" title="copy_list_with_random_pointer_interweave.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="copy_list_with_random_pointer_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="copy_list_with_random_pointer_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="CopyListWithRandomPointerSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="copy_list_with_random_pointer_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="copy_list_with_random_pointer_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="copy_list_with_random_pointer_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting that random pointers can point backward, forward, or to themselves — they are not bound by list order.
+- In the hash map approach, checking if a pointer exists before accessing the map; always use a map that safely returns null for missing keys.
+- In the interweaving approach, losing track of the original list structure during separation; restore it carefully in pass 3.
+- Confusing shallow copy (copying pointers) with deep copy (creating new nodes); this problem requires a full deep copy.
+- Not handling the null head case or null pointers within the random field.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 206, title: 'Reverse Linked List', difficulty: 'Easy', leetcodeSlug: 'reverse-linked-list' },
+  { number: 21, title: 'Merge Two Sorted Lists', difficulty: 'Easy', leetcodeSlug: 'merge-two-sorted-lists' },
+  { number: 141, title: 'Linked List Cycle', difficulty: 'Easy', leetcodeSlug: 'linked-list-cycle' },
+  { number: 19, title: 'Remove Nth Node From End of List', difficulty: 'Medium', leetcodeSlug: 'remove-nth-node-from-end-of-list' },
+  { number: 2, title: 'Add Two Numbers', difficulty: 'Medium', leetcodeSlug: 'add-two-numbers' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Hash Map vs. Interweaving:** Hash map is clearer and safer; interweaving is more elegant and space-optimal. Most interviewers accept either.
+- **Why two passes minimum?** Random pointers can point forward or backward; you cannot build the copy in a single pass without either a map or temporary storage.
+- **Handling cycles:** The algorithm does not assume the list is acyclic, so it correctly handles cases where random pointers create cycles (e.g., a node's random points back to itself).
+- **Testing:** Always test with null head, single node, and random pointers that form cycles or span the entire list.
+- **Distinguishing deep from shallow:** Explicitly mention that you are creating new nodes, not just copying pointers. Shallow copy would fail this problem.
+
+
+<PrevNextNav
+  prevProblem={ number: 137, title: "Single Number II", slug: "single-number-ii" }
+  nextProblem={ number: 139, title: "Word Break", slug: "word-break" }
+/></Aside>

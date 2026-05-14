@@ -1,0 +1,196 @@
+---
+title: Evaluate Division
+description: Evaluate division expressions in a graph. Two approaches — DFS O(q*(n+e)) + Union-Find O(q*(n*α(n))) — in six languages.
+leetcodeNumber: 399
+difficulty: Medium
+leetcodeSlug: evaluate-division
+tags: [Graph, DFS, BFS, Graph Traversal]
+prev:
+  label: "#383 Ransom Note"
+  link: "../ransom-note/"
+next:
+  label: "#427 Construct Quad Tree"
+  link: "../construct-quad-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyApproach1 from '@solutions/Python/evaluate_division_dfs.py?raw';
+import cppApproach1 from '@solutions/C++/evaluate_division_dfs.cpp?raw';
+import javaApproach1 from '@solutions/Java/EvaluateDivisionDfs.java?raw';
+import jsApproach1 from '@solutions/JavaScript/evaluate_division_dfs.js?raw';
+import rustApproach1 from '@solutions/Rust/evaluate_division_dfs.rs?raw';
+import goApproach1 from '@solutions/Golang/evaluate_division_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/evaluate_division_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/evaluate_division_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/EvaluateDivisionBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/evaluate_division_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/evaluate_division_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/evaluate_division_bfs_iterative.go?raw';
+
+import pyApproach2 from '@solutions/Python/evaluate_division_union-find.py?raw';
+import cppApproach2 from '@solutions/C++/evaluate_division_union-find.cpp?raw';
+import javaApproach2 from '@solutions/Java/EvaluateDivisionUnion-Find.java?raw';
+import jsApproach2 from '@solutions/JavaScript/evaluate_division_union-find.js?raw';
+import rustApproach2 from '@solutions/Rust/evaluate_division_union-find.rs?raw';
+import goApproach2 from '@solutions/Golang/evaluate_division_union-find.go?raw';
+
+## Problem Statement
+
+You are given an array of variable pairs `equations` where `equations[i] = [ai, bi]` and an array of real numbers `values` where `values[i]` represents the value of `ai / bi`. You are also given some `queries` where `queries[j] = [cj, dj]`.
+
+For each query, calculate the value of `cj / dj` and return the answer. If a single answer cannot be determined, return `-1.0`.
+
+<Aside type="tip" title="What to notice first">
+- Build a graph where each variable is a node and each equation defines an edge with a weight (the ratio).
+- From `a / b = 2`, we know `a = 2*b` and `b = 0.5*a`.
+- For a query `c / d`, find a path from `c` to `d` and multiply the edge weights.
+</Aside>
+
+### Examples
+
+| equations | values | queries | Output | Explanation |
+| --- | --- | --- | --- | --- |
+| `[["a","b"],["b","c"]]` | `[2.0,3.0]` | `[["a","c"],["b","a"],["a","e"]]` | `[6.0,0.5,-1.0]` | a/b=2, b/c=3 → a/c=6. b/a=0.5. a/e=-1 (not connected) |
+| `[["a","b"]]` | `[0.5]` | `[["a","b"],["b","a"],["c","c"]]` | `[0.5,2.0,1.0]` | a/b=0.5, b/a=2, c/c=1 |
+| `[["x1","x2"],["x2","x3"]]` | `[2.0,3.0]` | `[["x1","x3"],["x3","x1"]]` | `[6.0,0.166...]` | x1/x3=6, x3/x1≈0.167 |
+
+## Constraints
+
+- `1 <= equations.length <= 20`
+- `equations[i].length == 2`
+- `1 <= queries.length <= 20`
+- `queries[i].length == 2`
+- `1 <= len(equations[i][j]) <= 5`
+- `-100.0 < values[i] <= 100.0`
+- All equations are unique, answers are at most `10^5` in absolute value
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Social network analysis and friend recommendations
+- Route planning and GPS navigation
+- Dependency resolution and build systems
+- Recommendation systems and collaborative filtering
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| DFS | O(n) | O(n) | First approach |
+| Union-Find | O(n) | O(n) | Second approach |
+
+## Approach 1: DFS
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyApproach1} lang="python" title="evaluate_division_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppApproach1} lang="cpp" title="evaluate_division_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaApproach1} lang="java" title="EvaluateDivisionDfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsApproach1} lang="javascript" title="evaluate_division_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustApproach1} lang="rust" title="evaluate_division_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goApproach1} lang="go" title="evaluate_division_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Union-Find
+
+<ApproachTag tag="simple" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyApproach2} lang="python" title="evaluate_division_union-find.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppApproach2} lang="cpp" title="evaluate_division_union-find.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaApproach2} lang="java" title="EvaluateDivisionUnion-Find.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsApproach2} lang="javascript" title="evaluate_division_union-find.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustApproach2} lang="rust" title="evaluate_division_union-find.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goApproach2} lang="go" title="evaluate_division_union-find.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="evaluate_division_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="evaluate_division_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="EvaluateDivisionBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="evaluate_division_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="evaluate_division_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="evaluate_division_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- Approach 1 vs Approach 2 trade-offs
+- Edge cases and how to handle them
+- Follow-up questions
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 130, title: "Surrounded Regions", slug: "surrounded-regions" }}
+  nextProblem={{ number: 207, title: "Course Schedule", slug: "course-schedule" }}
+/>

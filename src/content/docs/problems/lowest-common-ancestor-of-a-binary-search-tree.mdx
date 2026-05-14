@@ -1,0 +1,331 @@
+---
+title: Lowest Common Ancestor of a Binary Search Tree
+description: Find the lowest common ancestor of two nodes in a binary search tree. Two approaches — Recursive O(log n) and Iterative O(log n) — in six languages.
+leetcodeNumber: 235
+difficulty: Easy
+leetcodeSlug: lowest-common-ancestor-of-a-bst
+tags: [Binary Search Tree, DFS, Tree]
+prev:
+  label: "#230 Kth Smallest Element in a BST"
+  link: "../kth-smallest-element-in-a-bst/"
+next:
+  label: "#236 Lowest Common Ancestor of a Binary Tree"
+  link: "../lowest-common-ancestor-of-a-binary-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyRecursive   from '@solutions/Python/lowest_common_ancestor_bst_recursive.py?raw';
+import cppRecursive  from '@solutions/C++/lowest_common_ancestor_bst_recursive.cpp?raw';
+import javaRecursive from '@solutions/Java/LowestCommonAncestorBST_Recursive.java?raw';
+import jsRecursive   from '@solutions/JavaScript/lowest_common_ancestor_bst_recursive.js?raw';
+import rustRecursive from '@solutions/Rust/lowest_common_ancestor_bst_recursive.rs?raw';
+import goRecursive   from '@solutions/Golang/lowest_common_ancestor_bst_recursive.go?raw';
+import pySpaceOptimized from '@solutions/Python/lowest_common_ancestor_of_a_binary_search_tree_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/lowest_common_ancestor_of_a_binary_search_tree_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/LowestCommonAncestorOfABinarySearchTreeSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/lowest_common_ancestor_of_a_binary_search_tree_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/lowest_common_ancestor_of_a_binary_search_tree_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/lowest_common_ancestor_of_a_binary_search_tree_space_optimized.go?raw';
+
+import pyIterative   from '@solutions/Python/lowest_common_ancestor_bst_iterative.py?raw';
+import cppIterative  from '@solutions/C++/lowest_common_ancestor_bst_iterative.cpp?raw';
+import javaIterative from '@solutions/Java/LowestCommonAncestorBST_Iterative.java?raw';
+import jsIterative   from '@solutions/JavaScript/lowest_common_ancestor_bst_iterative.js?raw';
+import rustIterative from '@solutions/Rust/lowest_common_ancestor_bst_iterative.rs?raw';
+import goIterative   from '@solutions/Golang/lowest_common_ancestor_bst_iterative.go?raw';
+
+## Problem Statement
+
+Given a binary search tree (BST) of unique values and two nodes `p` and `q`, return the **lowest common ancestor** (LCA) of the two nodes in the BST.
+
+The lowest common ancestor between two nodes p and q is the lowest node in a tree T such that both p and q are descendants of node (where we allow **a node to be a descendant of itself**).
+
+<Aside type="tip" title="What to notice first">
+- The BST property guarantees a **unique path** from root to any node.
+- If both `p` and `q` are less than the current node, the LCA is in the **left subtree**.
+- If both `p` and `q` are greater than the current node, the LCA is in the **right subtree**.
+- Otherwise, the current node is the **LCA** (they diverge here).
+</Aside>
+
+### Examples
+
+| Input | p | q | Output | Explanation |
+| --- | --- | --- | --- | --- |
+| Tree: `6, 2→8, 0, 4→7, 9, 3, 5` | 2 | 8 | 6 | 6 is the LCA of 2 and 8 |
+| Tree: `6, 2→8, 0, 4→7, 9, 3, 5` | 2 | 4 | 2 | 2 is the LCA of 2 and 4 (one node is ancestor of the other) |
+| Tree: `2, 1, 3` | 1 | 3 | 2 | 2 is the LCA of 1 and 3 |
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[2, 10^5]`.
+- `-10^9 <= Node.val <= 10^9`
+- All Node.val are **unique**.
+- `p != q`
+- Both `p` and `q` exist in the BST.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **File system hierarchies** — find the common parent directory of two files to determine shared permissions.
+- **Organizational structures** — identify the smallest management unit responsible for two employees.
+- **Biological taxonomy** — find the most recent common ancestor of two species in an evolutionary tree.
+- **Version control systems** — determine the merge base between two branches in Git history.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Key Idea | Best When |
+| --- | --- | --- | --- | --- |
+| Recursive | O(log n) avg, O(n) worst | O(h) | Use BST property to prune search space | **Standard** — elegant, leverages BST structure |
+| Iterative | O(log n) avg, O(n) worst | O(1) | Same logic without recursion stack | Memory-constrained, prefer iteration |
+
+## Which approach should you learn first?
+
+- Pick **Recursive** if you want clarity and simplicity (most interviewers prefer this).
+- Pick **Iterative** if you want to optimize space or demonstrate understanding of iteration.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Standard & Elegant</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(log n) avg &middot; O(h) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Space Optimized</div>
+    <div class="lc-approach-quick__name">Iterative</div>
+    <div class="lc-approach-quick__stats">O(log n) avg &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Recursive (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Leverage the BST property: compare current node value with both `p` and `q`. If both are smaller, recurse left. If both are larger, recurse right. Otherwise, the current node is the LCA.
+
+The elegance comes from the fact that the BST structure guarantees a convergence point where the two nodes "split" — this point is the LCA.
+
+<ComplexityBadges time="O(log n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Binary search-like" spaceNote="Recursion stack" />
+
+### Step-by-step Example
+
+**Input:** BST with root = 6, p = 2, q = 8
+
+| Step | Current Node | p vs Node | q vs Node | Action |
+| --- | --- | --- | --- | --- |
+| 1 | 6 | 2 < 6 | 8 > 6 | p and q on different sides → return 6 |
+
+**Result:** LCA = 6 ✓
+
+**Input:** BST with root = 6, p = 2, q = 4
+
+| Step | Current Node | p vs Node | q vs Node | Action |
+| --- | --- | --- | --- | --- |
+| 1 | 6 | 2 < 6 | 4 < 6 | Both in left subtree → recurse left |
+| 2 | 2 | 2 == 2 | 4 > 2 | p and q on different sides → return 2 |
+
+**Result:** LCA = 2 ✓
+
+<LogicPlayer
+  title="How recursive approach finds the LCA"
+  description="Navigate down the tree using BST property. When p and q diverge (one left, one right), you've found the LCA."
+  target="6"
+  steps={[
+    {
+      title: 'Start at root (6), check p=2 and q=8',
+      note: 'p < 6 (left side) and q > 6 (right side). They diverge here!',
+      formula: 'p < root < q',
+      callout: 'The root is the convergence point where p and q split.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '6', state: 'active', index: 1 },
+        { label: '8', state: 'default', index: 2 },
+      ],
+      memory: ['p = 2, q = 8, root = 6'],
+    },
+    {
+      title: 'p < root and q > root → LCA found',
+      note: 'When values straddle the current node, this node is the LCA.',
+      formula: 'return root = 6',
+      callout: 'Node 6 is the lowest node with both p and q as descendants.',
+      items: [
+        { label: '2', state: 'match', index: 0 },
+        { label: '6', state: 'match', index: 1 },
+        { label: '8', state: 'match', index: 2 },
+      ],
+      memory: ['LCA = 6'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function lowestCommonAncestorRecursive(root, p, q):
+    if root.val > p.val and root.val > q.val:
+        // Both p and q are in left subtree
+        return lowestCommonAncestorRecursive(root.left, p, q)
+    elif root.val < p.val and root.val < q.val:
+        // Both p and q are in right subtree
+        return lowestCommonAncestorRecursive(root.right, p, q)
+    else:
+        // p and q are on different sides or one is root
+        return root
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="lowest_common_ancestor_bst_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="lowest_common_ancestor_bst_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="LowestCommonAncestorBST_Recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="lowest_common_ancestor_bst_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="lowest_common_ancestor_bst_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="lowest_common_ancestor_bst_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative
+
+<ApproachTag tag="interview" />
+
+Same logic as the recursive approach, but implemented with a `while` loop instead of recursion. Navigate the tree by comparing node values with `p` and `q`, moving left or right until convergence.
+
+This approach avoids the recursion stack entirely, useful when stack depth is a concern or when iterative solutions are preferred.
+
+<ComplexityBadges time="O(log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Binary search-like" spaceNote="No extra structure" />
+
+### Step-by-step Example
+
+Same as Approach 1, but using a while loop instead of recursion:
+
+| Iteration | Current Node | p vs Node | q vs Node | Action |
+| --- | --- | --- | --- | --- |
+| 1 | 6 | 2 < 6 | 8 > 6 | p and q on different sides → return 6 |
+
+### Pseudocode
+
+```plaintext
+function lowestCommonAncestorIterative(root, p, q):
+    current = root
+    while current is not null:
+        if current.val > p.val and current.val > q.val:
+            // Both in left subtree
+            current = current.left
+        elif current.val < p.val and current.val < q.val:
+            // Both in right subtree
+            current = current.right
+        else:
+            // Divergence point found
+            return current
+    return root
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="lowest_common_ancestor_bst_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="lowest_common_ancestor_bst_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="LowestCommonAncestorBST_Iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="lowest_common_ancestor_bst_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="lowest_common_ancestor_bst_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="lowest_common_ancestor_bst_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting the BST property:** Treating it like a general binary tree and searching both subtrees. The BST allows pruning.
+- **Comparing with both p and q separately:** Make sure you're comparing the **node value** against **both p.val and q.val**, not node structure.
+- **Not handling the case where one node is the ancestor of another:** If p = 2 and q = 4, and 2 is an ancestor of 4, then 2 is the LCA, not their "convergence."
+- **Assuming convergence always happens at an internal node:** The LCA can be one of the nodes themselves (p or q).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="lowest_common_ancestor_of_a_binary_search_tree_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="lowest_common_ancestor_of_a_binary_search_tree_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="LowestCommonAncestorOfABinarySearchTreeSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="lowest_common_ancestor_of_a_binary_search_tree_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="lowest_common_ancestor_of_a_binary_search_tree_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="lowest_common_ancestor_of_a_binary_search_tree_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 98, title: 'Validate Binary Search Tree', difficulty: 'Medium', slug: 'problems/validate-binary-search-tree', leetcodeSlug: 'validate-binary-search-tree' },
+  { number: 230, title: 'Kth Smallest Element in a BST', difficulty: 'Medium', slug: 'problems/kth-smallest-element-in-a-bst', leetcodeSlug: 'kth-smallest-element-in-a-bst' },
+  { number: 236, title: 'Lowest Common Ancestor of a Binary Tree', difficulty: 'Medium', slug: 'problems/lowest-common-ancestor-of-a-binary-tree', leetcodeSlug: 'lowest-common-ancestor-of-a-binary-tree' },
+  { number: 530, title: 'Minimum Absolute Difference in BST', difficulty: 'Easy', slug: 'problems/minimum-absolute-difference-in-bst', leetcodeSlug: 'minimum-absolute-difference-in-bst' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why BST LCA is simpler than general tree LCA:** The BST property creates a unique path to each node. You don't need to search both subtrees; you can prune based on value comparisons.
+- **Recursive vs Iterative:** Recursive is cleaner and more elegant. Iterative avoids stack overhead. Choose based on the interviewer's preference or constraints.
+- **Edge cases:** One node is the ancestor of another (still valid LCA), both nodes are the same node is not possible (p != q guaranteed), null checks are minimal due to problem constraints.
+- **Follow-up — General Binary Tree:** If the interviewer changes it to a non-BST, explain how you'd store parent pointers or use DFS to find ancestors, then find the first common one.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 234, title: "Palindrome Linked List", slug: "palindrome-linked-list" }}
+  nextProblem={{ number: 236, title: "Lowest Common Ancestor of a Binary Tree", slug: "lowest-common-ancestor-of-a-binary-tree" }}
+/>

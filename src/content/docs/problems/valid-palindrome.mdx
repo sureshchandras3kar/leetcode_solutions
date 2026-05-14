@@ -1,0 +1,314 @@
+---
+title: Valid Palindrome
+description: Determine if a string is a palindrome ignoring non-alphanumeric characters. Two approaches — two pointers O(1) space and clean-then-check O(n) space — in six languages.
+leetcodeNumber: 125
+difficulty: Easy
+leetcodeSlug: valid-palindrome
+tags: [Two Pointers, String]
+prev:
+  label: "#124 Binary Tree Maximum Path Sum"
+  link: "../binary-tree-maximum-path-sum/"
+next:
+  label: "#127 Word Ladder"
+  link: "../word-ladder/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyTwoPtr   from '@solutions/Python/valid_palindrome_two_pointer.py?raw';
+import cppTwoPtr  from '@solutions/C++/valid_palindrome_two_pointer.cpp?raw';
+import javaTwoPtr from '@solutions/Java/valid_palindrome_two_pointer.java?raw';
+import jsTwoPtr   from '@solutions/JavaScript/valid_palindrome_two_pointer.js?raw';
+import rustTwoPtr from '@solutions/Rust/valid_palindrome_two_pointer.rs?raw';
+import goTwoPtr   from '@solutions/Golang/valid_palindrome_two_pointer.go?raw';
+import pyoptimized from '@solutions/Python/valid_palindrome_optimized.py?raw';
+import cppoptimized from '@solutions/C++/valid_palindrome_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/ValidPalindromeOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/valid_palindrome_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/valid_palindrome_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/valid_palindrome_optimized.go?raw';
+
+import pyClean    from '@solutions/Python/valid_palindrome_clean.py?raw';
+import cppClean   from '@solutions/C++/valid_palindrome_clean.cpp?raw';
+import javaClean  from '@solutions/Java/valid_palindrome_clean.java?raw';
+import jsClean    from '@solutions/JavaScript/valid_palindrome_clean.js?raw';
+import rustClean  from '@solutions/Rust/valid_palindrome_clean.rs?raw';
+import goClean    from '@solutions/Golang/valid_palindrome_clean.go?raw';
+
+## Problem Statement
+
+A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers. Given a string `s`, return `true` if it is a palindrome, or `false` otherwise.
+
+<Aside type="tip" title="What to notice first">
+- "Alphanumeric" means letters (a-z, A-Z) and digits (0-9) — skip spaces, punctuation, etc.
+- Always convert to the same case before comparing.
+- Two pointers avoids creating a cleaned copy → O(1) extra space.
+</Aside>
+
+### Examples
+
+| Input | Output | Reason |
+| --- | --- | --- |
+| `"A man, a plan, a canal: Panama"` | `true` | Cleaned: `"amanaplanacanalpanama"` is a palindrome |
+| `"race a car"` | `false` | Cleaned: `"raceacar"` is not a palindrome |
+| `" "` | `true` | After cleaning: `""` — empty string is a palindrome |
+
+## Constraints
+
+- `1 <= s.length <= 2 × 10^5`
+- `s` consists only of printable ASCII characters
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Input sanitization** — checking if a DNA sequence or serial number is palindromic after stripping delimiters
+- **Symmetric routing** — checking if a path identifier is the same forward and backward
+- **Data integrity** — palindromic checksums in some encoding schemes
+- **Natural language processing** — detecting palindromes in text after normalization
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Two Pointers | O(n) | O(1) | Preferred — no extra allocation |
+| Clean Then Check | O(n) | O(n) | Clarity, simpler code |
+
+## Approach 1: Two Pointers (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Place left at the start and right at the end of the string. Skip non-alphanumeric characters on both sides, then compare the lowercased characters at each pointer. If any mismatch is found, return false. If the pointers meet or cross, return true.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="No extra allocation" />
+
+### Step-by-step Example
+
+**Input:** `s = "A man, a plan, a canal: Panama"`
+
+Cleaned view (not actually built): `"amanaplanacanalpanama"`
+
+| Step | left char | right char | match? | action |
+| --- | --- | --- | --- | --- |
+| 1 | `'A'` → `'a'` | `'a'` | ✓ | advance both |
+| 2 | `'m'` | `'m'` | ✓ | advance both |
+| 3 | `'a'` | `'a'` | ✓ | advance both |
+| ... | right pointer skips `':'`, `' '` | left skips `','`, `' '` | ... | skip non-alphanumeric |
+| last | pointers meet | — | — | return `true` |
+
+**Key behavior — skipping non-alphanumeric characters:**
+
+When the left pointer lands on `','` or `' '`, the inner while loop advances it until it finds an alphanumeric character without doing any comparison. The same happens on the right side.
+
+<LogicPlayer
+  title="Two pointers converging on 'A man, a plan, a canal: Panama'"
+  description="Use Next or Autoplay to watch the left and right pointers skip punctuation and spaces, then compare alphanumeric characters."
+  target="All characters matched"
+  steps={[
+    {
+      title: 'Initialize pointers at both ends',
+      note: 'left starts at index 0 (\'A\'), right starts at the last character (\'a\').',
+      formula: 'left = 0, right = len(s) - 1',
+      callout: 'We have not compared anything yet.',
+      items: [
+        { label: 'A', state: 'active', index: 0 },
+        { label: ' ', state: 'default', index: 1 },
+        { label: 'm', state: 'default', index: 2 },
+        { label: '…', state: 'default', index: 3 },
+        { label: 'a', state: 'active', index: 4 },
+      ],
+      memory: ['left = 0 (A)', 'right = last (a)'],
+    },
+    {
+      title: 'Compare A and a (both alphanumeric)',
+      note: 'Both are alphanumeric. Lowercased: \'a\' == \'a\'. Match — advance both pointers.',
+      formula: 'lower(A) == lower(a) → true',
+      callout: 'Both pointers move inward after a successful match.',
+      items: [
+        { label: 'A', state: 'match', index: 0 },
+        { label: ' ', state: 'default', index: 1 },
+        { label: 'm', state: 'active', index: 2 },
+        { label: '…', state: 'default', index: 3 },
+        { label: 'a', state: 'match', index: 4 },
+      ],
+      memory: ['left = 2 (m)', 'right = … (m)'],
+    },
+    {
+      title: 'Right pointer skips a non-alphanumeric character',
+      note: 'Right pointer encounters \':\' or \',\'. The inner while loop keeps decrementing right until it finds an alphanumeric character.',
+      formula: 'while not isAlphanumeric(s[right]): right--',
+      callout: 'Skipping punctuation without any comparison.',
+      items: [
+        { label: 'A', state: 'match', index: 0 },
+        { label: ',', state: 'skipped', index: 1 },
+        { label: ' ', state: 'skipped', index: 2 },
+        { label: '…', state: 'default', index: 3 },
+        { label: 'n', state: 'active', index: 4 },
+      ],
+      memory: ['right skipped punctuation', 'right now on alphanumeric'],
+    },
+    {
+      title: 'Pointers meet — return true',
+      note: 'All characters have been compared and every pair matched. The string is a valid palindrome.',
+      formula: 'left >= right → return true',
+      callout: 'When pointers cross or meet without a mismatch, the string is a palindrome.',
+      items: [
+        { label: 'a', state: 'match', index: 0 },
+        { label: 'm', state: 'match', index: 1 },
+        { label: 'a', state: 'match', index: 2 },
+        { label: '…', state: 'match', index: 3 },
+        { label: 'a', state: 'match', index: 4 },
+      ],
+      memory: ['result = true'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function isPalindrome(s):
+    left, right = 0, len(s) - 1
+    while left < right:
+        while left < right and not isAlphanumeric(s[left]):
+            left++
+        while left < right and not isAlphanumeric(s[right]):
+            right--
+        if lower(s[left]) != lower(s[right]):
+            return false
+        left++; right--
+    return true
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPtr} lang="python" title="valid_palindrome_two_pointer.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPtr} lang="cpp" title="valid_palindrome_two_pointer.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPtr} lang="java" title="valid_palindrome_two_pointer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPtr} lang="javascript" title="valid_palindrome_two_pointer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPtr} lang="rust" title="valid_palindrome_two_pointer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPtr} lang="go" title="valid_palindrome_two_pointer.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Clean Then Check
+
+<ApproachTag tag="simple" />
+
+Filter the string to keep only alphanumeric characters, lowercase them all, then check if the resulting string equals its own reverse. Simple and readable, but allocates O(n) extra space.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass" spaceNote="Cleaned string storage" />
+
+### Pseudocode
+
+```plaintext
+function isPalindrome(s):
+    cleaned = [c.lower() for c in s if c.isalnum()]
+    return cleaned == reversed(cleaned)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyClean} lang="python" title="valid_palindrome_clean.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppClean} lang="cpp" title="valid_palindrome_clean.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaClean} lang="java" title="valid_palindrome_clean.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsClean} lang="javascript" title="valid_palindrome_clean.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustClean} lang="rust" title="valid_palindrome_clean.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goClean} lang="go" title="valid_palindrome_clean.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to handle digits — `'0'`–`'9'` ARE alphanumeric and must not be skipped.
+- Not converting to lowercase before comparing (`'A' != 'a'`).
+- Empty string edge case: an empty string after cleaning is a valid palindrome — return `true`.
+</Aside>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="valid_palindrome_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="valid_palindrome_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="ValidPalindromeOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="valid_palindrome_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="valid_palindrome_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="valid_palindrome_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 9,   title: 'Palindrome Number',            difficulty: 'Easy',   slug: 'problems/palindrome-number', leetcodeSlug: 'palindrome-number' },
+  { number: 234, title: 'Palindrome Linked List',       difficulty: 'Easy',   leetcodeSlug: 'palindrome-linked-list' },
+  { number: 5,   title: 'Longest Palindromic Substring', difficulty: 'Medium', leetcodeSlug: 'longest-palindromic-substring' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- Clarify "alphanumeric" immediately — it includes digits, not just letters.
+- Lead with the two-pointer approach (O(1) space) — it is the expected answer in most interviews.
+- The clean-then-check approach is fine as a first step to understand the problem before optimizing to O(1) space.
+
+
+<PrevNextNav
+  prevProblem={ number: 124, title: "Binary Tree Maximum Path Sum", slug: "binary-tree-maximum-path-sum" }
+  nextProblem={ number: 127, title: "Word Ladder", slug: "word-ladder" }
+/></Aside>

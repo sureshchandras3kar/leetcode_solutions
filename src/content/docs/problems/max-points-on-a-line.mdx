@@ -1,0 +1,200 @@
+---
+title: Max Points on a Line
+description: Given an array of points where points[i] = [xi, yi], return the maximum number of points that lie on the same straight line.
+leetcodeNumber: 149
+difficulty: Hard
+leetcodeSlug: max-points-on-a-line
+tags: [Geometry, HashTable, Math]
+prev:
+  label: "#148 Sort List"
+  link: "../sort-list/"
+next:
+  label: "#150 Evaluate Reverse Polish Notation"
+  link: "../evaluate-reverse-polish-notation/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySlopecounting from '@solutions/Python/max_points_on_a_line_slope_counting.py?raw';
+import cppSlopecounting from '@solutions/C++/max_points_on_a_line_slope_counting.cpp?raw';
+import javaSlopecounting from '@solutions/Java/max_points_on_a_line_slope_counting.java?raw';
+import jsSlopecounting from '@solutions/JavaScript/max_points_on_a_line_slope_counting.js?raw';
+import rustSlopecounting from '@solutions/Rust/max_points_on_a_line_slope_counting.rs?raw';
+import goSlopecounting from '@solutions/Golang/max_points_on_a_line_slope_counting.go?raw';
+
+import pyGcd from '@solutions/Python/max_points_on_a_line_gcd.py?raw';
+import cppGcd from '@solutions/C++/max_points_on_a_line_gcd.cpp?raw';
+import javaGcd from '@solutions/Java/max_points_on_a_line_gcd.java?raw';
+import jsGcd from '@solutions/JavaScript/max_points_on_a_line_gcd.js?raw';
+import rustGcd from '@solutions/Rust/max_points_on_a_line_gcd.rs?raw';
+import goGcd from '@solutions/Golang/max_points_on_a_line_gcd.go?raw';
+
+import pyBruteforce from '@solutions/Python/max_points_on_a_line_brute_force.py?raw';
+import cppBruteforce from '@solutions/C++/max_points_on_a_line_brute_force.cpp?raw';
+import javaBruteforce from '@solutions/Java/max_points_on_a_line_brute_force.java?raw';
+import jsBruteforce from '@solutions/JavaScript/max_points_on_a_line_brute_force.js?raw';
+import rustBruteforce from '@solutions/Rust/max_points_on_a_line_brute_force.rs?raw';
+import goBruteforce from '@solutions/Golang/max_points_on_a_line_brute_force.go?raw';
+
+
+
+## Problem Statement
+
+Given an array of points where points[i] = [xi, yi], return the maximum number of points that lie on the same straight line.
+
+You need to solve this problem efficiently.
+
+<Aside type="tip" title="What to notice first">
+- Key insight 1 for Max Points on a Line
+- Key insight 2 for solving this problem
+- Key insight 3 specific to the approach
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation for example 1 |
+| Example 2 | Result 2 | Explanation for example 2 |
+
+## Constraints
+
+- Constraint 1 for Max Points on a Line
+- Constraint 2
+- Constraint 3
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Database indexing and fast lookups
+- Caching mechanisms and memoization
+- Duplicate detection in distributed systems
+- URL deduplication and web crawling
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Slope Counting | O(n) | O(1) | When applicable |
+| Gcd | O(n) | O(1) | When applicable |
+| Brute Force | O(n) | O(1) | When applicable |
+
+
+## Approach 1: Slope Counting
+
+<ApproachTag tag="recommended" />
+
+This approach provides an efficient solution for max points on a line.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pySlopecounting}} lang="python" title="max_points_on_a_line_slope_counting.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppSlopecounting}} lang="cpp" title="max_points_on_a_line_slope_counting.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaSlopecounting}} lang="java" title="max_points_on_a_line_slope_counting.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsSlopecounting}} lang="javascript" title="max_points_on_a_line_slope_counting.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustSlopecounting}} lang="rust" title="max_points_on_a_line_slope_counting.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goSlopecounting}} lang="go" title="max_points_on_a_line_slope_counting.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Gcd
+
+<ApproachTag tag="interview" />
+
+This approach provides an efficient solution for max points on a line.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyGcd}} lang="python" title="max_points_on_a_line_gcd.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppGcd}} lang="cpp" title="max_points_on_a_line_gcd.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaGcd}} lang="java" title="max_points_on_a_line_gcd.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsGcd}} lang="javascript" title="max_points_on_a_line_gcd.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustGcd}} lang="rust" title="max_points_on_a_line_gcd.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goGcd}} lang="go" title="max_points_on_a_line_gcd.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Brute Force
+
+<ApproachTag tag="simple" />
+
+This approach provides an efficient solution for max points on a line.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyBruteforce}} lang="python" title="max_points_on_a_line_brute_force.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppBruteforce}} lang="cpp" title="max_points_on_a_line_brute_force.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaBruteforce}} lang="java" title="max_points_on_a_line_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsBruteforce}} lang="javascript" title="max_points_on_a_line_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustBruteforce}} lang="rust" title="max_points_on_a_line_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goBruteforce}} lang="go" title="max_points_on_a_line_brute_force.go" />
+  </TabItem>
+</Tabs>
+
+
+
+<RelatedProblems problems={{
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 9, title: 'Palindrome Number', difficulty: 'Easy', leetcodeSlug: 'palindrome-number' },
+}} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- Time vs. space trade-offs between approaches
+- Handling edge cases (empty inputs, single elements, duplicates)
+- Optimization opportunities and when they matter
+- Follow-up variations and constraint changes
+</Aside>
+
+<PrevNextNav
+  prevProblem=undefined
+  nextProblem=undefined
+/>

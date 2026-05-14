@@ -1,0 +1,467 @@
+---
+title: Reverse Nodes in k-Group
+description: Reverse nodes in k-groups in a linked list. Two approaches — iterative O(n) and recursive O(n) — in six languages.
+leetcodeNumber: 25
+difficulty: Hard
+leetcodeSlug: reverse-nodes-in-k-group
+tags: [Linked List, Recursion]
+prev:
+  label: "#23 Merge k Sorted Lists"
+  link: "../merge-k-sorted-lists/"
+next:
+  label: "#26 Remove Duplicates from Sorted Array"
+  link: "../remove-duplicates-from-sorted-array/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyIterative     from '@solutions/Python/reverse_nodes_in_k_group_iterative.py?raw';
+import cppIterative    from '@solutions/C++/reverse_nodes_in_k_group_iterative.cpp?raw';
+import javaIterative   from '@solutions/Java/reverse_nodes_in_k_group_iterative.java?raw';
+import jsIterative     from '@solutions/JavaScript/reverse_nodes_in_k_group_iterative.js?raw';
+import rustIterative   from '@solutions/Rust/reverse_nodes_in_k_group_iterative.rs?raw';
+import goIterative     from '@solutions/Golang/reverse_nodes_in_k_group_iterative.go?raw';
+import pySpaceOptimized from '@solutions/Python/reverse_nodes_in_k_group_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/reverse_nodes_in_k_group_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ReverseNodesInKGroupSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/reverse_nodes_in_k_group_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/reverse_nodes_in_k_group_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/reverse_nodes_in_k_group_space_optimized.go?raw';
+
+import pyRecursive     from '@solutions/Python/reverse_nodes_in_k_group_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/reverse_nodes_in_k_group_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/reverse_nodes_in_k_group_recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/reverse_nodes_in_k_group_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/reverse_nodes_in_k_group_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/reverse_nodes_in_k_group_recursive.go?raw';
+
+## Problem Statement
+
+Given the head of a linked list, reverse the nodes of the list k at a time, and return the modified list.
+
+k is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of k then left-out nodes, in the end, should remain as is.
+
+You may not alter the values in the list's nodes, only nodes themselves may be changed.
+
+<Aside type="tip" title="What to notice first">
+- You must **reverse groups of exactly k nodes** — groups smaller than k are left unchanged.
+- You are working with a **linked list**, so pointer manipulation is essential.
+- The key insight is to identify group boundaries, reverse within each group, and reconnect groups.
+- A dummy node simplifies handling the head of the list (especially when the head changes).
+- Both iterative and recursive approaches visit each node exactly once.
+</Aside>
+
+### Examples
+
+| Input | k | Output | Explanation |
+| --- | --- | --- | --- |
+| `[1, 2, 3, 4, 5]` | `2` | `[2, 1, 4, 3, 5]` | Reverse (1, 2) and (3, 4); leave 5 as is |
+| `[1, 2, 3, 4, 5]` | `3` | `[3, 2, 1, 4, 5]` | Reverse (1, 2, 3); leave (4, 5) as is |
+| `[1]` | `1` | `[1]` | Only one node, no change |
+| `[1, 2]` | `2` | `[2, 1]` | Reverse the only group of 2 |
+
+## Constraints
+
+- The number of nodes in the list is `n`.
+- `1 <= k <= n <= 5000`
+- `0 <= Node.val <= 1000`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Batch processing** — reversing groups of consecutive records (e.g., transaction batches, log entries).
+- **Memory layout optimization** — rearranging memory blocks for cache efficiency.
+- **Protocol buffers** — reversing chunks of serialized data for certain encoding schemes.
+- **Playlist rotations** — reversing segments of songs in a queue for shuffle algorithms.
+- **Network packet reordering** — reordering packets in groups for flow control or congestion management.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Iterative | O(n) | O(1) | General case — no recursion overhead, more intuitive |
+| Recursive | O(n) | O(n/k) | Learning recursion, practicing elegant divide-and-conquer |
+
+\* Space refers to the call stack. The iterative approach uses only a few pointers.
+
+## Which approach should you learn first?
+
+- Pick **Iterative** for the most direct and efficient solution — it clearly shows group boundaries and reversal.
+- Pick **Recursive** if you want to practice thinking of the problem as smaller subproblems, each handling one group independently.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Efficient</div>
+    <div class="lc-approach-quick__name">Iterative</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Elegant</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n/k) space</div>
+  </div>
+</div>
+
+## Approach 1: Iterative with Group Reversal
+
+<ApproachTag tag="recommended" />
+
+Process the list in groups of k nodes. For each group:
+
+1. Identify the boundaries of the group (k-th node and the node after it)
+2. Reverse the pointers within the group
+3. Link the reversed group back to the previous group
+4. Move forward to the next group
+
+The key is using a **dummy node** as the head to simplify edge cases and tracking `prevGroup` to maintain links between groups.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="One pass through list" spaceNote="Only pointer variables" />
+
+### Step-by-step Example
+
+**Input:** `[1, 2, 3, 4, 5]`, k = 2
+
+| Step | Action | State |
+| --- | --- | --- |
+| Check group 1 | Group (1, 2) exists (2 nodes) | Group boundaries identified |
+| Reverse group 1 | Reverse pointers: 1 ← 2 | List becomes 2 → 1 → 3 → 4 → 5 |
+| Link backward | Connect dummy to reversed group | dummy → 2 → 1 → ... |
+| Check group 2 | Group (3, 4) exists (2 nodes) | Next group boundaries identified |
+| Reverse group 2 | Reverse pointers: 3 ← 4 | List becomes ... → 4 → 3 → 5 |
+| Link backward | Connect group 1 to reversed group 2 | ... → 1 → 4 → 3 → 5 |
+| Check group 3 | Only 1 node (5) left, k=2 | Stop (less than k nodes) |
+| Final result | Return dummy.next | `[2, 1, 4, 3, 5]` ✓ |
+
+<LogicPlayer
+  title="How iterative group reversal works"
+  description="Use Next or Autoplay to see how each group is identified, reversed, and reconnected."
+  steps={[
+    {
+      title: 'Step 1: Set up dummy node and identify first group',
+      note: 'The dummy node (value 0) sits before the list and simplifies handling. The first group is (1, 2).',
+      formula: 'dummy → 1 → 2 → 3 → 4 → 5',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['prevGroup: dummy', 'groupStart: 1', 'groupEnd: 2'],
+    },
+    {
+      title: 'Step 2: Reverse first group (1 ↔ 2)',
+      note: 'Reverse the pointers within (1, 2). After reversal, 2 points to 1, and 1 points to 3.',
+      formula: 'dummy → 2 → 1 → (pointer to 3)',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'active', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['prevGroup: dummy', 'Group (1, 2) reversed'],
+    },
+    {
+      title: 'Step 3: Link dummy to reversed group',
+      note: 'Connect the dummy node to the new head of the reversed group (which is 2).',
+      formula: 'dummy → 2 → 1 → 3 → 4 → 5',
+      items: [
+        { label: 'dummy', state: 'match', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['dummy → 2', 'prevGroup: 1 (tail of reversed group)'],
+    },
+    {
+      title: 'Step 4: Move to second group (3, 4)',
+      note: 'prevGroup moves to node 1 (tail of first reversed group). The second group is (3, 4).',
+      formula: 'prevGroup: 1, groupStart: 3, groupEnd: 4',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'active', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['prevGroup: 1', 'groupStart: 3', 'groupEnd: 4'],
+    },
+    {
+      title: 'Step 5: Reverse second group (3 ↔ 4)',
+      note: 'Reverse the pointers within (3, 4). After reversal, 4 points to 3, and 3 points to 5.',
+      formula: 'Reversed: 4 → 3 → (pointer to 5)',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'active', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['Group (3, 4) reversed'],
+    },
+    {
+      title: 'Step 6: Link first group tail to second reversed group',
+      note: 'Connect node 1 (tail of first reversed group) to node 4 (head of second reversed group).',
+      formula: '1 → 4, so: 2 → 1 → 4 → 3 → 5',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'match', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['1 → 4', 'prevGroup: 3 (tail of second reversed group)'],
+    },
+    {
+      title: 'Step 7: Check if more groups exist',
+      note: 'Only node 5 remains. Since 5 < k (which is 2), no more reversal. We are done!',
+      formula: 'Final list: 2 → 1 → 4 → 3 → 5',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '1', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 3 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['Result: [2, 1, 4, 3, 5] ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function reverseKGroupIterative(head, k):
+    dummy = ListNode(0)
+    dummy.next = head
+    prevGroup = dummy
+
+    while True:
+        kthNode = getKthNode(prevGroup, k + 1)
+        if not kthNode:
+            break
+
+        groupStart = prevGroup.next
+        groupEnd = kthNode
+        nextGroupStart = groupEnd.next
+
+        // Reverse the group from groupStart to groupEnd
+        prev = nextGroupStart
+        curr = groupStart
+        while curr != nextGroupStart:
+            nextTemp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = nextTemp
+
+        // Link previous group to reversed current group
+        prevGroup.next = groupEnd
+        prevGroup = groupStart
+
+    return dummy.next
+
+function getKthNode(node, k):
+    while node and k > 1:
+        node = node.next
+        k -= 1
+    return node
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="reverse_nodes_in_k_group_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="reverse_nodes_in_k_group_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="reverse_nodes_in_k_group_iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="reverse_nodes_in_k_group_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="reverse_nodes_in_k_group_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="reverse_nodes_in_k_group_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Recursive with Self-Similar Groups
+
+<ApproachTag tag="elegant" />
+
+Recursion allows us to think of the problem as:
+
+1. **Reverse the first k nodes** and get the new head of this group
+2. **Recursively solve** the rest of the list (starting from the (k+1)-th node)
+3. **Connect** the tail of the current group to the result of the recursive call
+
+This approach cleanly separates each group's processing and is conceptually elegant, though it uses O(n/k) stack space.
+
+<ComplexityBadges time="O(n)" space="O(n/k)" timeColor="green" spaceColor="yellow" timeNote="One pass, all nodes visited once" spaceNote="Call stack depth = number of groups" />
+
+### Step-by-step Example
+
+**Input:** `[1, 2, 3, 4, 5]`, k = 2
+
+| Recursion Level | Group | Action | Returns |
+| --- | --- | --- | --- |
+| 1 | (1, 2) → (3, 4, 5) | Reverse (1, 2); recursively solve (3, 4, 5) | head: 2, tail: 1 |
+| 2 | (3, 4) → (5) | Reverse (3, 4); recursively solve (5) | head: 4, tail: 3 |
+| 3 | (5) | Only 1 node left, cannot reverse | Return 5 as is |
+| 2 returns | Connect 3 to result | 3 → 5 (already in place) | 4 → 3 → 5 |
+| 1 returns | Connect 1 to result | 1 → 4 → 3 → 5 | 2 → 1 → 4 → 3 → 5 ✓ |
+
+### Pseudocode
+
+```plaintext
+function reverseKGroupRecursive(head, k):
+    // Find the k-th node
+    kth = head
+    for i from 0 to k - 2:
+        if not kth:
+            return head
+        kth = kth.next
+
+    // If no k-th node, cannot reverse this group
+    if not kth:
+        return head
+
+    // Save the next group's head (after k-th)
+    nextGroupHead = kth.next
+
+    // Reverse from head to kth
+    prev = nextGroupHead
+    curr = head
+    while curr != nextGroupHead:
+        nextTemp = curr.next
+        curr.next = prev
+        prev = curr
+        curr = nextTemp
+
+    // curr is now at the old head (which is now tail)
+    // prev is at kth (which is now head)
+    // Recursively process the rest and connect
+    head.next = reverseKGroupRecursive(nextGroupHead, k)
+
+    return prev  // Return the new head (which was kth)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="reverse_nodes_in_k_group_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="reverse_nodes_in_k_group_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="reverse_nodes_in_k_group_recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="reverse_nodes_in_k_group_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="reverse_nodes_in_k_group_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="reverse_nodes_in_k_group_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Common Pitfalls
+
+<Aside type="caution" title="Watch out for:">
+- **Off-by-one errors** when counting k nodes — double-check loop bounds.
+- **Null pointer dereferences** — always check if a node exists before accessing `.next`.
+- **Losing track of group boundaries** — maintain clear references to `groupStart`, `groupEnd`, and `nextGroupStart`.
+- **Forgetting to link groups** — if you reverse a group but don't link it back, the list becomes disconnected.
+- **Modifying node values instead of pointers** — the problem requires changing pointers only, not values.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="reverse_nodes_in_k_group_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="reverse_nodes_in_k_group_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ReverseNodesInKGroupSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="reverse_nodes_in_k_group_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="reverse_nodes_in_k_group_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="reverse_nodes_in_k_group_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Interview Tips
+
+<Aside type="tip" title="How to impress:">
+- Explain **both approaches** — iterative for efficiency, recursive for elegance.
+- Draw **pointer diagrams** to show how reversal works at each step.
+- Discuss **edge cases** explicitly: lists shorter than k, lists of exact length k, k=1.
+- Walk through a **concrete example** step-by-step to show clarity.
+- Mention **complexity trade-offs** — O(1) space vs. O(n/k) stack usage.
+- If asked to optimize, explain why **iterative is preferred** in production (less stack overhead).
+
+
+<PrevNextNav
+  prevProblem={ number: 23, title: "Merge k Sorted Lists", slug: "merge-k-sorted-lists" }
+  nextProblem={ number: 26, title: "Remove Duplicates from Sorted Array", slug: "remove-duplicates-from-sorted-array" }
+/></Aside>
+
+## Related Problems
+
+<RelatedProblems
+  problems={[
+    { number: 2, slug: 'add-two-numbers', title: 'Add Two Numbers' },
+    { number: 21, slug: 'merge-two-sorted-lists', title: 'Merge Two Sorted Lists' },
+    { number: 24, slug: 'swap-nodes-in-pairs', title: 'Swap Nodes in Pairs' },
+    { number: 61, slug: 'rotate-list', title: 'Rotate List' },
+    { number: 92, slug: 'reverse-linked-list-ii', title: 'Reverse Linked List II' },
+  ]}
+/>

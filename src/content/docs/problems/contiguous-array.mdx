@@ -1,0 +1,251 @@
+---
+title: Contiguous Array
+description: Find the maximum length subarray with equal numbers of 0s and 1s. Prefix sum with 0→-1 transform in O(n) — in six languages.
+leetcodeNumber: 525
+difficulty: Medium
+leetcodeSlug: contiguous-array
+tags: [Array, Hash Table, Prefix Sum]
+prev:
+  label: "#502 IPO"
+  link: "../ipo/"
+next:
+  label: "#530 Minimum Absolute Difference in BST"
+  link: "../minimum-absolute-difference-in-bst/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyPrefixSum   from '@solutions/Python/contiguous_array_prefix_sum.py?raw';
+import cppPrefixSum  from '@solutions/C++/contiguous_array_prefix_sum.cpp?raw';
+import javaPrefixSum from '@solutions/Java/contiguous_array_prefix_sum.java?raw';
+import jsPrefixSum   from '@solutions/JavaScript/contiguous_array_prefix_sum.js?raw';
+import rustPrefixSum from '@solutions/Rust/contiguous_array_prefix_sum.rs?raw';
+import goPrefixSum   from '@solutions/Golang/contiguous_array_prefix_sum.go?raw';
+
+## Problem Statement
+
+Given a binary array `nums`, return the maximum length of a contiguous subarray with an equal number of `0` and `1`.
+
+<Aside type="tip" title="The core trick">
+- Replace every `0` with `-1`. Now "equal 0s and 1s" means "subarray sum equals 0".
+- When the same prefix sum appears at two different positions, the subarray between those positions sums to 0.
+- Initialize the map with `{0: -1}` to handle subarrays starting at index 0.
+</Aside>
+
+### Examples
+
+| Input | Output | Subarray |
+| --- | --- | --- |
+| `[0,1]` | 2 | `[0,1]` |
+| `[0,1,0]` | 2 | `[0,1]` or `[1,0]` |
+
+## Constraints
+
+- `1 <= nums.length <= 10^5`
+- `nums[i]` is either `0` or `1`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Network packet analysis** — find the longest span where requests and responses are balanced.
+- **Voting record analysis** — longest period where yes and no votes are equal.
+- **Signal balancing** — longest run of a binary signal that is perfectly balanced.
+- **Load balancing** — find time windows with equal load on two servers.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Prefix Sum with 0→-1 Transform | O(n) | O(n) | Optimal solution, single pass |
+
+\* n = length of the input array
+
+## The Key Transform
+
+The problem asks for equal counts of `0` and `1`. Directly comparing counts requires tracking two separate running totals. The insight is to collapse that into a single value:
+
+**Replace `0` with `-1`.** Now each `1` contributes `+1` and each `0` contributes `-1`. A subarray with equal 0s and 1s has net sum `0`.
+
+This reduces the problem to: *find the longest subarray with sum 0*, which is solved in O(n) with a prefix sum hash map — the same pattern as Subarray Sum Equals K.
+
+The map stores the **first** index where each prefix sum was seen. When the same prefix sum reappears at index `i`, the subarray from `seen[prefix]+1` to `i` has sum 0, so its length is `i - seen[prefix]`. We never update the map for a seen prefix — we always want the earliest occurrence to maximize window length.
+
+## Approach: Prefix Sum with 0→-1 Transform
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass" spaceNote="Hash map storage" />
+
+### Step-by-step Example
+
+**Input:** `nums = [0,1,0,1]`
+
+After replacing 0→-1: `[-1, 1, -1, 1]`
+
+| i | num | delta | prefix | seen (before) | length if match | best |
+| --- | --- | --- | --- | --- | --- | --- |
+| — | — | — | 0 | `{}` | — | 0 |
+| 0 | 0 | -1 | -1 | `{0:-1}` | — | 0 |
+| 1 | 1 | +1 | 0 | `{0:-1, -1:0}` | 1−(−1)=**2** | 2 |
+| 2 | 0 | -1 | -1 | `{0:-1, -1:0}` | 2−0=**2** | 2 |
+| 3 | 1 | +1 | 0 | `{0:-1, -1:0}` | 3−(−1)=**4** | 4 |
+
+**Result:** 4
+
+**Input:** `nums = [0,1,0]`
+
+After replacing 0→-1: `[-1, 1, -1]`
+
+| i | delta | prefix | seen (before) | length if match | best |
+| --- | --- | --- | --- | --- | --- |
+| — | — | 0 | `{}` | — | 0 |
+| 0 | -1 | -1 | `{0:-1}` | — | 0 |
+| 1 | +1 | 0 | `{0:-1, -1:0}` | 1−(−1)=**2** | 2 |
+| 2 | -1 | -1 | `{0:-1, -1:0}` | 2−0=**2** | 2 |
+
+**Result:** 2
+
+<LogicPlayer
+  title="Finding maximum balanced subarray with prefix sums"
+  description="Use Next or Autoplay to watch the prefix sum (with 0→-1) accumulate, the map record first-seen positions, and the window lengths calculate for nums=[0,1,0,1]."
+  steps={[
+    {
+      title: 'Initialize with {0: -1}',
+      note: 'Seed the map with prefix 0 at index -1. This allows subarrays starting at index 0 to be detected when the prefix sum returns to 0.',
+      formula: 'seen = {0: -1},  prefix = 0,  best = 0',
+      callout: 'Treating index -1 as "before the array" means a prefix-0 at index i gives length i - (-1) = i + 1.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '0', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['seen: {0: -1}', 'prefix = 0', 'best = 0'],
+    },
+    {
+      title: 'i=0: num=0 → delta=-1, prefix=-1',
+      note: '-1 not in seen. Record first occurrence of prefix -1 at index 0.',
+      formula: 'prefix = 0 + (−1) = −1  →  not in seen  →  seen[-1] = 0',
+      callout: 'No balanced subarray ending here yet.',
+      items: [
+        { label: '0', state: 'active', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '0', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['seen: {0:-1, -1:0}', 'prefix = -1', 'best = 0'],
+    },
+    {
+      title: 'i=1: num=1 → delta=+1, prefix=0',
+      note: '0 is in seen at index -1. Length = 1 - (-1) = 2. That is nums[0..1] = [0,1].',
+      formula: 'prefix = −1 + 1 = 0  →  in seen at −1  →  length = 1−(−1) = 2',
+      callout: 'First balanced subarray found: [0,1] of length 2.',
+      items: [
+        { label: '0', state: 'match', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '0', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['seen: {0:-1, -1:0}', 'prefix = 0', 'best = 2'],
+    },
+    {
+      title: 'i=2: num=0 → delta=-1, prefix=-1',
+      note: '-1 is already in seen at index 0. Length = 2 - 0 = 2. That is nums[1..2] = [1,0].',
+      formula: 'prefix = 0 + (−1) = −1  →  in seen at 0  →  length = 2−0 = 2',
+      callout: 'Another balanced subarray of length 2. Best stays 2. Crucially, we do NOT update seen[-1] — we keep the earliest occurrence.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '0', state: 'match', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['seen: {0:-1, -1:0}', 'prefix = -1', 'best = 2'],
+    },
+    {
+      title: 'i=3: num=1 → delta=+1, prefix=0',
+      note: '0 is in seen at index -1. Length = 3 - (-1) = 4. The entire array [0,1,0,1] is balanced!',
+      formula: 'prefix = −1 + 1 = 0  →  in seen at −1  →  length = 3−(−1) = 4',
+      callout: 'The whole array is balanced. Final answer: 4.',
+      items: [
+        { label: '0', state: 'match', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '0', state: 'match', index: 2 },
+        { label: '1', state: 'match', index: 3 },
+      ],
+      memory: ['seen: {0:-1, -1:0}', 'prefix = 0', 'best = 4'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function findMaxLength(nums):
+    seen = {0: -1}
+    prefix = 0
+    best = 0
+    for i, num in enumerate(nums):
+        prefix += 1 if num == 1 else -1
+        if prefix in seen:
+            best = max(best, i - seen[prefix])
+        else:
+            seen[prefix] = i
+    return best
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPrefixSum} lang="python" title="contiguous_array_prefix_sum.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPrefixSum} lang="cpp" title="contiguous_array_prefix_sum.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPrefixSum} lang="java" title="contiguous_array_prefix_sum.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPrefixSum} lang="javascript" title="contiguous_array_prefix_sum.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPrefixSum} lang="rust" title="contiguous_array_prefix_sum.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPrefixSum} lang="go" title="contiguous_array_prefix_sum.go" />
+  </TabItem>
+</Tabs>
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Not initializing the map with `{0: -1}`** — without this, subarrays starting at index 0 are never detected.
+- **Updating `seen[prefix]` when the key already exists** — you want the *first* (earliest) occurrence to maximize the window length. Never overwrite an existing entry.
+- **Forgetting to replace 0 with -1** — adding 0 to the prefix sum does nothing, so the prefix never changes when a `0` is encountered, breaking the algorithm entirely.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 560, title: 'Subarray Sum Equals K',         difficulty: 'Medium', slug: 'problems/subarray-sum-equals-k', leetcodeSlug: 'subarray-sum-equals-k' },
+  { number: 1,   title: 'Two Sum',                       difficulty: 'Easy',   slug: 'problems/two-sum',              leetcodeSlug: 'two-sum' },
+  { number: 128, title: 'Longest Consecutive Sequence',  difficulty: 'Medium',                                        leetcodeSlug: 'longest-consecutive-sequence' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- **State the 0→-1 substitution explicitly** — this is the core insight that transforms the problem into a prefix sum problem. Say it out loud before writing code.
+- **Why not update the map when we see a duplicate?** — because the first occurrence gives the longest possible window. Updating would shrink the answer.
+- **Works in O(n) with a single pass** — there is no better asymptotic solution since every element must be read at least once.
+- **Edge cases:** an all-zeros or all-ones array returns 0. An array of length 1 always returns 0. The algorithm handles both correctly.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 502, title: "IPO", slug: "ipo" }}
+  nextProblem={{ number: 530, title: "Minimum Absolute Difference in BST", slug: "minimum-absolute-difference-in-bst" }}
+/>

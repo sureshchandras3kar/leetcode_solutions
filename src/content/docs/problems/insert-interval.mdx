@@ -1,0 +1,283 @@
+---
+title: Insert Interval
+description: Insert a new interval into a list of non-overlapping intervals. Two approaches — greedy O(n) and iterative O(n) — in six languages.
+leetcodeNumber: 57
+difficulty: Medium
+leetcodeSlug: insert-interval
+tags: [Array, Intervals]
+prev:
+  label: "#56 Merge Intervals"
+  link: "../merge-intervals/"
+next:
+  label: "#61 Rotate List"
+  link: "../rotate-list/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+## Problem Statement
+
+You are given an array of non-overlapping intervals `intervals` where `intervals[i] = [starti, endi]` represent the start and end of the ith interval. You are also given a new interval `newInterval = [newStart, newEnd]` that may overlap with some of the existing intervals.
+
+**Insert** `newInterval` into `intervals` such that `intervals` is still sorted and non-overlapping (merge overlapping intervals as necessary). Return the resulting array of intervals.
+
+<Aside type="tip" title="What to notice first">
+- Three phases: (1) add non-overlapping intervals before newInterval, (2) merge overlapping intervals, (3) add remaining non-overlapping intervals.
+- No need to sort; input is already sorted.
+- Overlapping condition: `interval.end >= newInterval.start` AND `interval.start <= newInterval.end`.
+</Aside>
+
+### Examples
+
+| intervals | newInterval | Output | Explanation |
+| --- | --- | --- | --- |
+| `[[1,2],[3,5],[6,9]]` | `[2,5]` | `[[1,5],[6,9]]` | [2,5] overlaps with [1,2] and [3,5], merge to [1,5] |
+| `[[1,5]]` | `[0,0]` | `[[0,0],[1,5]]` | [0,0] doesn't overlap, add before |
+| `[[1,5]]` | `[5,7]` | `[[1,7]]` | [5,7] overlaps at boundary, merge |
+| `[[1,2],[3,5],[6,9]]` | `[10,11]` | `[[1,2],[3,5],[6,9],[10,11]]` | [10,11] doesn't overlap, append |
+
+## Constraints
+
+- `0 <= intervals.length <= 10^4`
+- `intervals[i].length == 2`
+- `0 <= starti <= endi <= 10^5`
+- `newInterval.length == 2`
+- `0 <= newStart <= newEnd <= 10^5`
+- `intervals` is sorted by `start` and does not contain overlapping intervals
+
+import pyGreedy       from '@solutions/Python/insert_interval_greedy.py?raw';
+import cppGreedy      from '@solutions/C++/insert_interval_greedy.cpp?raw';
+import javaGreedy     from '@solutions/Java/InsertIntervalGreedy.java?raw';
+import jsGreedy       from '@solutions/JavaScript/insert_interval_greedy.js?raw';
+import rustGreedy     from '@solutions/Rust/insert_interval_greedy.rs?raw';
+import goGreedy       from '@solutions/Golang/insert_interval_greedy.go?raw';
+import pySpaceOptimized from '@solutions/Python/insert_interval_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/insert_interval_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/InsertIntervalSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/insert_interval_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/insert_interval_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/insert_interval_space_optimized.go?raw';
+
+import pyIterative     from '@solutions/Python/insert_interval_iterative.py?raw';
+import cppIterative    from '@solutions/C++/insert_interval_iterative.cpp?raw';
+import javaIterative   from '@solutions/Java/InsertIntervalIterative.java?raw';
+import jsIterative     from '@solutions/JavaScript/insert_interval_iterative.js?raw';
+import rustIterative   from '@solutions/Rust/insert_interval_iterative.rs?raw';
+import goIterative     from '@solutions/Golang/insert_interval_iterative.go?raw';
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Calendar event scheduling** — insert new events while merging overlaps.
+- **Database range queries** — insert new time ranges while maintaining non-overlapping constraints.
+- **Memory allocation** — track free memory blocks and insert new allocations.
+- **Stock trading systems** — manage price ranges and insert new trading intervals.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Greedy Three-Phase | O(n) | O(n) | Single pass through intervals; merge during iteration |
+| Iterative Merge | O(n) | O(n) | Explicit three phases; clearer logic |
+
+## Approach 1: Greedy Three-Phase (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Divide the problem into three phases:
+1. Add all intervals that end before `newInterval` starts.
+2. Merge all overlapping intervals with `newInterval`.
+3. Add remaining intervals that start after the merged interval ends.
+
+This is efficient because the input is pre-sorted and non-overlapping.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single scan through intervals" spaceNote="Result list storage" />
+
+### Step-by-step Example
+
+**Input:** `intervals = [[1,2],[3,5],[6,9]]`, `newInterval = [2,5]`
+
+| Phase | Action | Result |
+| --- | --- | --- |
+| 1 | Add [1,2] (ends before 2) | [[1,2]] |
+| 2 | Merge [2,5] with [3,5] → [2,5] | [[1,2], [2,5]] |
+| 3 | Merge [2,5] with [6,9]? No (6 > 5) | [[1,2], [2,5]] |
+| Final | Add [6,9] | [[1,2], [2,5], [6,9]] |
+
+### Pseudocode
+
+```plaintext
+function insert(intervals, newInterval):
+    result = []
+    i = 0
+    newStart, newEnd = newInterval
+    
+    // Phase 1: Add non-overlapping intervals before
+    while i < len(intervals) and intervals[i][1] < newStart:
+        result.append(intervals[i])
+        i += 1
+    
+    // Phase 2: Merge overlapping intervals
+    while i < len(intervals) and intervals[i][0] <= newEnd:
+        newStart = min(newStart, intervals[i][0])
+        newEnd = max(newEnd, intervals[i][1])
+        i += 1
+    result.append([newStart, newEnd])
+    
+    // Phase 3: Add remaining intervals
+    while i < len(intervals):
+        result.append(intervals[i])
+        i += 1
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyGreedy} lang="python" title="insert_interval_greedy.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppGreedy} lang="cpp" title="insert_interval_greedy.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaGreedy} lang="java" title="InsertIntervalGreedy.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedy} lang="javascript" title="insert_interval_greedy.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedy} lang="rust" title="insert_interval_greedy.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedy} lang="go" title="insert_interval_greedy.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative Merge
+
+<ApproachTag tag="simple" />
+
+Identical algorithm to Approach 1 but written with explicit three-phase structure. More verbose but clarifies the three distinct merge phases.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Three single-pass loops" spaceColor="Result storage" />
+
+### Pseudocode
+
+```plaintext
+function insert(intervals, newInterval):
+    result = []
+    i = 0
+    newStart, newEnd = newInterval
+    
+    // Phase 1: Add intervals ending before new interval starts
+    while i < len(intervals) and intervals[i][1] < newStart:
+        result.append(intervals[i])
+        i += 1
+    
+    // Phase 2: Merge overlapping intervals
+    while i < len(intervals) and intervals[i][0] <= newEnd:
+        newStart = min(newStart, intervals[i][0])
+        newEnd = max(newEnd, intervals[i][1])
+        i += 1
+    result.append([newStart, newEnd])
+    
+    // Phase 3: Append remaining non-overlapping intervals
+    while i < len(intervals):
+        result.append(intervals[i])
+        i += 1
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="insert_interval_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="insert_interval_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="InsertIntervalIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="insert_interval_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="insert_interval_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="insert_interval_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="insert_interval_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="insert_interval_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="InsertIntervalSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="insert_interval_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="insert_interval_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="insert_interval_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Sorting the result:** The input is already sorted, so never sort again—it wastes O(n log n).
+- **Off-by-one errors in phase boundaries:** Ensure `intervals[i][1] < newStart` (strictly less) and `intervals[i][0] <= newEnd` (less or equal).
+- **Not updating newStart during merge:** Always take the minimum start; it expands the merged interval.
+- **Forgetting to check phase 1 condition:** If phase 1 loop is skipped, newInterval should still be added.
+</Aside>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why three phases?** Breaking into phases makes logic clear and avoids re-sorting.
+- **Can you do this without modifying the list?** Yes, but you'd still need O(n) space for the result.
+- **What if intervals overlapped in the input?** Merge them first (LeetCode 56), then insert.
+- **What if newInterval is already in the list?** The algorithm handles it naturally by merging.
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

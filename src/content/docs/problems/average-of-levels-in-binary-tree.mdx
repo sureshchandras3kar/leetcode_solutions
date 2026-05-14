@@ -1,0 +1,320 @@
+---
+title: Average of Levels in Binary Tree
+description: Calculate the average value of nodes at each level. Two approaches — BFS level-order O(n) and DFS with level tracking O(n) — in six languages.
+leetcodeNumber: 637
+difficulty: Easy
+leetcodeSlug: average-of-levels-in-binary-tree
+tags: [Tree, Breadth-First Search, Depth-First Search]
+prev:
+  label: "#560 Subarray Sum Equals K"
+  link: "../subarray-sum-equals-k/"
+next:
+  label: "#909 Snakes and Ladders"
+  link: "../snakes-and-ladders/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBFS     from '@solutions/Python/average_of_levels_in_binary_tree_bfs.py?raw';
+import cppBFS    from '@solutions/C++/average_of_levels_in_binary_tree_bfs.cpp?raw';
+import javaBFS   from '@solutions/Java/average_of_levels_in_binary_tree_bfs.java?raw';
+import jsBFS     from '@solutions/JavaScript/average_of_levels_in_binary_tree_bfs.js?raw';
+import rustBFS   from '@solutions/Rust/average_of_levels_in_binary_tree_bfs.rs?raw';
+import goBFS     from '@solutions/Golang/average_of_levels_in_binary_tree_bfs.go?raw';
+import pybfsIterative from '@solutions/Python/average_of_levels_in_binary_tree_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/average_of_levels_in_binary_tree_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/AverageOfLevelsInBinaryTreeBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/average_of_levels_in_binary_tree_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/average_of_levels_in_binary_tree_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/average_of_levels_in_binary_tree_bfs_iterative.go?raw';
+
+import pyDFS     from '@solutions/Python/average_of_levels_in_binary_tree_dfs.py?raw';
+import cppDFS    from '@solutions/C++/average_of_levels_in_binary_tree_dfs.cpp?raw';
+import javaDFS   from '@solutions/Java/average_of_levels_in_binary_tree_dfs.java?raw';
+import jsDFS     from '@solutions/JavaScript/average_of_levels_in_binary_tree_dfs.js?raw';
+import rustDFS   from '@solutions/Rust/average_of_levels_in_binary_tree_dfs.rs?raw';
+import goDFS     from '@solutions/Golang/average_of_levels_in_binary_tree_dfs.go?raw';
+
+## Problem Statement
+
+Given the `root` of a binary tree, return an array of the average value of the nodes on each level of the tree.
+
+Answers within 10^-5 of the actual answer will be accepted as correct.
+
+<Aside type="tip" title="What to notice first">
+- You need to process each level and calculate the average of all nodes in that level.
+- Both BFS and DFS can solve this, but with different approaches.
+- Be careful with floating-point precision when calculating averages.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[3,9,20,null,null,15,7]` | `[3.00000,14.50000,7.50000]` | Level 1: 3/1=3; Level 2: (9+20)/2=14.5; Level 3: (15+7)/2=7.5 |
+| `[3,9,20]` | `[3.00000,14.50000]` | Level 1: 3; Level 2: (9+20)/2=14.5 |
+
+### Visualized Examples
+
+```
+Example 1:       3           Level 1: avg = 3
+              /     \
+             9      20       Level 2: avg = (9+20)/2 = 14.5
+                  /    \
+                 15     7    Level 3: avg = (15+7)/2 = 7.5
+
+Example 2:       3           Level 1: avg = 3
+              /     \
+             9      20       Level 2: avg = 14.5
+```
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[1, 10^4]`.
+- `-2^31 <= Node.val <= 2^31 - 1`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Data center monitoring** — calculate average resource usage per layer.
+- **Sales analytics** — compute average sales by tier or department level.
+- **Performance metrics** — track average response times by request depth.
+- **Educational institutions** — calculate average scores by grade level.
+- **Healthcare systems** — compute average patient metrics by care level.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| BFS Level-Order | O(n) | O(w) | Clear level-by-level processing |
+| DFS with Level Tracking | O(n) | O(h) | Smaller trees; prefer recursion |
+
+**Where h = height, w = max width**
+
+## Which approach should you learn first?
+
+- Pick **BFS Level-Order** for intuitive, clear level-by-level aggregation.
+- Pick **DFS with Level Tracking** if you prefer recursive solutions.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Level-by-Level</div>
+    <div class="lc-approach-quick__name">BFS Level-Order</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(w) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Recursive</div>
+    <div class="lc-approach-quick__name">DFS with Level Tracking</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(h) space</div>
+  </div>
+</div>
+
+## Approach 1: BFS Level-Order (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use a queue to traverse level by level. For each level, sum all node values, then divide by the count.
+
+<ComplexityBadges time="O(n)" space="O(w)" timeColor="green" spaceColor="yellow" timeNote="Visit all nodes" spaceNote="Queue width at widest level" />
+
+### Step-by-step Example
+
+**Input:** `root = [3,9,20,null,null,15,7]`
+
+Level 1: sum=3, count=1, avg=3.0
+Level 2: sum=29, count=2, avg=14.5
+Level 3: sum=22, count=2, avg=7.5
+
+### Pseudocode
+
+```plaintext
+function averageOfLevelsBFS(root):
+    result = []
+    queue = [root]
+    
+    while queue is not empty:
+        levelSize = length of queue
+        levelSum = 0
+        
+        for i = 0 to levelSize - 1:
+            node = queue.dequeue()
+            levelSum += node.val
+            
+            if node.left exists:
+                queue.enqueue(node.left)
+            if node.right exists:
+                queue.enqueue(node.right)
+        
+        result.append(levelSum / levelSize)
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="average_of_levels_in_binary_tree_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="average_of_levels_in_binary_tree_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="average_of_levels_in_binary_tree_bfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="average_of_levels_in_binary_tree_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="average_of_levels_in_binary_tree_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="average_of_levels_in_binary_tree_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: DFS with Level Tracking
+
+<ApproachTag tag="interview" />
+
+Use DFS to traverse the tree, tracking the current level. Maintain lists of sums and counts per level, then calculate averages.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Visit all nodes" spaceNote="Recursion call stack" />
+
+### Step-by-step Example
+
+DFS visits nodes in pre-order: 3 (L0), 9 (L1), 20 (L1), 15 (L2), 7 (L2)
+
+Accumulate:
+- Level 0: sum=3, count=1
+- Level 1: sum=29, count=2
+- Level 2: sum=22, count=2
+
+Average: [3.0, 14.5, 7.5]
+
+### Pseudocode
+
+```plaintext
+function averageOfLevelsDFS(root):
+    sums = []
+    counts = []
+    
+    function dfs(node, level):
+        if node is null:
+            return
+        
+        if level == length of sums:
+            sums.append(0)
+            counts.append(0)
+        
+        sums[level] += node.val
+        counts[level] += 1
+        
+        dfs(node.left, level + 1)
+        dfs(node.right, level + 1)
+    
+    dfs(root, 0)
+    
+    result = []
+    for i in range(length of sums):
+        result.append(sums[i] / counts[i])
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="average_of_levels_in_binary_tree_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="average_of_levels_in_binary_tree_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="average_of_levels_in_binary_tree_dfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="average_of_levels_in_binary_tree_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="average_of_levels_in_binary_tree_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="average_of_levels_in_binary_tree_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="average_of_levels_in_binary_tree_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="average_of_levels_in_binary_tree_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="AverageOfLevelsInBinaryTreeBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="average_of_levels_in_binary_tree_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="average_of_levels_in_binary_tree_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="average_of_levels_in_binary_tree_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Integer division instead of floating-point.** Use double/float for the average calculation.
+- **Forgetting to initialize sum/count arrays.** Make sure you create them as you encounter new levels.
+- **Off-by-one in level tracking.** Ensure levels are indexed correctly.
+- **Not handling empty trees.** Return an empty list for null input.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 102, title: 'Binary Tree Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-level-order-traversal' },
+  { number: 103, title: 'Binary Tree Zigzag Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-zigzag-level-order-traversal' },
+  { number: 199, title: 'Binary Tree Right Side View', difficulty: 'Medium', leetcodeSlug: 'binary-tree-right-side-view' },
+  { number: 104, title: 'Maximum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'maximum-depth-of-binary-tree' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Floating-point precision:** Discuss rounding strategies and acceptable error margins.
+- **Space vs code clarity:** BFS is clearer; DFS saves space on wide trees.
+- **Follow-ups to expect:** sum of levels, product of levels, or filtering by conditions.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 636, title: "Exclusive Time of Functions", slug: "exclusive-time-of-functions" }}
+  nextProblem={{ number: 638, title: "Shopping Offers", slug: "shopping-offers" }}
+/>

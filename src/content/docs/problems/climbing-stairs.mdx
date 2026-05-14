@@ -1,0 +1,358 @@
+---
+title: Climbing Stairs
+description: Climb n stairs using dynamic programming. Two approaches — DP Array O(n) + space-optimized Fibonacci variables — in six languages.
+leetcodeNumber: 70
+difficulty: Easy
+leetcodeSlug: climbing-stairs
+tags: [Math, Dynamic Programming, Memoization]
+prev:
+  label: "#69 Sqrt(x)"
+  link: "../sqrtx/"
+next:
+  label: "#71 Simplify Path"
+  link: "../simplify-path/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDpArray     from '@solutions/Python/climbing_stairs_dp_array.py?raw';
+import cppDpArray    from '@solutions/C++/climbing_stairs_dp_array.cpp?raw';
+import javaDpArray   from '@solutions/Java/ClimbingStairsDpArray.java?raw';
+import jsDpArray     from '@solutions/JavaScript/climbing_stairs_dp_array.js?raw';
+import rustDpArray   from '@solutions/Rust/climbing_stairs_dp_array.rs?raw';
+import goDpArray     from '@solutions/Golang/climbing_stairs_dp_array.go?raw';
+import pySpaceOptimized from '@solutions/Python/climbing_stairs_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/climbing_stairs_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ClimbingStairsSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/climbing_stairs_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/climbing_stairs_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/climbing_stairs_space_optimized.go?raw';
+
+import pyFib         from '@solutions/Python/climbing_stairs_fibonacci_variables.py?raw';
+import cppFib        from '@solutions/C++/climbing_stairs_fibonacci_variables.cpp?raw';
+import javaFib       from '@solutions/Java/ClimbingStairsFibonacciVariables.java?raw';
+import jsFib         from '@solutions/JavaScript/climbing_stairs_fibonacci_variables.js?raw';
+import rustFib       from '@solutions/Rust/climbing_stairs_fibonacci_variables.rs?raw';
+import goFib         from '@solutions/Golang/climbing_stairs_fibonacci_variables.go?raw';
+
+## Problem Statement
+
+You are climbing a staircase with `n` steps. Each time you can climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+
+<Aside type="tip" title="What to notice first">
+- You start at step 0 and want to reach step n.
+- At each step, you have exactly 2 choices: take 1 step or take 2 steps.
+- The order of choices matters: [1, 1, 2] is different from [1, 2, 1].
+- Each subproblem (reaching step i) depends on previous subproblems.
+</Aside>
+
+### Examples
+
+| n | Output | Explanation |
+| --- | --- | --- |
+| 2 | 2 | [1, 1] or [2] |
+| 3 | 3 | [1, 1, 1], [1, 2], or [2, 1] |
+| 4 | 5 | [1, 1, 1, 1], [1, 1, 2], [1, 2, 1], [2, 1, 1], or [2, 2] |
+| 5 | 8 | Follow Fibonacci sequence |
+
+## Constraints
+
+- `1 <= n <= 45`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Navigation menus** — counting distinct paths through multi-level menus with step sizes.
+- **Robotics path planning** — discrete movement options and counting total routes to a destination.
+- **Game AI** — determining number of move sequences to reach a target position with limited step sizes.
+- **Password generation** — breaking a string into chunks of size 1 or 2 (word break variants).
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Description |
+| --- | --- | --- | --- |
+| DP Array | O(n) | O(n) | Store all values, easy to understand and debug |
+| Fibonacci Variables | O(n) | O(1) | Only keep last two values, space-optimized |
+
+## Which approach should you learn first?
+
+- Pick **DP Array** if you want the clearest explanation and debugging capability.
+- Pick **Fibonacci Variables** if you want to optimize space and understand the Fibonacci connection.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Understanding</div>
+    <div class="lc-approach-quick__name">DP Array</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Space Optimized</div>
+    <div class="lc-approach-quick__name">Fibonacci Variables</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: DP Array
+
+<ApproachTag tag="recommended" />
+
+Build a dynamic programming array where `dp[i]` represents the number of distinct ways to reach step `i`.
+
+The recurrence relation is simple: to reach step `i`, you can either:
+- Come from step `i-1` and take 1 step
+- Come from step `i-2` and take 2 steps
+
+Therefore: `dp[i] = dp[i-1] + dp[i-2]`
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass" spaceNote="DP array storage" />
+
+### Step-by-step Example
+
+**Input:** `n = 4`
+
+| Step i | dp[i] | Ways to reach step i |
+| --- | --- | --- |
+| 0 | 1 | Base case (starting point) |
+| 1 | 1 | [1] |
+| 2 | 2 | [1, 1], [2] |
+| 3 | 3 | [1, 1, 1], [1, 2], [2, 1] |
+| 4 | 5 | [1, 1, 1, 1], [1, 1, 2], [1, 2, 1], [2, 1, 1], [2, 2] |
+
+<LogicPlayer
+  title="How the DP array solution counts paths"
+  description="Use Next or Autoplay to watch the DP array build step by step, showing how each new value is the sum of the previous two."
+  target="4"
+  steps={[
+    {
+      title: 'Initialize base cases',
+      note: 'We can reach step 0 in 1 way (be there already) and step 1 in 1 way (take 1 step).',
+      formula: 'dp[0] = 1, dp[1] = 1',
+      callout: 'Base cases establish the foundation for the recurrence.',
+      items: [
+        { label: 'step 0', state: 'active', index: 0 },
+        { label: 'step 1', state: 'active', index: 1 },
+        { label: 'step 2', state: 'default', index: 2 },
+        { label: 'step 3', state: 'default', index: 3 },
+        { label: 'step 4', state: 'default', index: 4 },
+      ],
+      memory: ['dp[0] = 1', 'dp[1] = 1'],
+    },
+    {
+      title: 'Calculate dp[2]',
+      note: 'To reach step 2, we can come from step 1 (1 way) or step 0 (1 way). Total: 1 + 1 = 2',
+      formula: 'dp[2] = dp[1] + dp[0] = 1 + 1 = 2',
+      callout: 'The paths are: [1,1] and [2]',
+      items: [
+        { label: 'step 0', state: 'default', index: 0 },
+        { label: 'step 1', state: 'default', index: 1 },
+        { label: 'step 2', state: 'active', index: 2 },
+        { label: 'step 3', state: 'default', index: 3 },
+        { label: 'step 4', state: 'default', index: 4 },
+      ],
+      memory: ['dp[0] = 1', 'dp[1] = 1', 'dp[2] = 2'],
+    },
+    {
+      title: 'Calculate dp[3]',
+      note: 'To reach step 3, we combine paths from step 2 (2 ways) and step 1 (1 way). Total: 2 + 1 = 3',
+      formula: 'dp[3] = dp[2] + dp[1] = 2 + 1 = 3',
+      callout: 'The paths are: [1,1,1], [1,2], [2,1]',
+      items: [
+        { label: 'step 0', state: 'default', index: 0 },
+        { label: 'step 1', state: 'default', index: 1 },
+        { label: 'step 2', state: 'default', index: 2 },
+        { label: 'step 3', state: 'active', index: 3 },
+        { label: 'step 4', state: 'default', index: 4 },
+      ],
+      memory: ['dp[0] = 1', 'dp[1] = 1', 'dp[2] = 2', 'dp[3] = 3'],
+    },
+    {
+      title: 'Calculate dp[4]',
+      note: 'To reach step 4, we combine paths from step 3 (3 ways) and step 2 (2 ways). Total: 3 + 2 = 5',
+      formula: 'dp[4] = dp[3] + dp[2] = 3 + 2 = 5',
+      callout: 'The paths are: [1,1,1,1], [1,1,2], [1,2,1], [2,1,1], [2,2]',
+      items: [
+        { label: 'step 0', state: 'default', index: 0 },
+        { label: 'step 1', state: 'default', index: 1 },
+        { label: 'step 2', state: 'default', index: 2 },
+        { label: 'step 3', state: 'default', index: 3 },
+        { label: 'step 4', state: 'match', index: 4 },
+      ],
+      memory: ['dp[0] = 1', 'dp[1] = 1', 'dp[2] = 2', 'dp[3] = 3', 'dp[4] = 5'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function climbingStairsDpArray(n):
+    if n <= 1:
+        return 1
+    dp = array of size n+1
+    dp[0] = 1
+    dp[1] = 1
+    for i from 2 to n:
+        dp[i] = dp[i-1] + dp[i-2]
+    return dp[n]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDpArray} lang="python" title="climbing_stairs_dp_array.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDpArray} lang="cpp" title="climbing_stairs_dp_array.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDpArray} lang="java" title="ClimbingStairsDpArray.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDpArray} lang="javascript" title="climbing_stairs_dp_array.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDpArray} lang="rust" title="climbing_stairs_dp_array.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDpArray} lang="go" title="climbing_stairs_dp_array.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Fibonacci Variables (Space-Optimized)
+
+<ApproachTag tag="interview" />
+
+Instead of storing all `n` values, we only keep track of the last two values (`prev1` and `prev2`) since `dp[i]` only depends on `dp[i-1]` and `dp[i-2]`.
+
+This approach recognizes that the climbing stairs problem follows the Fibonacci sequence.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Only two variables" />
+
+### Step-by-step Example
+
+**Input:** `n = 4`
+
+| Iteration | prev2 | prev1 | current = prev1 + prev2 | Interpretation |
+| --- | --- | --- | --- | --- |
+| Start | 1 | 1 | — | Base cases |
+| i=2 | 1 | 2 | 2 | 2 ways to reach step 2 |
+| i=3 | 2 | 3 | 3 | 3 ways to reach step 3 |
+| i=4 | 3 | 5 | 5 | 5 ways to reach step 4 |
+
+<Aside type="tip" title="Why this works">
+The Fibonacci sequence naturally appears because each number is the sum of the two preceding ones. The number of ways to reach step `n` is the `(n+1)`-th Fibonacci number.
+</Aside>
+
+### Pseudocode
+
+```plaintext
+function climbingStairsFibonacciVariables(n):
+    if n <= 1:
+        return 1
+    prev2 = 1
+    prev1 = 1
+    for i from 2 to n:
+        current = prev1 + prev2
+        prev2 = prev1
+        prev1 = current
+    return prev1
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyFib} lang="python" title="climbing_stairs_fibonacci_variables.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppFib} lang="cpp" title="climbing_stairs_fibonacci_variables.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaFib} lang="java" title="ClimbingStairsFibonacciVariables.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsFib} lang="javascript" title="climbing_stairs_fibonacci_variables.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustFib} lang="rust" title="climbing_stairs_fibonacci_variables.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goFib} lang="go" title="climbing_stairs_fibonacci_variables.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting base cases: `dp[0]` and `dp[1]` must be initialized correctly.
+- Off-by-one errors in loop bounds: the loop should go from 2 to `n` (inclusive).
+- Confusing the recurrence: it's `dp[i] = dp[i-1] + dp[i-2]`, not multiplication or other operations.
+- In the Fibonacci approach, not updating `prev2` before `prev1`, which breaks the recurrence.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="climbing_stairs_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="climbing_stairs_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ClimbingStairsSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="climbing_stairs_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="climbing_stairs_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="climbing_stairs_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 740, title: 'Delete and Earn', difficulty: 'Medium', leetcodeSlug: 'delete-and-earn' },
+  { number: 198, title: 'House Robber', difficulty: 'Medium', leetcodeSlug: 'house-robber' },
+  { number: 213, title: 'House Robber II', difficulty: 'Medium', leetcodeSlug: 'house-robber-ii' },
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum', leetcodeSlug: 'two-sum' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why DP over brute force?** Brute force would explore 2^n paths through recursion. DP reduces it to O(n) by storing intermediate results.
+- **Space optimization:** The Fibonacci variables approach shows you understand the problem deeply enough to optimize unused state. Many interviewers appreciate this.
+- **Connection to Fibonacci:** Mentioning the Fibonacci sequence shows mathematical insight and helps with memoization interview follow-ups.
+- **Edge cases:** Handle n=1 and n=2 explicitly; they are base cases. For n=0, return 1 (already at destination).
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 69, title: "Sqrt(x)", slug: "sqrtx" }}
+  nextProblem={{ number: 71, title: "Simplify Path", slug: "simplify-path" }}
+/>

@@ -1,0 +1,465 @@
+---
+title: Merge Two Sorted Lists
+description: Merge two sorted linked lists into a single sorted list. Two approaches — iterative O(m+n) and recursive O(m+n) — in six languages.
+leetcodeNumber: 21
+difficulty: Easy
+leetcodeSlug: merge-two-sorted-lists
+tags: [Linked List, Recursion]
+prev:
+  label: "#20 Valid Parentheses"
+  link: "../valid-parentheses/"
+next:
+  label: "#22 Generate Parentheses"
+  link: "../generate-parentheses/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyIterative     from '@solutions/Python/merge_two_sorted_lists_iterative.py?raw';
+import cppIterative    from '@solutions/C++/merge_two_sorted_lists_iterative.cpp?raw';
+import javaIterative   from '@solutions/Java/merge_two_sorted_lists_iterative.java?raw';
+import jsIterative     from '@solutions/JavaScript/merge_two_sorted_lists_iterative.js?raw';
+import rustIterative   from '@solutions/Rust/merge_two_sorted_lists_iterative.rs?raw';
+import goIterative     from '@solutions/Golang/merge_two_sorted_lists_iterative.go?raw';
+import pySpaceOptimized from '@solutions/Python/merge_two_sorted_lists_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/merge_two_sorted_lists_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/MergeTwoSortedListsSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/merge_two_sorted_lists_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/merge_two_sorted_lists_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/merge_two_sorted_lists_space_optimized.go?raw';
+
+import pyRecursive     from '@solutions/Python/merge_two_sorted_lists_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/merge_two_sorted_lists_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/merge_two_sorted_lists_recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/merge_two_sorted_lists_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/merge_two_sorted_lists_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/merge_two_sorted_lists_recursive.go?raw';
+
+## Problem Statement
+
+You are given the heads of two sorted linked lists `list1` and `list2`. Merge the two lists in a **single sorted list**. The list should be made by splicing together the nodes of the two lists.
+
+Return the head of the merged linked list.
+
+<Aside type="tip" title="What to notice first">
+- You are working with **linked lists**, not arrays, so you cannot jump to arbitrary indices.
+- Both input lists are already **sorted**, so you can decide which node to add next by simple comparison.
+- You must use pointer manipulation; you cannot create new nodes (except for a dummy node to simplify code).
+- The traversal pattern is similar to merging two sorted arrays, but with node pointers instead of indices.
+</Aside>
+
+### Examples
+
+| list1 | list2 | Output | Explanation |
+| --- | --- | --- | --- |
+| `[1, 2, 4]` | `[1, 3, 4]` | `[1, 1, 2, 3, 4, 4]` | All six nodes merged in sorted order |
+| `[]` | `[]` | `[]` | Both lists are empty |
+| `[]` | `[0]` | `[0]` | First list is empty, return second list |
+
+## Constraints
+
+- The number of nodes in both lists is in the range `[0, 50]`.
+- `-100 <= Node.val <= 100`
+- Both `list1` and `list2` are sorted in non-decreasing order.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **File merging** — combining two sorted file streams (log files, time-series data) into a single sorted output.
+- **Database operations** — merging results from two sorted database queries or indexes.
+- **Merge sort implementation** — the merge step of a divide-and-conquer sorting algorithm.
+- **Stream processing** — combining two ordered event streams in real-time analytics.
+- **Playlist management** — merging two chronologically sorted playlists into a unified timeline.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Nodes Created | Best When |
+| --- | --- | --- | --- | --- |
+| Iterative | O(m + n) | O(1) | Zero (reuse input nodes) | General case — clearer, no stack overhead |
+| Recursive | O(m + n) | O(m + n) | Zero (reuse input nodes) | Learning recursion, practicing pointer manipulation |
+
+\* Space refers to extra memory *excluding* the output list. Both approaches reuse nodes from the input lists.
+
+## Which approach should you learn first?
+
+- Pick **Iterative** if you want the most efficient solution with minimal memory overhead.
+- Pick **Recursive** if you are practicing recursion or want to understand the elegant elegance of self-similar problems.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Recommended</div>
+    <div class="lc-approach-quick__name">Iterative</div>
+    <div class="lc-approach-quick__stats">O(m + n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Elegant</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(m + n) time &middot; O(m + n) space</div>
+  </div>
+</div>
+
+## Approach 1: Iterative (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Maintain a pointer to the tail of the merged list and step through both input lists, always appending the smaller node to the result.
+
+The key idea is simple: maintain a tail pointer that points to the last node of the merged list. Compare the next nodes from both lists, append the smaller one, and advance its pointer. When one list is exhausted, append the entire remainder of the other list.
+
+<ComplexityBadges time="O(m + n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass through both lists" spaceNote="Only pointer variables" />
+
+### Step-by-step Example
+
+**Input:** `list1 = [1, 2, 4]`, `list2 = [1, 3, 4]`
+
+| Step | current.next | list1 | list2 | list1.val vs list2.val | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | dummy | 1 | 1 | 1 == 1 → choose list1 | Attach list1 node (1), advance list1 |
+| 2 | 1 | 2 | 1 | 2 > 1 → choose list2 | Attach list2 node (1), advance list2 |
+| 3 | 1 | 2 | 3 | 2 < 3 → choose list1 | Attach list1 node (2), advance list1 |
+| 4 | 2 | 4 | 3 | 4 > 3 → choose list2 | Attach list2 node (3), advance list2 |
+| 5 | 3 | 4 | 4 | 4 == 4 → choose list1 | Attach list1 node (4), advance list1 |
+| 6 | 4 | null | 4 | list1 exhausted | Attach entire list2 (4) |
+
+**Final Output:** `1 → 1 → 2 → 3 → 4 → 4`
+
+<LogicPlayer
+  title="How the iterative solution merges two sorted lists"
+  description="Watch the tail pointer move through both input lists, always choosing the smaller node at each step."
+  target="merged"
+  steps={[
+    {
+      title: 'Start with dummy node and two lists',
+      note: 'The dummy node has value 0 and acts as a sentinel. The tail starts at the dummy node.',
+      formula: 'dummy.next = null, current = dummy',
+      callout: 'The algorithm begins: compare the heads of both lists and attach the smaller one.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      items2: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      memory: ['tail points to dummy node'],
+    },
+    {
+      title: 'Compare 1 vs 1, attach list1[0] = 1',
+      note: 'Both list heads are 1. Since 1 <= 1, we attach list1 node and advance list1.',
+      formula: 'list1.val (1) <= list2.val (1) → attach list1',
+      callout: 'After attaching, the tail moves to this node and list1 advances.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      items2: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      memory: ['merged: 1', 'tail → 1', 'list1 → 2'],
+    },
+    {
+      title: 'Compare 2 vs 1, attach list2[0] = 1',
+      note: 'Now list1 points to 2 and list2 points to 1. Since 2 > 1, we attach list2 node and advance list2.',
+      formula: 'list1.val (2) > list2.val (1) → attach list2',
+      callout: 'The merged list grows: 1 → 1. The tail continues.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      items2: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      memory: ['merged: 1 → 1', 'tail → 1 (list2)', 'list2 → 3'],
+    },
+    {
+      title: 'Compare 2 vs 3, attach list1[1] = 2',
+      note: 'list1 points to 2, list2 points to 3. Since 2 < 3, attach list1 and advance list1.',
+      formula: 'list1.val (2) < list2.val (3) → attach list1',
+      callout: 'Merged grows to: 1 → 1 → 2. Pattern continues.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      items2: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      memory: ['merged: 1 → 1 → 2', 'tail → 2 (list1)', 'list1 → 4'],
+    },
+    {
+      title: 'Compare 4 vs 3, attach list2[1] = 3',
+      note: 'list1 points to 4, list2 points to 3. Since 4 > 3, attach list2 and advance list2.',
+      formula: 'list1.val (4) > list2.val (3) → attach list2',
+      callout: 'Result: 1 → 1 → 2 → 3. One list will soon be exhausted.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      items2: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '3', state: 'match', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      memory: ['merged: 1 → 1 → 2 → 3', 'tail → 3 (list2)', 'list2 → 4'],
+    },
+    {
+      title: 'Compare 4 vs 4, attach list1[2] = 4',
+      note: 'list1 points to 4, list2 points to 4. Since 4 <= 4, attach list1 and advance list1.',
+      formula: 'list1.val (4) <= list2.val (4) → attach list1',
+      callout: 'After this step, list1 will be exhausted (list1 → null).',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '4', state: 'match', index: 2 },
+      ],
+      items2: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '3', state: 'match', index: 1 },
+        { label: '4', state: 'default', index: 2 },
+      ],
+      memory: ['merged: 1 → 1 → 2 → 3 → 4', 'tail → 4 (list1)', 'list1 → null'],
+    },
+    {
+      title: 'list1 exhausted, append remaining list2[2] = 4',
+      note: 'Since list1 is now null and list2 still has nodes, we attach the entire remainder of list2.',
+      formula: 'list1 == null → current.next = list2',
+      callout: 'Final merge complete: 1 → 1 → 2 → 3 → 4 → 4. Return dummy.next.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '4', state: 'match', index: 2 },
+      ],
+      items2: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '3', state: 'match', index: 1 },
+        { label: '4', state: 'match', index: 2 },
+      ],
+      memory: ['merged: 1 → 1 → 2 → 3 → 4 → 4', 'All nodes processed', 'Return dummy.next'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function mergeTwoSortedListsIterative(list1, list2):
+    dummy = new ListNode(0)
+    current = dummy
+    
+    while list1 and list2:
+        if list1.val <= list2.val:
+            current.next = list1
+            list1 = list1.next
+        else:
+            current.next = list2
+            list2 = list2.next
+        current = current.next
+    
+    // Append remaining nodes
+    if list1:
+        current.next = list1
+    else:
+        current.next = list2
+    
+    return dummy.next
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="merge_two_sorted_lists_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="merge_two_sorted_lists_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="merge_two_sorted_lists_iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="merge_two_sorted_lists_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="merge_two_sorted_lists_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="merge_two_sorted_lists_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Recursive
+
+<ApproachTag tag="interview" />
+
+At each step, decide which of the two next nodes (from `list1` or `list2`) should come first, set it to point to the merged result of the remaining lists, and return it.
+
+This approach is elegant because the problem exhibits **optimal substructure**: merging two lists is the same as choosing the smaller head and then merging the remainder. The recursion naturally mirrors the structure of linked lists.
+
+<Aside type="note" title="Recursion vs Iteration tradeoff">
+The recursive solution is cleaner conceptually but uses O(m + n) extra space for the call stack. For very long lists, the iterative approach is safer.
+</Aside>
+
+<ComplexityBadges time="O(m + n)" space="O(m + n)" timeColor="green" spaceColor="yellow" timeNote="Single pass through both lists" spaceNote="Call stack depth" />
+
+### Step-by-step Example
+
+**Input:** `list1 = [1, 2, 4]`, `list2 = [1, 3, 4]`
+
+The recursion tree shows how the problem breaks down:
+
+```
+merge([1, 2, 4], [1, 3, 4])
+├─ 1 <= 1 → return 1.next = merge([2, 4], [1, 3, 4])
+│  ├─ 2 > 1 → return 1.next = merge([2, 4], [3, 4])
+│  │  ├─ 2 < 3 → return 2.next = merge([4], [3, 4])
+│  │  │  ├─ 4 > 3 → return 3.next = merge([4], [4])
+│  │  │  │  ├─ 4 <= 4 → return 4.next = merge(null, [4])
+│  │  │  │  │  └─ return 4
+│  │  │  │  └─ result: 4 → 4
+│  │  │  └─ result: 3 → 4 → 4
+│  │  └─ result: 2 → 3 → 4 → 4
+│  └─ result: 1 → 2 → 3 → 4 → 4
+└─ result: 1 → 1 → 2 → 3 → 4 → 4
+```
+
+### Pseudocode
+
+```plaintext
+function mergeTwoSortedListsRecursive(list1, list2):
+    // Base cases
+    if list1 is null:
+        return list2
+    if list2 is null:
+        return list1
+    
+    // Recursive case: choose the smaller head and recurse
+    if list1.val <= list2.val:
+        list1.next = mergeTwoSortedListsRecursive(list1.next, list2)
+        return list1
+    else:
+        list2.next = mergeTwoSortedListsRecursive(list1, list2.next)
+        return list2
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="merge_two_sorted_lists_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="merge_two_sorted_lists_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="merge_two_sorted_lists_recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="merge_two_sorted_lists_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="merge_two_sorted_lists_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="merge_two_sorted_lists_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Creating new nodes instead of reusing:** Both input lists' nodes should be reused in the output. Only the dummy node (if used) should be newly created.
+- **Forgetting to handle empty lists:** If one or both lists are empty, the result should simply be the other list (or null if both are empty).
+- **Not advancing pointers correctly:** Forgetting to move `list1` or `list2` after attaching a node can cause an infinite loop or incorrect merge.
+- **Losing reference to the merged list head:** Make sure you return the node after the dummy (i.e., `dummy.next`), not the dummy itself.
+- **Recursion stack overflow on very long lists:** For production code, iterative is safer; for interviews, mention this tradeoff.
+</Aside>
+
+## Edge cases to handle
+
+| Case | Behavior | Example |
+| --- | --- | --- |
+| Both lists empty | Return null | `[]` + `[]` → `[]` |
+| First list empty | Return second list | `[]` + `[1, 2]` → `[1, 2]` |
+| Second list empty | Return first list | `[1, 2]` + `[]` → `[1, 2]` |
+| Single-node lists | Merge correctly | `[1]` + `[2]` → `[1, 2]` |
+| Duplicate values | Merge in stable order | `[1, 3]` + `[1, 3]` → `[1, 1, 3, 3]` |
+| Negative values | Treat as regular integers | `[-2, 0, 2]` + `[-1, 1]` → `[-2, -1, 0, 1, 2]` |
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="merge_two_sorted_lists_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="merge_two_sorted_lists_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="MergeTwoSortedListsSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="merge_two_sorted_lists_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="merge_two_sorted_lists_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="merge_two_sorted_lists_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 23, title: 'Merge k Sorted Lists', difficulty: 'Hard', leetcodeSlug: 'merge-k-sorted-lists' },
+  { number: 88, title: 'Merge Sorted Array', difficulty: 'Easy', leetcodeSlug: 'merge-sorted-array' },
+  { number: 148, title: 'Sort List', difficulty: 'Medium', leetcodeSlug: 'sort-list' },
+  { number: 2, title: 'Add Two Numbers', difficulty: 'Medium', leetcodeSlug: 'add-two-numbers' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- **Why iterative over recursive?** The iterative approach uses O(1) extra space (excluding output) versus O(m + n) for the call stack. For interviews, mention both and discuss the tradeoff.
+- **Why no new nodes?** You are reusing the input nodes' structure; only the connections change. A dummy node is an exception — it simplifies code by eliminating special cases.
+- **Why compare and choose?** Both lists are sorted, so you only need to compare heads. This greedy choice is optimal.
+- **Follow-up — Merge k Sorted Lists:** Extend this to merge multiple lists using a priority queue or merge pairwise.
+- **Follow-up — In-place merge of arrays:** If you had two sorted arrays, you'd merge in-place from right to left to avoid overwriting unprocessed elements.
+- **Edge case emphasis:** Always check empty list handling in interviews; it is a common mistake and easily caught.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 20, title: "Valid Parentheses", slug: "valid-parentheses" }}
+  nextProblem={{ number: 22, title: "Generate Parentheses", slug: "generate-parentheses" }}
+/>

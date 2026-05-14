@@ -1,0 +1,52 @@
+---
+/**
+ * Starlight PageTitle override.
+ * Renders the standard page title then auto-injects ProblemMeta beneath it
+ * for any page that has leetcodeNumber in its frontmatter — no manual
+ * <ProblemMeta> calls needed in MDX files.
+ */
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+import BreadcrumbNav from '../BreadcrumbNav.astro';
+
+const { entry } = Astro.props as Props;
+const { leetcodeNumber, difficulty, leetcodeSlug, tags } = (entry?.data ?? {}) as {
+  leetcodeNumber?: number;
+  difficulty?: 'Easy' | 'Medium' | 'Hard';
+  leetcodeSlug?: string;
+  tags?: string[];
+};
+
+const isProblem = typeof leetcodeNumber === 'number';
+---
+{isProblem && <BreadcrumbNav currentPage={entry?.data?.title ?? ''} category="Problems" />}
+
+<Default {...Astro.props}><slot /></Default>
+
+{isProblem && (
+  <div class="lc-problem-meta">
+    <span class="lc-problem-meta__number">#{leetcodeNumber}</span>
+
+    {difficulty && (
+      <span class={`lc-problem-meta__diff lc-problem-meta__diff--${difficulty.toLowerCase()}`}>
+        {difficulty}
+      </span>
+    )}
+
+    {tags && tags.map((tag) => (
+      <span class="lc-problem-meta__tag">{tag}</span>
+    ))}
+
+    {leetcodeSlug && (
+      <a
+        href={`https://leetcode.com/problems/${leetcodeSlug}/`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="lc-problem-meta__link"
+        aria-label={`Try on LeetCode`}
+      >
+        ▶ Try on LeetCode
+      </a>
+    )}
+  </div>
+)}

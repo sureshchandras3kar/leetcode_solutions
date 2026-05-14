@@ -1,0 +1,397 @@
+---
+title: Maximum Depth of Binary Tree
+description: Find the maximum depth of a binary tree. Two approaches — DFS recursion O(n) and BFS level-order O(n) — in six languages.
+leetcodeNumber: 104
+difficulty: Easy
+leetcodeSlug: maximum-depth-of-binary-tree
+tags: [Tree, Depth-First Search, Breadth-First Search]
+prev:
+  label: "#103 Binary Tree Zigzag Level Order Traversal"
+  link: "../binary-tree-zigzag-level-order-traversal/"
+next:
+  label: "#105 Construct Binary Tree from Preorder and Inorder Traversal"
+  link: "../construct-binary-tree-from-preorder-and-inorder-traversal/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDFS     from '@solutions/Python/maximum_depth_of_binary_tree_dfs.py?raw';
+import cppDFS    from '@solutions/C++/maximum_depth_of_binary_tree_dfs.cpp?raw';
+import javaDFS   from '@solutions/Java/maximum_depth_of_binary_tree_dfs.java?raw';
+import jsDFS     from '@solutions/JavaScript/maximum_depth_of_binary_tree_dfs.js?raw';
+import rustDFS   from '@solutions/Rust/maximum_depth_of_binary_tree_dfs.rs?raw';
+import goDFS     from '@solutions/Golang/maximum_depth_of_binary_tree_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/maximum_depth_of_binary_tree_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/maximum_depth_of_binary_tree_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/MaximumDepthOfBinaryTreeBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/maximum_depth_of_binary_tree_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/maximum_depth_of_binary_tree_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/maximum_depth_of_binary_tree_bfs_iterative.go?raw';
+
+import pyBFS     from '@solutions/Python/maximum_depth_of_binary_tree_bfs.py?raw';
+import cppBFS    from '@solutions/C++/maximum_depth_of_binary_tree_bfs.cpp?raw';
+import javaBFS   from '@solutions/Java/maximum_depth_of_binary_tree_bfs.java?raw';
+import jsBFS     from '@solutions/JavaScript/maximum_depth_of_binary_tree_bfs.js?raw';
+import rustBFS   from '@solutions/Rust/maximum_depth_of_binary_tree_bfs.rs?raw';
+import goBFS     from '@solutions/Golang/maximum_depth_of_binary_tree_bfs.go?raw';
+
+## Problem Statement
+
+Given the `root` of a binary tree, return its **maximum depth**.
+
+The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+<Aside type="tip" title="What to notice first">
+- The depth is the **count of nodes** on the path, not the count of edges.
+- An empty tree has depth 0, a single node has depth 1.
+- Both DFS (recursive) and BFS (level-order) visit all nodes — the difference is memory and when you get the answer.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[3,9,20,null,null,15,7]` | `3` | Tree has height 3: root → 9, root → 20 → 15/7 |
+| `[1,null,2]` | `2` | Unbalanced tree: root → right child |
+| `[]` | `0` | Empty tree |
+
+### Visualized Examples
+
+```
+Example 1:       3          Depth: 3
+              /     \
+             9      20
+                  /    \
+                 15     7
+
+Example 2:       1          Depth: 2
+                  \
+                   2
+
+Example 3:    (empty)        Depth: 0
+```
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[0, 10^4]`.
+- `-100 <= Node.val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Parse tree depth in compilers** — determine how deeply nested expressions or statements are to verify they don't exceed recursion limits.
+- **Directory structure analysis** — find the deepest folder nesting in a file system.
+- **DOM tree inspection** — measure how deeply nested HTML elements are for performance analysis.
+- **Organizational hierarchies** — find the longest chain from CEO to individual contributors.
+- **Graph algorithms** — establish bounds for recursion limits before traversing unknown tree structures.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| DFS Recursive | O(n) | O(h) | Small to medium trees; simple code preferred |
+| BFS Level-Order | O(n) | O(w) | Early termination possible; breadth matters |
+
+**Where h = height (at most n), w = max width (at most n)**
+
+## Which approach should you learn first?
+
+- Pick **DFS Recursive** if you want the simplest, most elegant solution. It's the natural way to think about the problem.
+- Pick **BFS Level-Order** if you want to understand tree level-by-level traversal or need to optimize for specific tree shapes.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Simplest</div>
+    <div class="lc-approach-quick__name">DFS Recursive</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(h) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Level-by-Level</div>
+    <div class="lc-approach-quick__name">BFS Level-Order</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(w) space</div>
+  </div>
+</div>
+
+## Approach 1: DFS Recursive (Recommended)
+
+<ApproachTag tag="recommended" />
+
+For each node, recursively find the maximum depth of its left and right subtrees, then return 1 plus the maximum of those two depths.
+
+The insight is simple: the depth of a tree is 1 plus the depth of its taller subtree. For a null node, the depth is 0.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Visit all nodes once" spaceNote="Recursion call stack" />
+
+### Step-by-step Example
+
+**Input:** `root = [3,9,20,null,null,15,7]`
+
+```
+       3
+      / \
+     9  20
+       /  \
+      15   7
+```
+
+| Node | Left Subtree Depth | Right Subtree Depth | Result |
+| --- | --- | --- | --- |
+| 15 | 0 | 0 | 1 + max(0, 0) = 1 |
+| 7 | 0 | 0 | 1 + max(0, 0) = 1 |
+| 9 | 0 | 0 | 1 + max(0, 0) = 1 |
+| 20 | 1 | 1 | 1 + max(1, 1) = 2 |
+| 3 | 1 | 2 | 1 + max(1, 2) = **3** ✓ |
+
+<LogicPlayer
+  title="How DFS recursion finds the maximum depth"
+  description="Use Next or Autoplay to watch as the recursion explores left subtree, right subtree, then combines results at each node."
+  steps={[
+    {
+      title: 'Start at root node 3',
+      note: 'We need to find max depth of left subtree and right subtree of node 3.',
+      formula: 'depth(3) = 1 + max(depth(9), depth(20))',
+      callout: 'Recursion will first explore the left child.',
+      items: [
+        { label: '3', state: 'active', index: 0 },
+        { label: '9', state: 'default', index: 1 },
+        { label: '20', state: 'default', index: 2 },
+      ],
+      memory: ['Evaluating: depth(3)'],
+    },
+    {
+      title: 'Recurse on left child (node 9)',
+      note: 'Node 9 has no children, so its depth is 1 (just the node itself).',
+      formula: 'depth(9) = 1 + max(depth(null), depth(null)) = 1',
+      callout: 'Both children are null, so we return 1.',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '9', state: 'active', index: 1 },
+        { label: '20', state: 'default', index: 2 },
+      ],
+      memory: ['Evaluating: depth(9)', 'Result: depth(9) = 1'],
+    },
+    {
+      title: 'Recurse on right child (node 20)',
+      note: 'Node 20 has two children: 15 and 7. We need their depths.',
+      formula: 'depth(20) = 1 + max(depth(15), depth(7))',
+      callout: 'Both children are leaf nodes.',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '9', state: 'default', index: 1 },
+        { label: '20', state: 'active', index: 2 },
+      ],
+      memory: ['Evaluating: depth(20)'],
+    },
+    {
+      title: 'Leaf nodes 15 and 7 return 1',
+      note: 'Both have no children, so each returns 1.',
+      formula: 'depth(15) = 1, depth(7) = 1',
+      callout: 'Combine at node 20.',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '9', state: 'default', index: 1 },
+        { label: '20', state: 'match', index: 2 },
+      ],
+      memory: ['depth(15) = 1', 'depth(7) = 1', 'depth(20) = 1 + max(1, 1) = 2'],
+    },
+    {
+      title: 'Combine results at root',
+      note: 'Now we have depth(9) = 1 and depth(20) = 2.',
+      formula: 'depth(3) = 1 + max(1, 2) = 3',
+      callout: 'The answer is 3.',
+      items: [
+        { label: '3', state: 'match', index: 0 },
+        { label: '9', state: 'match', index: 1 },
+        { label: '20', state: 'match', index: 2 },
+      ],
+      memory: ['Final answer: depth(3) = 3'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function maxDepthDFS(root):
+    if root is null:
+        return 0
+    
+    leftDepth = maxDepthDFS(root.left)
+    rightDepth = maxDepthDFS(root.right)
+    
+    return 1 + max(leftDepth, rightDepth)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="maximum_depth_of_binary_tree_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="maximum_depth_of_binary_tree_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="maximum_depth_of_binary_tree_dfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="maximum_depth_of_binary_tree_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="maximum_depth_of_binary_tree_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="maximum_depth_of_binary_tree_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS Level-Order Traversal
+
+<ApproachTag tag="interview" />
+
+Use a queue to traverse the tree level by level. Increment the depth counter after processing each complete level. Return the depth when the queue becomes empty.
+
+This approach processes nodes layer by layer, which can be more intuitive for understanding tree structure and is useful when you need information about each level.
+
+<ComplexityBadges time="O(n)" space="O(w)" timeColor="green" spaceColor="yellow" timeNote="Visit all nodes once" spaceNote="Queue width at widest level" />
+
+### Step-by-step Example
+
+**Input:** `root = [3,9,20,null,null,15,7]`
+
+```
+       3           Level 1: process [3], depth = 1
+      / \
+     9  20         Level 2: process [9, 20], depth = 2
+       /  \
+      15   7       Level 3: process [15, 7], depth = 3
+```
+
+| Step | Current Level | Queue After | Depth |
+| --- | --- | --- | --- |
+| 1 | [3] | [9, 20] | 1 |
+| 2 | [9, 20] | [15, 7] | 2 |
+| 3 | [15, 7] | [] | 3 |
+| 4 | Queue empty | — | Return 3 ✓ |
+
+### Pseudocode
+
+```plaintext
+function maxDepthBFS(root):
+    if root is null:
+        return 0
+    
+    queue = [root]
+    depth = 0
+    
+    while queue is not empty:
+        depth += 1
+        levelSize = length of queue
+        
+        for i = 0 to levelSize - 1:
+            node = queue.dequeue()
+            if node.left exists:
+                queue.enqueue(node.left)
+            if node.right exists:
+                queue.enqueue(node.right)
+    
+    return depth
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="maximum_depth_of_binary_tree_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="maximum_depth_of_binary_tree_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="maximum_depth_of_binary_tree_bfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="maximum_depth_of_binary_tree_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="maximum_depth_of_binary_tree_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="maximum_depth_of_binary_tree_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="maximum_depth_of_binary_tree_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="maximum_depth_of_binary_tree_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="MaximumDepthOfBinaryTreeBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="maximum_depth_of_binary_tree_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="maximum_depth_of_binary_tree_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="maximum_depth_of_binary_tree_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Confusing depth with height.** Depth is the number of nodes on the path; height is often edges (one less). We count nodes here.
+- **Forgetting base case.** A null node must return 0, not an error or -1.
+- **Off-by-one errors in BFS.** Make sure you increment depth *outside* the inner loop that processes a level, not inside.
+- **Forgetting single-node trees.** A tree with just the root node has depth 1, not 0.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 111, title: 'Minimum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'minimum-depth-of-binary-tree' },
+  { number: 103, title: 'Binary Tree Zigzag Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-zigzag-level-order-traversal' },
+  { number: 102, title: 'Binary Tree Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-level-order-traversal' },
+  { number: 100, title: 'Same Tree', difficulty: 'Easy', leetcodeSlug: 'same-tree' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **DFS vs BFS:** Both are O(n), but DFS uses call stack (implicit) while BFS uses explicit queue. DFS is typically simpler to code; BFS is easier to parallelize.
+- **Memory for skewed trees:** A completely unbalanced tree (like a linked list) uses O(n) space in DFS (deep recursion) but O(1) in BFS (only queue has one node at a time).
+- **When to use BFS:** If you need the minimum depth (can stop early when reaching a leaf) or if you need per-level processing.
+- **Follow-ups to expect:** minimum depth, level-order traversal, validate balanced tree, find all leaves, or modifications like "sum at each level."
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 103, title: "Binary Tree Zigzag Level Order Traversal", slug: "binary-tree-zigzag-level-order-traversal" }}
+  nextProblem={{ number: 105, title: "Construct Binary Tree from Preorder and Inorder Traversal", slug: "construct-binary-tree-from-preorder-and-inorder-traversal" }}
+/>

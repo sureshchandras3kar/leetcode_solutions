@@ -1,0 +1,342 @@
+---
+title: Group Anagrams
+description: Group strings that are anagrams of each other. Two approaches — sort key O(n·k·log k) and character count O(n·k) — in six languages.
+leetcodeNumber: 49
+difficulty: Medium
+leetcodeSlug: group-anagrams
+tags: [Array, Hash Table, String, Sorting]
+prev:
+  label: "#46 Permutations"
+  link: "../permutations/"
+next:
+  label: "#50 Pow(x, n)"
+  link: "../powx-n/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySortKey  from '@solutions/Python/group_anagrams_sort_key.py?raw';
+import cppSortKey from '@solutions/C++/group_anagrams_sort_key.cpp?raw';
+import javaSortKey from '@solutions/Java/group_anagrams_sort_key.java?raw';
+import jsSortKey  from '@solutions/JavaScript/group_anagrams_sort_key.js?raw';
+import rustSortKey from '@solutions/Rust/group_anagrams_sort_key.rs?raw';
+import goSortKey  from '@solutions/Golang/group_anagrams_sort_key.go?raw';
+import pySpaceOptimized from '@solutions/Python/group_anagrams_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/group_anagrams_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/GroupAnagramsSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/group_anagrams_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/group_anagrams_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/group_anagrams_space_optimized.go?raw';
+
+import pyCharCount  from '@solutions/Python/group_anagrams_char_count.py?raw';
+import cppCharCount from '@solutions/C++/group_anagrams_char_count.cpp?raw';
+import javaCharCount from '@solutions/Java/group_anagrams_char_count.java?raw';
+import jsCharCount  from '@solutions/JavaScript/group_anagrams_char_count.js?raw';
+import rustCharCount from '@solutions/Rust/group_anagrams_char_count.rs?raw';
+import goCharCount  from '@solutions/Golang/group_anagrams_char_count.go?raw';
+
+## Problem Statement
+
+Given an array of strings `strs`, group the anagrams together. You can return the answer in any order. An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+<Aside type="tip" title="What to notice first">
+Anagrams share the same character frequency — and therefore the same sorted form. Both observations lead directly to an O(1)-comparison group key.
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `["eat","tea","tan","ate","nat","bat"]` | `[["bat"],["nat","tan"],["ate","eat","tea"]]` |
+| `[""]` | `[[""]]` |
+| `["a"]` | `[["a"]]` |
+
+## Constraints
+
+- `1 <= strs.length <= 10^4`
+- `0 <= strs[i].length <= 100`
+- `strs[i]` consists of lowercase English letters.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Log file clustering** — group log messages by their normalised template.
+- **Search query deduplication** — recognise that "listen" and "silent" are the same search intent.
+- **Spell checker** — find all valid rearrangements of a misspelled word.
+- **DNA sequence grouping** — cluster gene sequences that are permutations of each other.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Sort Key | O(n·k·log k) | O(n·k) | General case, simple to implement |
+| Char Count | O(n·k) | O(n·k) | Long strings where sort cost is noticeable |
+
+## Approach 1: Sort Key (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Sort each string's characters to produce a canonical key. Words that are anagrams will produce the same key and get appended to the same bucket in the hash map.
+
+<ComplexityBadges time="O(n·k·log k)" space="O(n·k)" timeColor="yellow" spaceColor="yellow" timeNote="k = max string length; sorting each string costs k log k" spaceNote="All strings stored once in the map" />
+
+### Step-by-step Example
+
+**Input:** `["eat","tea","tan","ate","nat","bat"]`
+
+| Word | Sorted key | Groups state |
+| --- | --- | --- |
+| `"eat"` | `"aet"` | `{"aet": ["eat"]}` |
+| `"tea"` | `"aet"` | `{"aet": ["eat","tea"]}` |
+| `"tan"` | `"ant"` | `{"aet": ["eat","tea"], "ant": ["tan"]}` |
+| `"ate"` | `"aet"` | `{"aet": ["eat","tea","ate"], "ant": ["tan"]}` |
+| `"nat"` | `"ant"` | `{..., "ant": ["tan","nat"]}` |
+| `"bat"` | `"abt"` | `{..., "abt": ["bat"]}` |
+
+<LogicPlayer
+  title="How sort key groups anagrams"
+  description="Use Next or Autoplay to watch each word get sorted into its canonical key, then placed into the correct bucket."
+  steps={[
+    {
+      title: 'Start: all words unprocessed',
+      note: 'For each word we will sort its characters to get a key, then append the original word to that key\'s bucket.',
+      formula: 'groups = {}',
+      items: [
+        { label: 'eat', state: 'default', index: 0 },
+        { label: 'tea', state: 'default', index: 1 },
+        { label: 'tan', state: 'default', index: 2 },
+        { label: 'ate', state: 'default', index: 3 },
+        { label: 'nat', state: 'default', index: 4 },
+        { label: 'bat', state: 'default', index: 5 },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Process "eat" → key "aet"',
+      note: 'Sorting "eat" gives "aet". This key does not exist yet so a new bucket is created.',
+      formula: 'sorted("eat") → "aet"',
+      items: [
+        { label: 'eat', state: 'active', index: 0 },
+        { label: 'tea', state: 'default', index: 1 },
+        { label: 'tan', state: 'default', index: 2 },
+        { label: 'ate', state: 'default', index: 3 },
+        { label: 'nat', state: 'default', index: 4 },
+        { label: 'bat', state: 'default', index: 5 },
+      ],
+      memory: ['"aet": ["eat"]'],
+    },
+    {
+      title: 'Process "tea" → key "aet"',
+      note: 'Sorting "tea" also gives "aet". "tea" joins the same bucket as "eat".',
+      formula: 'sorted("tea") → "aet"',
+      items: [
+        { label: 'eat', state: 'match', index: 0 },
+        { label: 'tea', state: 'active', index: 1 },
+        { label: 'tan', state: 'default', index: 2 },
+        { label: 'ate', state: 'default', index: 3 },
+        { label: 'nat', state: 'default', index: 4 },
+        { label: 'bat', state: 'default', index: 5 },
+      ],
+      memory: ['"aet": ["eat","tea"]'],
+    },
+    {
+      title: 'Process "tan" → key "ant"',
+      note: 'Sorting "tan" gives "ant" — a new key, so a new bucket is created.',
+      formula: 'sorted("tan") → "ant"',
+      items: [
+        { label: 'eat', state: 'match', index: 0 },
+        { label: 'tea', state: 'match', index: 1 },
+        { label: 'tan', state: 'active', index: 2 },
+        { label: 'ate', state: 'default', index: 3 },
+        { label: 'nat', state: 'default', index: 4 },
+        { label: 'bat', state: 'default', index: 5 },
+      ],
+      memory: ['"aet": ["eat","tea"]', '"ant": ["tan"]'],
+    },
+    {
+      title: 'Process "ate", "nat", "bat"',
+      note: '"ate" → "aet", "nat" → "ant", "bat" → "abt". Each word lands in the correct bucket.',
+      formula: 'sorted("ate")→"aet"  sorted("nat")→"ant"  sorted("bat")→"abt"',
+      items: [
+        { label: 'eat', state: 'match', index: 0 },
+        { label: 'tea', state: 'match', index: 1 },
+        { label: 'tan', state: 'match', index: 2 },
+        { label: 'ate', state: 'active', index: 3 },
+        { label: 'nat', state: 'active', index: 4 },
+        { label: 'bat', state: 'active', index: 5 },
+      ],
+      memory: ['"aet": ["eat","tea","ate"]', '"ant": ["tan","nat"]', '"abt": ["bat"]'],
+    },
+    {
+      title: 'Return all bucket values',
+      note: 'The three buckets become the three groups in the answer.',
+      formula: 'return list(groups.values())',
+      callout: 'Output: [["eat","tea","ate"], ["tan","nat"], ["bat"]]',
+      items: [
+        { label: 'eat', state: 'match', index: 0 },
+        { label: 'tea', state: 'match', index: 1 },
+        { label: 'tan', state: 'match', index: 2 },
+        { label: 'ate', state: 'match', index: 3 },
+        { label: 'nat', state: 'match', index: 4 },
+        { label: 'bat', state: 'match', index: 5 },
+      ],
+      memory: ['"aet": ["eat","tea","ate"]', '"ant": ["tan","nat"]', '"abt": ["bat"]'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function groupAnagrams(strs):
+    groups = defaultdict(list)
+    for s in strs:
+        key = sorted(s) as tuple/string
+        groups[key].append(s)
+    return list(groups.values())
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySortKey} lang="python" title="group_anagrams_sort_key.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSortKey} lang="cpp" title="group_anagrams_sort_key.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSortKey} lang="java" title="group_anagrams_sort_key.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSortKey} lang="javascript" title="group_anagrams_sort_key.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSortKey} lang="rust" title="group_anagrams_sort_key.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSortKey} lang="go" title="group_anagrams_sort_key.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Character Count
+
+<ApproachTag tag="interview" />
+
+Instead of sorting, count the frequency of each of the 26 lowercase letters and use that count array as the key. This removes the log k sort factor, giving a linear-per-string cost.
+
+<ComplexityBadges time="O(n·k)" space="O(n·k)" timeColor="green" spaceColor="yellow" timeNote="k = max string length; one pass per string" spaceNote="All strings stored once in the map" />
+
+### How the Key Works
+
+For `"eat"`:
+- `count[4]` (e) = 1, `count[0]` (a) = 1, `count[19]` (t) = 1
+- key = `(0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0)`
+
+For `"tea"` — identical count array → same bucket as `"eat"`.
+
+### Pseudocode
+
+```plaintext
+function groupAnagrams(strs):
+    groups = defaultdict(list)
+    for s in strs:
+        count = [0] * 26
+        for c in s:
+            count[ord(c) - ord('a')] += 1
+        groups[tuple(count)].append(s)
+    return list(groups.values())
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyCharCount} lang="python" title="group_anagrams_char_count.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppCharCount} lang="cpp" title="group_anagrams_char_count.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaCharCount} lang="java" title="group_anagrams_char_count.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsCharCount} lang="javascript" title="group_anagrams_char_count.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustCharCount} lang="rust" title="group_anagrams_char_count.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goCharCount} lang="go" title="group_anagrams_char_count.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Using the string itself as a key instead of its sorted/counted form — "eat" and "tea" would be treated as different groups.
+- Forgetting that the empty string `""` is a valid input — its sorted form is also `""` and its count array is all zeros; it forms its own group.
+- In Java, using `Arrays.sort()` on a `char[]` and then `new String(arr)` as the key is correct — do not sort the original string variable directly.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="group_anagrams_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="group_anagrams_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="GroupAnagramsSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="group_anagrams_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="group_anagrams_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="group_anagrams_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum', leetcodeSlug: 'two-sum' },
+  { number: 242, title: 'Valid Anagram', difficulty: 'Easy', slug: 'problems/valid-anagram', leetcodeSlug: 'valid-anagram' },
+  { number: 347, title: 'Top K Frequent Elements', difficulty: 'Medium', leetcodeSlug: 'top-k-frequent-elements' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- The sort key approach is the clearest to explain in an interview. Lead with it.
+- Mention the char count optimisation as a follow-up: it removes the log k factor for long strings.
+- Edge cases: empty string (valid group of its own), single character strings, all strings identical.
+
+
+<PrevNextNav
+  prevProblem={ number: 46, title: "Permutations", slug: "permutations" }
+  nextProblem={ number: 50, title: "Pow(x, n)", slug: "powx-n" }
+/></Aside>

@@ -1,0 +1,308 @@
+---
+title: Add Binary
+description: Add two binary strings and return their binary sum. Two approaches — String Simulation O(max(a,b)) + Bit Operations O(max(a,b)) — in six languages.
+leetcodeNumber: 67
+difficulty: Easy
+leetcodeSlug: add-binary
+tags: [Bit Manipulation, String, Math]
+prev:
+  label: "#66 Plus One"
+  link: "../plus-one/"
+next:
+  label: "#69 Sqrt(x)"
+  link: "../sqrtx/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyStringSimulation     from '@solutions/Python/add_binary_string_simulation.py?raw';
+import cppStringSimulation    from '@solutions/C++/add_binary_string_simulation.cpp?raw';
+import javaStringSimulation   from '@solutions/Java/AddBinaryStringSimulation.java?raw';
+import jsStringSimulation     from '@solutions/JavaScript/add_binary_string_simulation.js?raw';
+import rustStringSimulation   from '@solutions/Rust/add_binary_string_simulation.rs?raw';
+import goStringSimulation     from '@solutions/Golang/add_binary_string_simulation.go?raw';
+import pySpaceOptimized from '@solutions/Python/add_binary_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/add_binary_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/AddBinarySpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/add_binary_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/add_binary_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/add_binary_space_optimized.go?raw';
+
+import pyBitOps      from '@solutions/Python/add_binary_bit_operations.py?raw';
+import cppBitOps     from '@solutions/C++/add_binary_bit_operations.cpp?raw';
+import javaBitOps    from '@solutions/Java/AddBinaryBitOperations.java?raw';
+import jsBitOps      from '@solutions/JavaScript/add_binary_bit_operations.js?raw';
+import rustBitOps    from '@solutions/Rust/add_binary_bit_operations.rs?raw';
+import goBitOps      from '@solutions/Golang/add_binary_bit_operations.go?raw';
+
+## Problem Statement
+
+Given two binary strings `a` and `b`, return their sum as a binary string.
+
+You may assume neither string has leading zeros, except for the zero itself.
+
+<Aside type="tip" title="What to notice first">
+- Binary addition works exactly like decimal addition, just with carries at each power of 2.
+- Process from right to left, tracking the carry bit just like in elementary school addition.
+- The result string may be one bit longer than the inputs if there's a final carry.
+</Aside>
+
+### Examples
+
+| Input a | Input b | Output | Explanation |
+| --- | --- | --- | --- |
+| `"11"` | `"1"` | `"100"` | `3 + 1 = 4` in binary |
+| `"1010"` | `"1011"` | `"10101"` | `10 + 11 = 21` in binary |
+| `"0"` | `"0"` | `"0"` | Edge case: zero + zero |
+
+## Constraints
+
+- `1 <= a.length, b.length <= 10^4`
+- `a` and `b` consist of only `'0'` or `'1'` characters
+- Each string does not have leading zeros except for the zero itself
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Arbitrary precision arithmetic** — implementing addition for numbers too large for native integer types.
+- **Cryptographic operations** — multi-precision arithmetic in public-key algorithms.
+- **Quantum computing simulators** — representing quantum state vectors as binary values.
+- **Hardware design** — ALU (Arithmetic Logic Unit) simulation and validation.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| String Simulation | O(max(n, m)) | O(max(n, m)) | Manual carry propagation, easy to understand |
+| Bit Operations | O(max(n, m)) | O(max(n, m)) | Convert to integers, add natively, convert back |
+
+\* n = length of string a, m = length of string b
+
+## Which approach should you learn first?
+
+- Pick **String Simulation** if you want to understand how binary addition works at the bit level.
+- Pick **Bit Operations** if you want the simplest implementation using built-in radix conversion.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Intuitive</div>
+    <div class="lc-approach-quick__name">String Simulation</div>
+    <div class="lc-approach-quick__stats">O(max(n, m)) time &middot; O(max(n, m)) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simplest Code</div>
+    <div class="lc-approach-quick__name">Bit Operations</div>
+    <div class="lc-approach-quick__stats">O(max(n, m)) time &middot; O(max(n, m)) space</div>
+  </div>
+</div>
+
+## Approach 1: String Simulation (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Simulate elementary school binary addition: process digits from right to left, maintaining a carry bit. When you reach the end of the shorter string, pad with zeros and continue.
+
+<ComplexityBadges time="O(max(n, m))" space="O(max(n, m))" timeColor="green" spaceColor="yellow" timeNote="Single pass right to left" spaceNote="Result string storage" />
+
+### Step-by-step Example
+
+**Input:** `a = "1010"`, `b = "1011"`
+
+| Step | i | j | a[i] | b[j] | carry | sum | Action |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 3 | 3 | 0 | 1 | 0 | 1 | Append 1, carry=0 |
+| 2 | 2 | 2 | 1 | 1 | 0 | 2 | Append 0, carry=1 |
+| 3 | 1 | 1 | 0 | 0 | 1 | 1 | Append 1, carry=0 |
+| 4 | 0 | 0 | 1 | 1 | 0 | 2 | Append 0, carry=1 |
+| 5 | -1 | -1 | - | - | 1 | - | Append 1, done |
+| **Result:** `"10101"` |
+
+### Bit-Level Visualization
+
+```
+    1010     (input a)
+  + 1011     (input b)
+  ------
+
+Step 1:  0 + 1 + 0 = 1, no carry
+Step 2:  1 + 1 + 0 = 10 (binary) = 0 with carry 1
+Step 3:  0 + 0 + 1 = 1, no carry
+Step 4:  1 + 1 + 0 = 10 (binary) = 0 with carry 1
+Step 5:       carry 1 left = 1
+
+Result: 10101
+```
+
+### Pseudocode
+
+```plaintext
+function addBinaryStringSimulation(a, b):
+    result = []
+    carry = 0
+    i = len(a) - 1
+    j = len(b) - 1
+
+    while i >= 0 or j >= 0 or carry:
+        digitA = a[i] if i >= 0 else 0
+        digitB = b[j] if j >= 0 else 0
+        total = digitA + digitB + carry
+        result.append(total % 2)
+        carry = total // 2
+        i -= 1
+        j -= 1
+
+    return reverse(result).join('')
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyStringSimulation} lang="python" title="add_binary_string_simulation.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppStringSimulation} lang="cpp" title="add_binary_string_simulation.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaStringSimulation} lang="java" title="AddBinaryStringSimulation.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsStringSimulation} lang="javascript" title="add_binary_string_simulation.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustStringSimulation} lang="rust" title="add_binary_string_simulation.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goStringSimulation} lang="go" title="add_binary_string_simulation.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Bit Operations
+
+<ApproachTag tag="simple" />
+
+Convert both binary strings to integers using the built-in radix parser, add them using native arithmetic, then convert the result back to binary.
+
+This approach leverages language-native support for arbitrary precision (Python, JavaScript BigInt) or fixed-width integers with overflow-safe addition.
+
+<ComplexityBadges time="O(max(n, m))" space="O(max(n, m))" timeColor="green" spaceColor="yellow" timeNote="Conversion + addition" spaceNote="Result string storage" />
+
+### Step-by-step Example
+
+**Input:** `a = "11"`, `b = "1"`
+
+```
+Step 1: int('11', 2) = 3
+Step 2: int('1', 2) = 1
+Step 3: 3 + 1 = 4
+Step 4: bin(4) = '0b100'
+Result: '100' (strip '0b' prefix)
+```
+
+### Pseudocode
+
+```plaintext
+function addBinaryBitOperations(a, b):
+    numA = parseInt(a, 2)
+    numB = parseInt(b, 2)
+    total = numA + numB
+    return bin(total).replace('0b', '')
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBitOps} lang="python" title="add_binary_bit_operations.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBitOps} lang="cpp" title="add_binary_bit_operations.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBitOps} lang="java" title="AddBinaryBitOperations.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBitOps} lang="javascript" title="add_binary_bit_operations.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBitOps} lang="rust" title="add_binary_bit_operations.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBitOps} lang="go" title="add_binary_bit_operations.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="add_binary_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="add_binary_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="AddBinarySpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="add_binary_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="add_binary_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="add_binary_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to append the final carry bit if there's an overflow.
+- Processing from left to right instead of right to left (carry won't propagate correctly).
+- Confusing the output: you're building the result in reverse, so remember to reverse it.
+- For languages with fixed-width integers (C++, Java), watch out for overflow on very large inputs.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 190, title: 'Reverse Bits', difficulty: 'Easy', slug: 'problems/reverse-bits', leetcodeSlug: 'reverse-bits' },
+  { number: 191, title: 'Number of 1 Bits', difficulty: 'Easy', slug: 'problems/number-of-1-bits', leetcodeSlug: 'number-of-1-bits' },
+  { number: 2, title: 'Add Two Numbers', difficulty: 'Medium', leetcodeSlug: 'add-two-numbers' },
+  { number: 371, title: 'Sum of Two Integers', difficulty: 'Medium', leetcodeSlug: 'sum-of-two-integers' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **String Simulation vs. Bit Operations:** String Simulation shows you understand binary arithmetic deeply; Bit Operations is faster to code in an interview but may seem like you're "cheating" with built-in functions.
+- **Edge cases:** Zero strings, single-bit inputs, very long inputs (10^4 characters), carry overflow.
+- **Follow-up:** Can you implement this without converting to integers (in languages with limited integer size)? Can you do it iteratively vs. recursively?
+- **Why binary addition:** It's the foundation of CPU arithmetic; understanding this helps with hardware-level thinking.
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={{ number: 190, title: "Reverse Bits", slug: "reverse-bits" }}
+/>

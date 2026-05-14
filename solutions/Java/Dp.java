@@ -1,0 +1,21 @@
+import java.util.*;
+
+public class Dp {
+    public List<String> generateParenthesis(int n) {
+        List<List<String>> dp = new ArrayList<>();
+        for (int i = 0; i <= n; i++) dp.add(new ArrayList<>());
+        dp.get(0).add("");
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j < i; j++) {
+                for (String left : dp.get(j)) {
+                    for (String right : dp.get(i - 1 - j)) {
+                        dp.get(i).add("(" + left + ")" + right);
+                    }
+                }
+            }
+        }
+
+        return dp.get(n);
+    }
+}

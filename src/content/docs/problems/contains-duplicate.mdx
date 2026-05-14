@@ -1,0 +1,339 @@
+---
+title: Contains Duplicate
+description: Check whether any value appears at least twice in an array. Two approaches — hash set O(n) and sorting O(n log n) — in six languages.
+leetcodeNumber: 217
+difficulty: Easy
+leetcodeSlug: contains-duplicate
+tags: [Array, Hash Table, Sorting]
+prev:
+  label: "#215 Kth Largest Element in Array"
+  link: "../kth-largest-element-in-array/"
+next:
+  label: "#219 Contains Duplicate II"
+  link: "../contains-duplicate-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyHashSet  from '@solutions/Python/contains_duplicate_hash_set.py?raw';
+import cppHashSet from '@solutions/C++/contains_duplicate_hash_set.cpp?raw';
+import javaHashSet from '@solutions/Java/contains_duplicate_hash_set.java?raw';
+import jsHashSet  from '@solutions/JavaScript/contains_duplicate_hash_set.js?raw';
+import rustHashSet from '@solutions/Rust/contains_duplicate_hash_set.rs?raw';
+import goHashSet  from '@solutions/Golang/contains_duplicate_hash_set.go?raw';
+import pySpaceOptimized from '@solutions/Python/contains_duplicate_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/contains_duplicate_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ContainsDuplicateSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/contains_duplicate_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/contains_duplicate_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/contains_duplicate_space_optimized.go?raw';
+
+import pySort    from '@solutions/Python/contains_duplicate_sorting.py?raw';
+import cppSort   from '@solutions/C++/contains_duplicate_sorting.cpp?raw';
+import javaSort  from '@solutions/Java/contains_duplicate_sorting.java?raw';
+import jsSort    from '@solutions/JavaScript/contains_duplicate_sorting.js?raw';
+import rustSort  from '@solutions/Rust/contains_duplicate_sorting.rs?raw';
+import goSort    from '@solutions/Golang/contains_duplicate_sorting.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums`, return `true` if any value appears **at least twice**, and `false` if every element is distinct.
+
+<Aside type="tip" title="What to notice first">
+- You only need to find one duplicate — you can stop as soon as you find it.
+- The fastest approach avoids sorting by using a hash set to check membership in O(1).
+- The sorting approach trades speed for zero extra memory beyond the sort itself.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[1, 2, 3, 1]` | `true` | `1` appears at indices 0 and 3 |
+| `[1, 2, 3, 4]` | `false` | All elements are distinct |
+| `[1, 1, 1, 3, 3, 4, 3, 2, 4, 2]` | `true` | Multiple duplicates present |
+
+## Constraints
+
+- `1 <= nums.length <= 10^5`
+- `-10^9 <= nums[i] <= 10^9`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **User ID deduplication** — check whether a batch of new user IDs contains any that are already registered.
+- **Transaction fraud detection** — flag whether the same transaction ID appears more than once in a batch.
+- **File integrity** — verify that a list of file checksums has no repeated entries (which would indicate collisions).
+- **Inventory management** — confirm that a list of product SKUs contains no accidental duplicates before importing.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Hash Set | O(n) | O(n) | General case — fast lookup, stop early on first duplicate |
+| Sorting | O(n log n) | O(1) | Memory is constrained and you can afford extra time |
+
+## Which approach should you learn first?
+
+- Pick **Hash Set** for interviews — O(n) with early exit is the expected answer.
+- Pick **Sorting** if you need to understand the space trade-off or the interviewer bans extra memory.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Hash Set</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">No Extra Memory</div>
+    <div class="lc-approach-quick__name">Sorting</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Hash Set
+
+<ApproachTag tag="recommended" />
+
+Scan the array once. For each number, check if it is already in the set. If yes, return `true` immediately. Otherwise add it to the set and continue. A hash set gives O(1) average lookup and insert.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass, early exit" spaceNote="Set stores up to n elements" />
+
+### Step-by-step Example
+
+**Input:** `[1, 2, 3, 1]`
+
+| Step | num | In seen? | seen after |
+| --- | --- | --- | --- |
+| 1 | 1 | No | `{1}` |
+| 2 | 2 | No | `{1, 2}` |
+| 3 | 3 | No | `{1, 2, 3}` |
+| 4 | 1 | **Yes** → return `true` | — |
+
+<LogicPlayer
+  title="How the hash set scan detects a duplicate"
+  description="Use Next or Autoplay to see each number checked against the set and either stored or flagged as a duplicate."
+  steps={[
+    {
+      title: 'Start with an empty seen set',
+      note: 'Before scanning, the hash set is empty. We have not seen any number yet.',
+      formula: 'seen = {}',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Check 1 — not in seen, add it',
+      note: '1 is not in the set. No duplicate yet. Store it so we can recognize it if it reappears.',
+      formula: '1 ∉ seen → add 1',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['seen: {1}'],
+    },
+    {
+      title: 'Check 2 — not in seen, add it',
+      note: '2 is not in the set. Continue scanning.',
+      formula: '2 ∉ seen → add 2',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['seen: {1, 2}'],
+    },
+    {
+      title: 'Check 3 — not in seen, add it',
+      note: '3 is not in the set. Continue scanning.',
+      formula: '3 ∉ seen → add 3',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+      ],
+      memory: ['seen: {1, 2, 3}'],
+    },
+    {
+      title: 'Check 1 — already in seen! Return true',
+      note: '1 is in the set. We have found a duplicate. Return true immediately without checking the rest.',
+      formula: '1 ∈ seen → return true',
+      callout: 'Early exit — we stop here and never inspect any further elements.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '1', state: 'match', index: 3 },
+      ],
+      memory: ['seen: {1, 2, 3}', '1 found again → duplicate!'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function containsDuplicate(nums):
+    seen = {}
+    for num in nums:
+        if num in seen:
+            return true
+        seen.add(num)
+    return false
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHashSet} lang="python" title="contains_duplicate_hash_set.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHashSet} lang="cpp" title="contains_duplicate_hash_set.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHashSet} lang="java" title="contains_duplicate_hash_set.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHashSet} lang="javascript" title="contains_duplicate_hash_set.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHashSet} lang="rust" title="contains_duplicate_hash_set.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHashSet} lang="go" title="contains_duplicate_hash_set.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Sorting
+
+<ApproachTag tag="simple" />
+
+Sort the array first. After sorting, any duplicate values must be adjacent. A single pass then detects any pair of equal neighbours.
+
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Dominated by sort" spaceNote="In-place sort, no extra structure" />
+
+### Step-by-step Example
+
+**Input:** `[3, 1, 3, 2]`
+
+After sorting: `[1, 3, 3, 2]` → wait: `[1, 2, 3, 3]`
+
+| i | nums[i] | nums[i-1] | Equal? |
+| --- | --- | --- | --- |
+| 1 | 2 | 1 | No |
+| 2 | 3 | 2 | No |
+| 3 | 3 | 3 | **Yes → return `true`** |
+
+### Pseudocode
+
+```plaintext
+function containsDuplicate(nums):
+    sort(nums)
+    for i from 1 to len(nums) - 1:
+        if nums[i] == nums[i - 1]:
+            return true
+    return false
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySort} lang="python" title="contains_duplicate_sorting.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSort} lang="cpp" title="contains_duplicate_sorting.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSort} lang="java" title="contains_duplicate_sorting.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSort} lang="javascript" title="contains_duplicate_sorting.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSort} lang="rust" title="contains_duplicate_sorting.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSort} lang="go" title="contains_duplicate_sorting.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Using `==` on the wrong indices — compare `nums[i]` with `nums[i-1]`, not `nums[i+1]`, to avoid an off-by-one out-of-bounds.
+- Forgetting that sorting mutates the input — if the caller needs the original order, sort a copy.
+- In the hash set approach, do not insert before checking — insert after, so you don't accidentally match a number against itself.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="contains_duplicate_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="contains_duplicate_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ContainsDuplicateSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="contains_duplicate_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="contains_duplicate_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="contains_duplicate_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum' },
+  { number: 242, title: 'Valid Anagram', difficulty: 'Easy', slug: 'problems/valid-anagram' },
+  { number: 349, title: 'Intersection of Two Arrays', difficulty: 'Easy', slug: 'problems/intersection-of-two-arrays' },
+  { number: 219, title: 'Contains Duplicate II', difficulty: 'Medium', leetcodeSlug: 'contains-duplicate-ii' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why hash set over sorting?** O(n) vs O(n log n), and the hash set exits as soon as the first duplicate is found — often much earlier in practice.
+- **Follow-up — no extra space?** The sorting approach is the answer. Be ready to discuss that it mutates the input and takes O(n log n) time.
+- **Edge cases to mention:** single-element array (always false), all identical elements (immediately true after the first element is added), negative numbers (handled transparently by a hash set).
+
+
+<PrevNextNav
+  prevProblem={ number: 215, title: "Kth Largest Element in Array", slug: "kth-largest-element-in-array" }
+  nextProblem={ number: 219, title: "Contains Duplicate II", slug: "contains-duplicate-ii" }
+/></Aside>

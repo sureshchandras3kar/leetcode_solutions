@@ -1,0 +1,420 @@
+---
+title: Construct Binary Tree from Preorder and Inorder Traversal
+description: Reconstruct a binary tree from preorder and inorder traversals. Two approaches — hash map O(n) and index tracking O(n) — in six languages.
+leetcodeNumber: 105
+difficulty: Medium
+leetcodeSlug: construct-binary-tree-from-preorder-and-inorder-traversal
+tags: [Array, Tree, Hash Table, Divide and Conquer]
+prev:
+  label: "#104 Maximum Depth of Binary Tree"
+  link: "../maximum-depth-of-binary-tree/"
+next:
+  label: "#106 Construct Binary Tree from Inorder and Postorder Traversal"
+  link: "../construct-binary-tree-from-inorder-and-postorder-traversal/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyHashMap     from '@solutions/Python/construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.py?raw';
+import cppHashMap    from '@solutions/C++/construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.cpp?raw';
+import javaHashMap   from '@solutions/Java/construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.java?raw';
+import jsHashMap     from '@solutions/JavaScript/construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.js?raw';
+import rustHashMap   from '@solutions/Rust/construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.rs?raw';
+import goHashMap     from '@solutions/Golang/construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.go?raw';
+import pySpaceOptimized from '@solutions/Python/construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ConstructBinaryTreeFromPreorderAndInorderTraversalSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.go?raw';
+
+import pyIndex       from '@solutions/Python/construct_binary_tree_from_preorder_and_inorder_traversal_index.py?raw';
+import cppIndex      from '@solutions/C++/construct_binary_tree_from_preorder_and_inorder_traversal_index.cpp?raw';
+import javaIndex     from '@solutions/Java/construct_binary_tree_from_preorder_and_inorder_traversal_index.java?raw';
+import jsIndex       from '@solutions/JavaScript/construct_binary_tree_from_preorder_and_inorder_traversal_index.js?raw';
+import rustIndex     from '@solutions/Rust/construct_binary_tree_from_preorder_and_inorder_traversal_index.rs?raw';
+import goIndex       from '@solutions/Golang/construct_binary_tree_from_preorder_and_inorder_traversal_index.go?raw';
+
+## Problem Statement
+
+Given two integer arrays `preorder` and `inorder` where:
+- `preorder` is the preorder traversal of a binary tree
+- `inorder` is the inorder traversal of the same tree
+
+Reconstruct and return the binary tree.
+
+Preorder traversal visits nodes in this order: **Root → Left → Right**
+
+Inorder traversal visits nodes in this order: **Left → Root → Right**
+
+<Aside type="tip" title="What to notice first">
+- The **first element in preorder is always the root** of the current subtree.
+- Once you identify the root in **inorder**, everything **left of it is in the left subtree**, and everything **right of it is in the right subtree**.
+- This divide-and-conquer property allows you to recursively build left and right subtrees.
+- Preorder has the root first, so you process elements from preorder in order, and use inorder to partition the tree.
+</Aside>
+
+### Examples
+
+| Preorder | Inorder | Tree Structure |
+| --- | --- | --- |
+| `[3, 9, 20, 15, 7]` | `[9, 3, 15, 20, 7]` | Root=3, Left child=9, Right child=20 (with its own subtree) |
+| `[1]` | `[1]` | Single node tree |
+| `[1, 2, 3]` | `[1, 3, 2]` | Root=1, Right child=2, Left child of 2 is 3 |
+
+## Constraints
+
+- `1 <= preorder.length <= 3000`
+- `inorder.length == preorder.length`
+- `-3000 <= preorder[i], inorder[i] <= 3000`
+- `preorder` and `inorder` consist of **unique** values.
+- Each value of `preorder` also appears in `inorder`.
+- `inorder` **does not contain** duplicates.
+- `preorder` **does not contain** duplicates.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Serialization/Deserialization** — Reconstructing objects from multiple views of a data structure.
+- **Compiler AST Construction** — Building abstract syntax trees from tokenized source code.
+- **File System Traversal Logs** — Reconstructing directory hierarchies from traversal records.
+- **Network Topology Recovery** — Rebuilding network trees from different traversal snapshots.
+- **Expression Tree Building** — Constructing operator trees from infix and prefix notations.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Lookup | Best When |
+| --- | --- | --- | --- | --- |
+| Hash Map | O(n) | O(n) | Instant O(1) | General case — predictable performance |
+| Index Tracking | O(n²) worst | O(h) | O(n) linear search | Memory-constrained, or when inorder lookups are rare |
+| Iterative with Stack | O(n) | O(h) | Instant O(1) | Advanced optimization |
+
+## Which approach should you learn first?
+
+- Pick **Hash Map** if you want the clearest, most balanced approach.
+- Pick **Index Tracking** if you want to minimize extra space and understand the basic recursion pattern.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best for Speed</div>
+    <div class="lc-approach-quick__name">Hash Map</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Space-Efficient</div>
+    <div class="lc-approach-quick__name">Index Tracking</div>
+    <div class="lc-approach-quick__stats">O(n²) worst &middot; O(h) space</div>
+  </div>
+</div>
+
+## Approach 1: Hash Map (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Store the position of each value in **inorder** in a hash map for instant lookup. For each node in **preorder**, find its position in **inorder** to determine the split between left and right subtrees.
+
+The key insight: once you know the **root** (from preorder), you can instantly find its position in **inorder** using the hash map, then partition the arrays and recurse.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass per element" spaceNote="Hash map + recursion stack" />
+
+### Step-by-step Example
+
+**Preorder:** `[3, 9, 20, 15, 7]`
+
+**Inorder:** `[9, 3, 15, 20, 7]`
+
+**Hash Map:** `{9: 0, 3: 1, 15: 2, 20: 3, 7: 4}`
+
+| Step | Root | Position in Inorder | Left Elements | Right Elements | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 3 (preorder[0]) | 1 | `[9]` at inorder[0:1] | `[15, 20, 7]` at inorder[2:5] | Split at position 1 |
+| 2 | 9 (preorder[1]) | 0 | `[]` | `[]` | Leaf node |
+| 3 | 20 (preorder[2]) | 3 | `[15]` at inorder[2:3] | `[7]` at inorder[4:5] | Split at position 3 |
+
+<LogicPlayer
+  title="How the reconstruction algorithm finds the tree structure"
+  description="Watch as the preorder root pointer moves forward and the inorder boundaries shrink during recursion."
+  target="root"
+  steps={[
+    {
+      title: 'Start: identify root from preorder[0]',
+      note: 'Preorder always starts with root. We find 3 in inorder at position 1.',
+      formula: 'root_val = preorder[0] = 3, position in inorder = 1',
+      callout: 'Elements at inorder[0:1] = [9] go to LEFT. Elements at inorder[2:5] = [15,20,7] go to RIGHT.',
+      items: [
+        { label: '3', state: 'active', index: 0 },
+        { label: '9', state: 'default', index: 1 },
+        { label: '20', state: 'default', index: 2 },
+        { label: '15', state: 'default', index: 3 },
+        { label: '7', state: 'default', index: 4 },
+      ],
+      memory: ['3 is root', 'Left subtree: [9]', 'Right subtree: [15, 20, 7]'],
+    },
+    {
+      title: 'Recurse left: build left subtree from [9]',
+      note: 'Preorder[1] = 9. Since inorder left partition has only [9], it is a leaf.',
+      formula: 'root_val = preorder[1] = 9, position in inorder = 0',
+      callout: 'No left or right children for node 9.',
+      items: [
+        { label: '3', state: 'match', index: 0 },
+        { label: '9', state: 'active', index: 1 },
+        { label: '20', state: 'default', index: 2 },
+        { label: '15', state: 'default', index: 3 },
+        { label: '7', state: 'default', index: 4 },
+      ],
+      memory: ['3 is root', '9 is left child of 3', '20 is next root'],
+    },
+    {
+      title: 'Recurse right: build right subtree from [15, 20, 7]',
+      note: 'Preorder[2] = 20. Find 20 in inorder right partition at position 3.',
+      formula: 'root_val = preorder[2] = 20, position in inorder = 3',
+      callout: 'Elements before 20: [15] go LEFT. Elements after: [7] go RIGHT.',
+      items: [
+        { label: '3', state: 'match', index: 0 },
+        { label: '9', state: 'match', index: 1 },
+        { label: '20', state: 'active', index: 2 },
+        { label: '15', state: 'default', index: 3 },
+        { label: '7', state: 'default', index: 4 },
+      ],
+      memory: ['3 is root', '9 is left child of 3', '20 is right child of 3', 'Build 20 subtree'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function buildTreeHashMap(preorder, inorder):
+    if preorder is empty or inorder is empty:
+        return null
+    
+    // Create hash map for O(1) lookup
+    inorder_map = {}
+    for i, val in enumerate(inorder):
+        inorder_map[val] = i
+    
+    function build(preorder_start, preorder_end, inorder_start, inorder_end):
+        if preorder_start > preorder_end or inorder_start > inorder_end:
+            return null
+        
+        root_val = preorder[preorder_start]
+        root = new TreeNode(root_val)
+        
+        // Find root position in inorder
+        root_inorder_idx = inorder_map[root_val]
+        
+        // Calculate left subtree size
+        left_size = root_inorder_idx - inorder_start
+        
+        // Recurse on left subtree
+        root.left = build(
+            preorder_start + 1,
+            preorder_start + left_size,
+            inorder_start,
+            root_inorder_idx - 1
+        )
+        
+        // Recurse on right subtree
+        root.right = build(
+            preorder_start + left_size + 1,
+            preorder_end,
+            root_inorder_idx + 1,
+            inorder_end
+        )
+        
+        return root
+    
+    return build(0, len(preorder) - 1, 0, len(inorder) - 1)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHashMap} lang="python" title="construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHashMap} lang="cpp" title="construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHashMap} lang="java" title="construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHashMap} lang="javascript" title="construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHashMap} lang="rust" title="construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHashMap} lang="go" title="construct_binary_tree_from_preorder_and_inorder_traversal_hash_map.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Index Tracking
+
+<ApproachTag tag="interview" />
+
+Instead of storing a hash map, use a pointer to track the current position in preorder, and search for the root in inorder manually during each recursion. This saves the O(n) space used by the hash map, but trades it for slower inorder lookups.
+
+This approach is useful when space is severely limited or when you want to demonstrate understanding of the core recursion pattern without relying on extra data structures.
+
+<Aside type="caution" title="Performance caveat">
+The linear search in inorder during each recursion can lead to O(n²) worst-case time complexity in unbalanced trees. Use the hash map approach unless space is critical.
+</Aside>
+
+<ComplexityBadges time="O(n²)" space="O(h)" timeColor="orange" spaceColor="green" timeNote="Linear inorder search per node" spaceNote="Recursion stack height" />
+
+### Step-by-step Example
+
+**Preorder:** `[3, 9, 20, 15, 7]`
+
+**Inorder:** `[9, 3, 15, 20, 7]`
+
+**Preorder pointer:** Advances left-to-right through preorder
+
+| Step | Preorder Pointer | Current Value | Inorder Boundaries | Action |
+| --- | --- | --- | --- | --- |
+| 1 | 0 | 3 | [0:5] → find 3 at 1 | Split: left [0:1], right [2:5] |
+| 2 | 1 | 9 | [0:1] → find 9 at 0 | Leaf node |
+| 3 | 2 | 20 | [2:5] → find 20 at 3 | Split: left [2:3], right [4:5] |
+
+### Pseudocode
+
+```plaintext
+function buildTreeIndex(preorder, inorder):
+    if preorder is empty or inorder is empty:
+        return null
+    
+    preorder_idx = 0
+    
+    function build(inorder_start, inorder_end):
+        if inorder_start > inorder_end or preorder_idx >= len(preorder):
+            return null
+        
+        root_val = preorder[preorder_idx]
+        preorder_idx++
+        root = new TreeNode(root_val)
+        
+        // Find root position in inorder by linear search
+        root_inorder_idx = search(inorder, root_val, inorder_start, inorder_end)
+        
+        // Recurse on left subtree
+        root.left = build(inorder_start, root_inorder_idx - 1)
+        
+        // Recurse on right subtree
+        root.right = build(root_inorder_idx + 1, inorder_end)
+        
+        return root
+    
+    return build(0, len(inorder) - 1)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIndex} lang="python" title="construct_binary_tree_from_preorder_and_inorder_traversal_index.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIndex} lang="cpp" title="construct_binary_tree_from_preorder_and_inorder_traversal_index.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIndex} lang="java" title="construct_binary_tree_from_preorder_and_inorder_traversal_index.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIndex} lang="javascript" title="construct_binary_tree_from_preorder_and_inorder_traversal_index.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIndex} lang="rust" title="construct_binary_tree_from_preorder_and_inorder_traversal_index.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIndex} lang="go" title="construct_binary_tree_from_preorder_and_inorder_traversal_index.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ConstructBinaryTreeFromPreorderAndInorderTraversalSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="construct_binary_tree_from_preorder_and_inorder_traversal_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Off-by-one errors in index calculations**: When computing `left_size` or splitting arrays, be careful with boundary conditions.
+- **Confusing preorder and inorder**: Remember: preorder = **root first**, inorder = **root in the middle**.
+- **Forgetting to advance the preorder pointer**: In the index-tracking approach, the pointer must move forward sequentially as you process nodes.
+- **Not handling empty subarrays**: When all nodes go to one side (e.g., a linked-list tree), ensure the recursion bottoms out correctly.
+- **Assuming duplicate values**: The problem guarantees unique values, but always verify input constraints.
+</Aside>
+
+## Key Insights
+
+1. **Preorder structure**: `preorder[0]` is always the root of the current subtree. This is the entry point for every recursive call.
+
+2. **Inorder partition**: Once you find the root in inorder, the left portion is the left subtree and the right portion is the right subtree. This gives you exact boundaries for recursion.
+
+3. **Index mapping**: Using a hash map to store inorder indices is the performance key. It transforms an O(n) search into O(1) lookup, keeping overall time at O(n).
+
+4. **Size calculation**: The number of nodes in the left subtree is `root_position_in_inorder - inorder_start`. This lets you correctly split preorder without needing to create new arrays.
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Hash Map vs. Index Tracking**: Hash map is O(n) time and space; index tracking is O(n²) worst time but only O(h) extra space. Discuss which matters more in your scenario.
+- **Why not just search inorder linearly**: You *can*, but it's slower. Interviews appreciate the optimization of using a hash map.
+- **Edge cases**: Single node (return that node), all nodes on one side (degenerate tree), empty arrays (return null).
+- **Follow-up — Inorder + Postorder**: Same idea, but postorder has root *last*. The logic adapts naturally.
+- **Real-world applicability**: Serialization formats often store multiple traversals to enable reconstruction. This problem teaches that pattern.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 104, title: 'Maximum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'maximum-depth-of-binary-tree' },
+  { number: 106, title: 'Construct Binary Tree from Inorder and Postorder Traversal', difficulty: 'Medium', leetcodeSlug: 'construct-binary-tree-from-inorder-and-postorder-traversal' },
+  { number: 108, title: 'Convert Sorted Array to Binary Search Tree', difficulty: 'Easy', leetcodeSlug: 'convert-sorted-array-to-binary-search-tree' },
+  { number: 297, title: 'Serialize and Deserialize Binary Tree', difficulty: 'Hard', leetcodeSlug: 'serialize-and-deserialize-binary-tree' },
+]} />
+
+<PrevNextNav
+  prevProblem={{ number: 104, title: "Maximum Depth of Binary Tree", slug: "maximum-depth-of-binary-tree" }}
+  nextProblem={{ number: 106, title: "Construct Binary Tree from Inorder and Postorder Traversal", slug: "construct-binary-tree-from-inorder-and-postorder-traversal" }}
+/>

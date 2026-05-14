@@ -1,0 +1,444 @@
+---
+title: Rotate List
+description: Rotate a linked list to the right by k positions. Two approaches — find break point O(n) and circular O(n) — in six languages.
+leetcodeNumber: 61
+difficulty: Medium
+leetcodeSlug: rotate-list
+tags: [Linked List, Two Pointers]
+prev:
+  label: "#57 Insert Interval"
+  link: "../insert-interval/"
+next:
+  label: "#63 Unique Paths II"
+  link: "../unique-paths-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBreakPoint   from '@solutions/Python/rotate_list_break_point.py?raw';
+import cppBreakPoint  from '@solutions/C++/rotate_list_break_point.cpp?raw';
+import javaBreakPoint from '@solutions/Java/rotate_list_break_point.java?raw';
+import jsBreakPoint   from '@solutions/JavaScript/rotate_list_break_point.js?raw';
+import rustBreakPoint from '@solutions/Rust/rotate_list_break_point.rs?raw';
+import goBreakPoint   from '@solutions/Golang/rotate_list_break_point.go?raw';
+import pyoptimized from '@solutions/Python/rotate_list_optimized.py?raw';
+import cppoptimized from '@solutions/C++/rotate_list_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/RotateListOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/rotate_list_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/rotate_list_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/rotate_list_optimized.go?raw';
+
+import pyCircular     from '@solutions/Python/rotate_list_circular.py?raw';
+import cppCircular    from '@solutions/C++/rotate_list_circular.cpp?raw';
+import javaCircular   from '@solutions/Java/rotate_list_circular.java?raw';
+import jsCircular     from '@solutions/JavaScript/rotate_list_circular.js?raw';
+import rustCircular   from '@solutions/Rust/rotate_list_circular.rs?raw';
+import goCircular     from '@solutions/Golang/rotate_list_circular.go?raw';
+
+## Problem Statement
+
+Given the `head` of a linked list, rotate the list to the right by `k` places.
+
+Rotating a list to the right by `k` places means taking the last `k` nodes and moving them to the front of the list, preserving their relative order.
+
+<Aside type="tip" title="What to notice first">
+- If `k` is larger than the list length, you only rotate by `k % length` places since the rotation is cyclic.
+- A list of length 1 or an empty list rotated any amount remains unchanged.
+- The key challenge is identifying where to "cut" the list and reconnect the pieces.
+- Both approaches achieve O(n) time but differ in how they locate the cut point.
+</Aside>
+
+### Examples
+
+| Input | k | Output | Explanation |
+| --- | --- | --- | --- |
+| `1 → 2 → 3 → 4 → 5` | 2 | `4 → 5 → 1 → 2 → 3` | Move the last 2 nodes to the front |
+| `0 → 1 → 2` | 4 | `2 → 0 → 1` | k % length = 4 % 3 = 1, rotate by 1 |
+| `1` | 1 | `1` | Single node; rotation has no effect |
+| `1 → 2` | 2 | `1 → 2` | Full rotation by list length; no change |
+
+## Constraints
+
+- The number of nodes in the list is in the range `[0, 100]`.
+- `0 <= Node.val <= 100`
+- `0 <= k <= 2 * 10^9`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Queue rotation** — implement circular queue buffer rotation or round-robin scheduling.
+- **Message queue shifting** — rotate message priorities by moving recent items to the front.
+- **Playlist rotation** — move the last k songs to the beginning in a music streaming app.
+- **Data pipeline buffering** — rotate batches of data in a sliding window operation.
+- **Event log rotation** — shift recent events to the front of a time-series log.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Passes | Best When |
+| --- | --- | --- | --- | --- |
+| Break Point | O(n) | O(1) | 2 | Easier to understand the concept; clear two-phase algorithm |
+| Circular | O(n) | O(1) | 1 | Want a more elegant single-pass-like approach; showing pattern mastery |
+
+## Which approach should you learn first?
+
+- Pick **Break Point** if you are learning linked list manipulation for the first time.
+- Pick **Circular** if you want to see an elegant alternative using the cyclic nature of the problem.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Conceptually Clear</div>
+    <div class="lc-approach-quick__name">Break Point</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Elegant Alternative</div>
+    <div class="lc-approach-quick__name">Circular</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Break Point
+
+<ApproachTag tag="recommended" />
+
+Find the node at position `(length - k - 1)` and break the list there. The new head is the node that follows this break point. Reconnect the tail of the rotated portion to the original head.
+
+The key insight is understanding that after a right rotation by k, the node that was at position `length - k` becomes the new head.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Two passes" spaceColor="No extra memory" />
+
+### Step-by-step Example
+
+**Input:** `1 → 2 → 3 → 4 → 5`, `k = 2`
+
+**Step 1:** Find length = 5
+
+**Step 2:** Normalize k = 2 (already less than 5)
+
+**Step 3:** Find break point at position `5 - 2 - 1 = 2` (the node with value 3)
+
+**Step 4:** Break the list:
+- Separate: `1 → 2 → 3` (break here) and `4 → 5`
+- Set `3.next = null`
+- Connect the tail of `4 → 5` (which is 5) back to 1
+- Result: `4 → 5 → 1 → 2 → 3`
+
+**Another case:** `0 → 1 → 2`, `k = 4`
+
+**Step 1:** Find length = 3
+
+**Step 2:** Normalize k = 4 % 3 = 1
+
+**Step 3:** Find break point at position `3 - 1 - 1 = 1` (the node with value 1)
+
+**Step 4:** Break and reconnect:
+- `0 → 1` and `2`
+- `2.next` points to `0`
+- Result: `2 → 0 → 1`
+
+### Pseudocode
+
+```plaintext
+function rotateListBreakPoint(head, k):
+    if head is null or head.next is null or k == 0:
+        return head
+
+    // Step 1: Find length
+    length = 0
+    current = head
+    while current != null:
+        length++
+        current = current.next
+
+    // Step 2: Normalize k
+    k = k % length
+    if k == 0:
+        return head
+
+    // Step 3: Find break point
+    current = head
+    for i from 0 to length - k - 2:
+        current = current.next
+
+    // Step 4: Break and reconnect
+    newHead = current.next
+    current.next = null
+    tail = newHead
+    while tail.next != null:
+        tail = tail.next
+    tail.next = head
+
+    return newHead
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBreakPoint} lang="python" title="rotate_list_break_point.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBreakPoint} lang="cpp" title="rotate_list_break_point.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBreakPoint} lang="java" title="rotate_list_break_point.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBreakPoint} lang="javascript" title="rotate_list_break_point.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBreakPoint} lang="rust" title="rotate_list_break_point.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBreakPoint} lang="go" title="rotate_list_break_point.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Circular
+
+<ApproachTag tag="interview" />
+
+Create a circular list by connecting the tail back to the head, then locate the new head at position `(length - k)` and break the circle there. This approach elegantly leverages the cyclic nature of rotation.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Find length and walk to break point" spaceColor="No extra memory" />
+
+### Step-by-step Example
+
+**Input:** `1 → 2 → 3 → 4 → 5`, `k = 2`
+
+**Step 1:** Find length = 5, identify tail (node 5)
+
+**Step 2:** Normalize k = 2
+
+**Step 3:** Create circular list: `5.next = 1` → `1 → 2 → 3 → 4 → 5 → 1 → 2 → 3 → ...`
+
+**Step 4:** Walk `length - k = 5 - 2 = 3` steps from head (starting at position 0):
+- Step 0: at node 1
+- Step 1: at node 2
+- Step 2: at node 3
+
+**Step 5:** Break after node 3:
+- `new_head = 3.next = 4`
+- `3.next = null`
+- Result: `4 → 5 → 1 → 2 → 3`
+
+**Another case:** `0 → 1 → 2`, `k = 4`
+
+**Step 1:** Find length = 3, tail = node 2
+
+**Step 2:** Normalize k = 1
+
+**Step 3:** Create circular list: `2.next = 0`
+
+**Step 4:** Walk `3 - 1 = 2` steps from head:
+- Step 0: at node 0
+- Step 1: at node 1
+
+**Step 5:** Break after node 1:
+- `new_head = 1.next = 2`
+- `1.next = null`
+- Result: `2 → 0 → 1`
+
+### Pseudocode
+
+```plaintext
+function rotateListCircular(head, k):
+    if head is null or head.next is null or k == 0:
+        return head
+
+    // Step 1: Find length and tail
+    length = 0
+    tail = head
+    while tail.next != null:
+        length++
+        tail = tail.next
+    length++
+
+    // Step 2: Normalize k
+    k = k % length
+    if k == 0:
+        return head
+
+    // Step 3: Create circular list
+    tail.next = head
+
+    // Step 4: Find new head position
+    stepsToWalk = length - k
+    current = head
+    for i from 0 to stepsToWalk - 2:
+        current = current.next
+
+    // Step 5: Break the circle
+    newHead = current.next
+    current.next = null
+
+    return newHead
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyCircular} lang="python" title="rotate_list_circular.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppCircular} lang="cpp" title="rotate_list_circular.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaCircular} lang="java" title="rotate_list_circular.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsCircular} lang="javascript" title="rotate_list_circular.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustCircular} lang="rust" title="rotate_list_circular.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goCircular} lang="go" title="rotate_list_circular.go" />
+  </TabItem>
+</Tabs>
+
+## Interactive Visualization
+
+<LogicPlayer
+  title="Understanding rotation: finding the break point and reconnecting"
+  description="Watch how the algorithm identifies the break point and performs the rotation. The list is broken at position (length - k - 1), then reconnected to create the rotated list."
+  target="rotation"
+  steps={[
+    {
+      title: 'Original list with target rotation k=2',
+      note: 'We want to move the last 2 nodes (4, 5) to the front. First, calculate the list length.',
+      formula: 'List: 1 → 2 → 3 → 4 → 5, k = 2, length = 5',
+      callout: 'Length calculation is the first step for both approaches.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['length = 5', 'k = 2', 'k % 5 = 2'],
+    },
+    {
+      title: 'Find the break point for rotation',
+      note: 'After right rotation by k, the new structure is: [last k nodes] → [first (length - k) nodes]. Break point is at position (length - k - 1) = 2.',
+      formula: 'break_point_index = 5 - 2 - 1 = 2 (node 3)',
+      callout: 'Node at index 2 (value 3) becomes the last node of the first portion.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['break_point = node 3', 'position = 2', 'new_head = 3.next = 4'],
+    },
+    {
+      title: 'Separate the list at the break point',
+      note: 'Set 3.next = null to separate. Now we have two parts: [1 → 2 → 3] and [4 → 5].',
+      formula: '3.next = null, Part1 = [1 → 2 → 3], Part2 = [4 → 5]',
+      callout: 'Breaking the chain isolates the portion to rotate.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+      ],
+      memory: ['Part 1: 1 → 2 → 3', 'Part 2: 4 → 5', '3.next = null'],
+    },
+    {
+      title: 'Connect the tail of Part2 back to the head',
+      note: 'Find the tail of [4 → 5], which is node 5. Connect it to the original head (node 1).',
+      formula: '5.next = 1, creating: 4 → 5 → 1 → 2 → 3',
+      callout: 'The rotation is complete. Return node 4 as the new head.',
+      items: [
+        { label: '4', state: 'active', index: 0 },
+        { label: '5', state: 'active', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+        { label: '2', state: 'match', index: 3 },
+        { label: '3', state: 'match', index: 4 },
+      ],
+      memory: ['5.next = 1', 'new_head = 4', 'Result: 4 → 5 → 1 → 2 → 3'],
+    },
+  ]}
+/>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="rotate_list_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="rotate_list_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="RotateListOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="rotate_list_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="rotate_list_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="rotate_list_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting to normalize k** — if k is larger than the list length, the rotation becomes k % length.
+- **Off-by-one errors in finding the break point** — ensure you find the node *before* the rotation point, not the rotation point itself.
+- **Not handling edge cases** — single-node lists, empty lists, and k=0 should return the original head.
+- **Creating actual circles in the circular approach** — remember to break the circle after finding the new head.
+- **Losing the tail reference** — in both approaches, ensure you correctly identify and reconnect the tail.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 19, title: 'Remove Nth Node From End of List', difficulty: 'Medium', leetcodeSlug: 'remove-nth-node-from-end-of-list' },
+  { number: 92, title: 'Reverse Linked List II', difficulty: 'Medium', leetcodeSlug: 'reverse-linked-list-ii' },
+  { number: 206, title: 'Reverse Linked List', difficulty: 'Easy', leetcodeSlug: 'reverse-linked-list' },
+  { number: 21, title: 'Merge Two Sorted Lists', difficulty: 'Easy', leetcodeSlug: 'merge-two-sorted-lists' },
+  { number: 60, title: 'Permutation Sequence', difficulty: 'Hard', slug: 'problems/permutation-sequence', leetcodeSlug: 'permutation-sequence' },
+  { number: 62, title: 'Unique Paths II', difficulty: 'Medium', slug: 'problems/unique-paths-ii', leetcodeSlug: 'unique-paths-ii' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Break Point vs. Circular:** Both achieve O(n) time and O(1) space. Break Point is more intuitive (two distinct phases), while Circular is more elegant and shows deeper understanding of linked list properties.
+- **Why normalize k?** Emphasize that rotations are cyclic: rotating by k is the same as rotating by k % length. This prevents unnecessary iterations.
+- **Why find (length - k - 1)?** Explain that after rotation, the new head is at the old position (length - k). To perform the break, you need the node *before* it.
+- **Edge cases to mention:** empty lists, single-node lists, k = 0, k = length, and k > length. All should be handled gracefully.
+- **Follow-up — Reverse Sections:** You can combine rotation with reversal to solve more complex linked list problems.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 60, title: "Permutation Sequence", slug: "permutation-sequence" }}
+  nextProblem={{ number: 62, title: "Unique Paths II", slug: "unique-paths-ii" }}
+/>

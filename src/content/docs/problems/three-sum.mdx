@@ -1,0 +1,385 @@
+---
+title: 3Sum
+description: Find all unique triplets in an array that sum to zero. Two approaches — sort + two pointers O(n²) and hash set O(n²) — in six languages.
+leetcodeNumber: 15
+difficulty: Medium
+leetcodeSlug: 3sum
+tags: [Array, Two Pointers, Sorting]
+prev:
+  label: "#11 Container With Most Water"
+  link: "../container-with-most-water/"
+next:
+  label: "#17 Letter Combinations of a Phone Number"
+  link: "../letter-combinations-of-a-phone-number/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySortTwoPtr  from '@solutions/Python/three_sum_sort_two_pointer.py?raw';
+import cppSortTwoPtr from '@solutions/C++/three_sum_sort_two_pointer.cpp?raw';
+import javaSortTwoPtr from '@solutions/Java/three_sum_sort_two_pointer.java?raw';
+import jsSortTwoPtr  from '@solutions/JavaScript/three_sum_sort_two_pointer.js?raw';
+import rustSortTwoPtr from '@solutions/Rust/three_sum_sort_two_pointer.rs?raw';
+import goSortTwoPtr  from '@solutions/Golang/three_sum_sort_two_pointer.go?raw';
+import pyoptimized from '@solutions/Python/3sum_optimized.py?raw';
+import cppoptimized from '@solutions/C++/3sum_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/3sumOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/3sum_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/3sum_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/3sum_optimized.go?raw';
+
+import pyHashSet     from '@solutions/Python/three_sum_hash_set.py?raw';
+import cppHashSet    from '@solutions/C++/three_sum_hash_set.cpp?raw';
+import javaHashSet   from '@solutions/Java/three_sum_hash_set.java?raw';
+import jsHashSet     from '@solutions/JavaScript/three_sum_hash_set.js?raw';
+import rustHashSet   from '@solutions/Rust/three_sum_hash_set.rs?raw';
+import goHashSet     from '@solutions/Golang/three_sum_hash_set.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums`, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, `j != k`, and `nums[i] + nums[j] + nums[k] == 0`. Notice that the solution set must not contain duplicate triplets.
+
+<Aside type="tip" title="Key insights">
+- "No duplicate triplets" is the hard part — sorting first makes duplicate-skipping easy.
+- Fix one number (`nums[i]`), then reduce to Two Sum II for the rest of the array.
+- The two-pointer approach here is the natural extension of Two Sum II to three numbers.
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `[-1,0,1,2,-1,-4]` | `[[-1,-1,2],[-1,0,1]]` |
+| `[0,1,1]` | `[]` |
+| `[0,0,0]` | `[[0,0,0]]` |
+
+## Constraints
+
+- `3 <= nums.length <= 3000`
+- `-10^5 <= nums[i] <= 10^5`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Financial reconciliation** — find three transactions that cancel each other out (sum to zero).
+- **Chemical balancing** — find three reagents whose net charges sum to neutral.
+- **3D vector cancellation** — find three force vectors that sum to zero.
+- **Error detection** — find three data values whose sum reveals a specific error pattern.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Sort + Two Pointers | O(n²) | O(1)* | Standard answer — elegant and fast |
+| Hash Set | O(n²) | O(n) | Unfamiliar with two-pointer pattern |
+
+\* O(log n) or O(n) if sorting space counts.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Recommended</div>
+    <div class="lc-approach-quick__name">Sort + Two Pointers</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Alternative</div>
+    <div class="lc-approach-quick__name">Hash Set</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Sort + Two Pointers (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Sort the array. For each index `i`, use two pointers — `left = i+1` and `right = n-1` — to find pairs that sum to `-nums[i]`. Skip duplicate values for `i` and for the inner pointers after finding a triplet.
+
+<ComplexityBadges time="O(n²)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Fixed outer + two-pointer inner" spaceNote="Sorting in-place" />
+
+### Step-by-step Example
+
+**Input:** `[-1, 0, 1, 2, -1, -4]`
+
+Sorted: `[-4, -1, -1, 0, 1, 2]`
+
+| i | nums[i] | left | right | sum | action |
+| --- | --- | --- | --- | --- | --- |
+| 0 | -4 | 1→4 | 5→5 | all < 0 | left advances to right |
+| 1 | -1 | 2 | 5 | -1-1+2=0 | ✓ add [-1,-1,2], skip dups |
+| 1 | -1 | 3 | 4 | -1+0+1=0 | ✓ add [-1,0,1] |
+| 2 | -1 | skip | — | — | dup of i=1, continue |
+| 3 | 0 | 4 | 5 | 0+1+2=3 | >0, right-- |
+| 3 | 0 | left≥right | — | — | done |
+
+<LogicPlayer
+  title="Sort + Two Pointers walking through [-1,0,1,2,-1,-4]"
+  description="Use Next or Autoplay to watch the outer pointer fix one element while inner two pointers converge to find zero-sum triplets."
+  steps={[
+    {
+      title: 'Sort the array',
+      note: 'Sorting is essential — it lets us skip duplicates and use directional pointer movement.',
+      formula: 'sorted: [-4, -1, -1, 0, 1, 2]',
+      callout: 'After sorting, duplicate values are adjacent, making them easy to skip.',
+      items: [
+        { label: '-4', state: 'default', index: 0 },
+        { label: '-1', state: 'default', index: 1 },
+        { label: '-1', state: 'default', index: 2 },
+        { label: '0',  state: 'default', index: 3 },
+        { label: '1',  state: 'default', index: 4 },
+        { label: '2',  state: 'default', index: 5 },
+      ],
+      memory: ['result: []'],
+    },
+    {
+      title: 'i=1, nums[i]=-1: left=2, right=5, sum=-1-1+2=0',
+      note: 'Fix -1 at index 1. Left starts at 2 (-1) and right at 5 (2). Sum is exactly 0.',
+      formula: '-1 + (-1) + 2 = 0 ✓',
+      callout: 'Found a triplet! Add [-1,-1,2] and advance both pointers, skipping duplicates.',
+      items: [
+        { label: '-4', state: 'default', index: 0 },
+        { label: '-1', state: 'active', index: 1 },
+        { label: '-1', state: 'match', index: 2 },
+        { label: '0',  state: 'default', index: 3 },
+        { label: '1',  state: 'default', index: 4 },
+        { label: '2',  state: 'match', index: 5 },
+      ],
+      memory: ['result: [[-1,-1,2]]', 'skip dup left, skip dup right'],
+    },
+    {
+      title: 'i=1, nums[i]=-1: left=3, right=4, sum=-1+0+1=0',
+      note: 'After skipping duplicates, left=3 (0) and right=4 (1). Sum is again 0.',
+      formula: '-1 + 0 + 1 = 0 ✓',
+      callout: 'Second triplet found! Add [-1,0,1]. Left and right meet, inner loop ends.',
+      items: [
+        { label: '-4', state: 'default', index: 0 },
+        { label: '-1', state: 'active', index: 1 },
+        { label: '-1', state: 'default', index: 2 },
+        { label: '0',  state: 'match', index: 3 },
+        { label: '1',  state: 'match', index: 4 },
+        { label: '2',  state: 'default', index: 5 },
+      ],
+      memory: ['result: [[-1,-1,2], [-1,0,1]]'],
+    },
+    {
+      title: 'i=2 skipped (dup of i=1); i=3, nums[i]=0 > 0? No',
+      note: 'i=2 has nums[2]=-1==nums[1]=-1, so it is skipped. i=3, nums[3]=0 is not positive.',
+      formula: 'nums[2]==nums[1] → skip; nums[3]=0 not > 0',
+      callout: 'Duplicate skipping for the outer loop prevents duplicate triplets in the result.',
+      items: [
+        { label: '-4', state: 'default', index: 0 },
+        { label: '-1', state: 'default', index: 1 },
+        { label: '-1', state: 'default', index: 2 },
+        { label: '0',  state: 'active', index: 3 },
+        { label: '1',  state: 'default', index: 4 },
+        { label: '2',  state: 'default', index: 5 },
+      ],
+      memory: ['result: [[-1,-1,2], [-1,0,1]]', 'i=3: left=4, right=5, 0+1+2=3>0 → right--'],
+    },
+    {
+      title: 'All done — return [[-1,-1,2],[-1,0,1]]',
+      note: 'After right--, left>=right so the inner loop ends. No more valid i values.',
+      formula: 'return [[-1,-1,2], [-1,0,1]]',
+      callout: 'Two unique zero-sum triplets found with no duplicates.',
+      items: [
+        { label: '-4', state: 'default', index: 0 },
+        { label: '-1', state: 'match', index: 1 },
+        { label: '-1', state: 'match', index: 2 },
+        { label: '0',  state: 'match', index: 3 },
+        { label: '1',  state: 'match', index: 4 },
+        { label: '2',  state: 'match', index: 5 },
+      ],
+      memory: ['result: [[-1,-1,2], [-1,0,1]] ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function threeSum(nums):
+    sort(nums)
+    result = []
+    for i in range(len(nums) - 2):
+        if nums[i] > 0: break
+        if i > 0 and nums[i] == nums[i-1]: continue  // skip dup outer
+        left, right = i + 1, len(nums) - 1
+        while left < right:
+            s = nums[i] + nums[left] + nums[right]
+            if s == 0:
+                result.append([nums[i], nums[left], nums[right]])
+                while left < right and nums[left] == nums[left+1]: left++
+                while left < right and nums[right] == nums[right-1]: right--
+                left++; right--
+            elif s < 0:
+                left++
+            else:
+                right--
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySortTwoPtr} lang="python" title="three_sum_sort_two_pointer.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSortTwoPtr} lang="cpp" title="three_sum_sort_two_pointer.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSortTwoPtr} lang="java" title="three_sum_sort_two_pointer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSortTwoPtr} lang="javascript" title="three_sum_sort_two_pointer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSortTwoPtr} lang="rust" title="three_sum_sort_two_pointer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSortTwoPtr} lang="go" title="three_sum_sort_two_pointer.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Hash Set
+
+<ApproachTag tag="simple" />
+
+Sort the array. For each index `i`, scan `j` from `i+1` to `n-1` using a set to check whether `-(nums[i] + nums[j])` was already seen in the current inner scan. Because the array is sorted and we skip duplicate `i` values, sorted triplets are naturally deduplicated.
+
+<ComplexityBadges time="O(n²)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Outer × inner scan" spaceNote="Inner set per outer iteration" />
+
+### Step-by-step Example
+
+**Input:** `[-1, 0, 1, 2, -1, -4]` (after sorting: `[-4, -1, -1, 0, 1, 2]`)
+
+For `i=1`, `nums[i]=-1`:
+- `j=2`: need = -(-1 + -1) = 2, seen={}; 2 not in seen → add -1 to seen
+- `j=3`: need = -(-1 + 0) = 1, seen={-1}; 1 not in seen → add 0 to seen
+- `j=4`: need = -(-1 + 1) = 0, seen={-1,0}; 0 not in seen → add 1 to seen
+- `j=5`: need = -(-1 + 2) = -1, seen={-1,0,1}; -1 **in seen** → add [-1,-1,2]
+
+Wait — the triplet is `[nums[i], need, nums[j]]` = `[-1, -1, 2]` ✓
+
+Continuing with `j=5` already recorded… next `i=3, nums[i]=0`:
+- `j=4`: need = -(0+1) = -1, seen={}; not in seen → add 1
+- `j=5`: need = -(0+2) = -2, seen={1}; not in seen → add 2
+
+No new triplets at `i=3`.
+
+### Pseudocode
+
+```plaintext
+function threeSumHashSet(nums):
+    sort(nums)
+    result = []
+    for i in range(len(nums) - 2):
+        if i > 0 and nums[i] == nums[i-1]: continue
+        seen = set()
+        for j in range(i+1, len(nums)):
+            need = -(nums[i] + nums[j])
+            if need in seen:
+                triplet = [nums[i], need, nums[j]]
+                if triplet not in result:
+                    result.append(triplet)
+            seen.add(nums[j])
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHashSet} lang="python" title="three_sum_hash_set.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHashSet} lang="cpp" title="three_sum_hash_set.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHashSet} lang="java" title="three_sum_hash_set.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHashSet} lang="javascript" title="three_sum_hash_set.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHashSet} lang="rust" title="three_sum_hash_set.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHashSet} lang="go" title="three_sum_hash_set.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="3sum_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="3sum_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="3sumOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="3sum_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="3sum_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="3sum_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Not skipping duplicates for the outer loop: `if i > 0 and nums[i] == nums[i-1]: continue`
+- Not skipping duplicates for left/right pointers after finding a valid triplet
+- Applying `if nums[i] > 0: break` too aggressively or not at all — it only works after sorting
+- Forgetting to sort first — without sorting, neither duplicate-skipping nor early termination works
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum', leetcodeSlug: 'two-sum' },
+  { number: 167, title: 'Two Sum II', difficulty: 'Medium', slug: 'problems/two-sum-ii', leetcodeSlug: 'two-sum-ii-input-array-is-sorted' },
+  { number: 18, title: '4Sum', difficulty: 'Medium', leetcodeSlug: '4sum' },
+  { number: 11, title: 'Container With Most Water', difficulty: 'Medium', leetcodeSlug: 'container-with-most-water' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- **Frame it as "fix one + Two Sum II"** — interviewers love this framing because it shows systematic problem decomposition.
+- **The duplicate-skipping logic is the trip wire** — walk through it carefully; most candidates forget one of the three skip conditions.
+- **Time complexity is O(n²) and that is optimal** — no known algorithm does better for 3Sum.
+- **The `if nums[i] > 0: break` optimization** — after sorting, if the smallest remaining number is positive, no triplet can sum to zero.
+- **Follow-up — 4Sum (#18)?** Add one more outer loop and reduce to 3Sum. The pattern generalizes to k-Sum recursively.
+
+
+<PrevNextNav
+  prevProblem={ number: 11, title: "Container With Most Water", slug: "container-with-most-water" }
+  nextProblem={ number: 17, title: "Letter Combinations of a Phone Number", slug: "letter-combinations-of-a-phone-number" }
+/></Aside>

@@ -1,0 +1,334 @@
+---
+title: Valid Anagram
+description: Determine whether two strings are anagrams of each other. Two approaches — hash map O(n) and sorting O(n log n) — in six languages.
+leetcodeNumber: 242
+difficulty: Easy
+leetcodeSlug: valid-anagram
+tags: [Hash Table, String, Sorting]
+prev:
+  label: "#238 Product of Array Except Self"
+  link: "../product-except-self/"
+next:
+  label: "#268 Missing Number"
+  link: "../missing-number/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyMap   from '@solutions/Python/valid_anagram_hash_map.py?raw';
+import cppMap  from '@solutions/C++/valid_anagram_hash_map.cpp?raw';
+import javaMap from '@solutions/Java/valid_anagram_hash_map.java?raw';
+import jsMap   from '@solutions/JavaScript/valid_anagram_hash_map.js?raw';
+import rustMap from '@solutions/Rust/valid_anagram_hash_map.rs?raw';
+import goMap   from '@solutions/Golang/valid_anagram_hash_map.go?raw';
+import pySpaceOptimized from '@solutions/Python/valid_anagram_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/valid_anagram_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ValidAnagramSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/valid_anagram_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/valid_anagram_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/valid_anagram_space_optimized.go?raw';
+
+import pySort    from '@solutions/Python/valid_anagram_sort.py?raw';
+import cppSort   from '@solutions/C++/valid_anagram_sort.cpp?raw';
+import javaSort  from '@solutions/Java/valid_anagram_sort.java?raw';
+import jsSort    from '@solutions/JavaScript/valid_anagram_sort.js?raw';
+import rustSort  from '@solutions/Rust/valid_anagram_sort.rs?raw';
+import goSort    from '@solutions/Golang/valid_anagram_sort.go?raw';
+
+## Problem Statement
+
+Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`, and `false` otherwise.
+
+An anagram is a word formed by rearranging all the letters of another word exactly once. Both strings must use the exact same characters with the exact same frequencies.
+
+<Aside type="tip" title="What to notice first">
+- Length check first: if `len(s) != len(t)`, immediately return `false`.
+- The key insight is that two strings are anagrams when they have **identical character frequency maps**.
+- The hash map approach counts characters in O(n) and needs no extra sorting pass.
+</Aside>
+
+### Examples
+
+| s | t | Output | Explanation |
+| --- | --- | --- | --- |
+| `"anagram"` | `"nagaram"` | `true` | Same letters, different order |
+| `"rat"` | `"car"` | `false` | `c` appears in `t` but not `s` |
+| `"a"` | `"ab"` | `false` | Different lengths |
+
+## Constraints
+
+- `1 <= s.length, t.length <= 5 * 10^4`
+- `s` and `t` consist of lowercase English letters only.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Spell checker / autocomplete** — detect if the user typed an anagram of a known word (e.g. a transposition typo).
+- **Plagiarism detection** — check whether two tokenised sentences use the same vocabulary with the same frequency.
+- **Cryptogram solving** — verify that a candidate decoded word uses exactly the letters of the cipher word.
+- **Password strength** — flag passwords that are simple rearrangements of dictionary words.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Hash Map | O(n) | O(1)\* | General case — single pass, fast |
+| Sorting | O(n log n) | O(n) | Code simplicity matters more than speed |
+
+\* At most 26 distinct lowercase letters, so the map size is bounded by a constant.
+
+## Which approach should you learn first?
+
+- Pick **Hash Map** for interviews — O(n) with constant extra space is the expected answer.
+- Pick **Sorting** when you want the shortest possible implementation or are familiar with sort-based comparisons.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Hash Map</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simplest Code</div>
+    <div class="lc-approach-quick__name">Sorting</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Hash Map
+
+<ApproachTag tag="recommended" />
+
+Count each character's frequency in `s` with a hash map, then subtract for each character in `t`. If every count returns to zero, the strings are anagrams. An early-exit check on lengths avoids unnecessary work.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Two passes of length n" spaceNote="At most 26 keys — constant" />
+
+### Step-by-step Example
+
+**Input:** `s = "rat"`, `t = "tar"`
+
+| Phase | char | Map state |
+| --- | --- | --- |
+| Count s | r | `{r:1}` |
+| Count s | a | `{r:1, a:1}` |
+| Count s | t | `{r:1, a:1, t:1}` |
+| Subtract t | t | `{r:1, a:1, t:0}` |
+| Subtract t | a | `{r:1, a:0, t:0}` |
+| Subtract t | r | `{r:0, a:0, t:0}` |
+| All zero? | — | **Yes → return `true`** |
+
+<LogicPlayer
+  title="How frequency counting determines an anagram"
+  description="Use Next or Autoplay to watch characters from s build up the count map, then characters from t subtract from it."
+  steps={[
+    {
+      title: 'Start: both strings unprocessed',
+      note: 'We will count characters in s, then subtract characters in t. If the map reaches all zeros, the strings are anagrams.',
+      formula: 'freq = {}',
+      items: [
+        { label: 'r', state: 'default', index: 0 },
+        { label: 'a', state: 'default', index: 1 },
+        { label: 't', state: 'default', index: 2 },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Count characters in s = "rat"',
+      note: 'Each character in s increments its count by 1. After this pass the map holds the full frequency of s.',
+      formula: 'for char in s: freq[char] += 1',
+      items: [
+        { label: 'r', state: 'active', index: 0 },
+        { label: 'a', state: 'active', index: 1 },
+        { label: 't', state: 'active', index: 2 },
+      ],
+      memory: ['r: +1 → 1', 'a: +1 → 1', 't: +1 → 1'],
+    },
+    {
+      title: 'Subtract characters in t = "tar"',
+      note: 'Each character in t decrements its count by 1. If t is an anagram, every count will reach exactly zero.',
+      formula: 'for char in t: freq[char] -= 1',
+      items: [
+        { label: 't', state: 'active', index: 0 },
+        { label: 'a', state: 'active', index: 1 },
+        { label: 'r', state: 'active', index: 2 },
+      ],
+      memory: ['t: -1 → 0', 'a: -1 → 0', 'r: -1 → 0'],
+    },
+    {
+      title: 'All counts are zero — return true',
+      note: 'Every character that appeared in s was matched exactly in t. The strings are anagrams.',
+      formula: 'all(v == 0 for v in freq.values()) → true',
+      callout: 'If any count were non-zero, t would have a surplus or deficit of that character — not an anagram.',
+      items: [
+        { label: 'r', state: 'match', index: 0 },
+        { label: 'a', state: 'match', index: 1 },
+        { label: 't', state: 'match', index: 2 },
+      ],
+      memory: ['r: 0', 'a: 0', 't: 0', 'all zero → anagram ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function isAnagram(s, t):
+    if len(s) != len(t): return false
+    freq = {}
+    for char in s: freq[char] = freq.get(char, 0) + 1
+    for char in t:
+        freq[char] = freq.get(char, 0) - 1
+        if freq[char] < 0: return false
+    return true
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyMap} lang="python" title="valid_anagram_hash_map.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppMap} lang="cpp" title="valid_anagram_hash_map.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaMap} lang="java" title="valid_anagram_hash_map.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsMap} lang="javascript" title="valid_anagram_hash_map.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustMap} lang="rust" title="valid_anagram_hash_map.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goMap} lang="go" title="valid_anagram_hash_map.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Sorting
+
+<ApproachTag tag="simple" />
+
+Sort both strings independently. If the sorted versions are equal, the original strings are anagrams — they contain the same characters in the same quantities, just in a different order.
+
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Two sort passes" spaceNote="Sorted char arrays" />
+
+### Step-by-step Example
+
+**Input:** `s = "anagram"`, `t = "nagaram"`
+
+| Step | Value |
+| --- | --- |
+| sorted(s) | `"aaagmnr"` |
+| sorted(t) | `"aaagmnr"` |
+| Equal? | **Yes → return `true`** |
+
+**Input:** `s = "rat"`, `t = "car"`
+
+| Step | Value |
+| --- | --- |
+| sorted(s) | `"art"` |
+| sorted(t) | `"acr"` |
+| Equal? | **No → return `false`** |
+
+### Pseudocode
+
+```plaintext
+function isAnagram(s, t):
+    return sorted(s) == sorted(t)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySort} lang="python" title="valid_anagram_sort.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSort} lang="cpp" title="valid_anagram_sort.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSort} lang="java" title="valid_anagram_sort.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSort} lang="javascript" title="valid_anagram_sort.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSort} lang="rust" title="valid_anagram_sort.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSort} lang="go" title="valid_anagram_sort.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting the length check — if `s` and `t` have different lengths they cannot be anagrams, so check this first.
+- Using a map key that doesn't exist — decrement before checking can produce negative counts; always initialise missing keys to 0 first.
+- Unicode follow-up: the constraint here guarantees lowercase ASCII, but in a real system you would want to handle Unicode correctly (use code points, not bytes).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="valid_anagram_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="valid_anagram_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ValidAnagramSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="valid_anagram_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="valid_anagram_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="valid_anagram_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum' },
+  { number: 217, title: 'Contains Duplicate', difficulty: 'Easy', slug: 'problems/contains-duplicate' },
+  { number: 49, title: 'Group Anagrams', difficulty: 'Medium', leetcodeSlug: 'group-anagrams' },
+  { number: 438, title: 'Find All Anagrams in a String', difficulty: 'Medium', leetcodeSlug: 'find-all-anagrams-in-a-string' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why hash map over sorting?** O(n) vs O(n log n). The map approach also lets you exit early the moment a character goes negative.
+- **Constant space claim:** with only lowercase English letters the map has at most 26 keys — technically O(1) space even though a map is used.
+- **Follow-up — Unicode strings?** The same hash map approach works; the bound on map size increases but the algorithm stays O(n).
+- **Follow-up — streams?** You cannot sort a stream, so the hash map approach is the only viable one for streaming input.
+
+
+<PrevNextNav
+  prevProblem={ number: 238, title: "Product of Array Except Self", slug: "product-except-self" }
+  nextProblem={ number: 268, title: "Missing Number", slug: "missing-number" }
+/></Aside>

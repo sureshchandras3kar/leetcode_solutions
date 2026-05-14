@@ -1,0 +1,270 @@
+---
+title: Longest Increasing Subsequence
+description: Find the longest strictly increasing subsequence. Two approaches — DP O(n²) + Binary Search O(n log n) — in six languages.
+leetcodeNumber: 300
+difficulty: Medium
+leetcodeSlug: longest-increasing-subsequence
+tags: [Array, Dynamic Programming, Binary Search]
+prev:
+  label: "#295 Find Median from Data Stream"
+  link: "../find-median-from-data-stream/"
+next:
+  label: "#322 Coin Change"
+  link: "../coin-change/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDP     from '@solutions/Python/longest_increasing_subsequence_dp_n2.py?raw';
+import cppDP    from '@solutions/C++/lis_dp_n2.cpp?raw';
+import javaDP   from '@solutions/Java/LIsDpN2.java?raw';
+import jsDP     from '@solutions/JavaScript/lis_dp_n2.js?raw';
+import rustDP   from '@solutions/Rust/lis_dp_n2.rs?raw';
+import goDP     from '@solutions/Golang/lis_dp_n2.go?raw';
+import pySpaceOptimized from '@solutions/Python/longest_increasing_subsequence_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/longest_increasing_subsequence_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/LongestIncreasingSubsequenceSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/longest_increasing_subsequence_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/longest_increasing_subsequence_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/longest_increasing_subsequence_space_optimized.go?raw';
+
+import pyBS     from '@solutions/Python/longest_increasing_subsequence_bs.py?raw';
+import cppBS    from '@solutions/C++/lis_binary_search.cpp?raw';
+import javaBS   from '@solutions/Java/LIsBinarySearch.java?raw';
+import jsBS     from '@solutions/JavaScript/lis_binary_search.js?raw';
+import rustBS   from '@solutions/Rust/lis_binary_search.rs?raw';
+import goBS     from '@solutions/Golang/lis_binary_search.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums`, return the length of the longest strictly increasing subsequence.
+
+A subsequence is a sequence that can be derived from an array by deleting some or no elements without changing the order of the remaining elements.
+
+<Aside type="tip" title="What to notice first">
+- A subsequence doesn't need to be contiguous.
+- The order of elements must be preserved from the original array.
+- "Strictly increasing" means each element must be strictly greater than the previous.
+- You only need to return the length, not the subsequence itself.
+</Aside>
+
+### Examples
+
+| nums | Output | Explanation |
+| --- | --- | --- |
+| `[10,9,2,5,3,7,101,18]` | `4` | The longest increasing subsequence is `[2,3,7,101]` with length 4 |
+| `[0,1,0,4,4,4,3,2,1]` | `2` | The longest increasing subsequence is `[0,1]` or `[0,4]` with length 2 |
+| `[3,1,4,1,5,9,2,6,5,3,5]` | `4` | One possible LIS: `[1,4,5,9]` or `[1,2,5,9]` or `[1,2,3,5]` |
+
+## Constraints
+
+- `1 <= nums.length <= 2500`
+- `-10^4 <= nums[i] <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Stock price analysis** — finding the longest period of consistently rising prices.
+- **Data compression** — identifying longest increasing runs in datasets.
+- **Seismic data processing** — locating increasing event sequences.
+- **Version tracking** — finding longest sequence of version improvements.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best For |
+| --- | --- | --- | --- |
+| DP | O(n²) | O(n) | Easier to understand and code |
+| Binary Search | O(n log n) | O(n) | Large arrays, optimal complexity |
+
+## Which approach should you learn first?
+
+- Pick **DP** if you want the foundational approach and clearer logic.
+- Pick **Binary Search** if you want optimal complexity and algorithmic sophistication.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Clearer Logic</div>
+    <div class="lc-approach-quick__name">DP</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Optimal Complexity</div>
+    <div class="lc-approach-quick__name">Binary Search</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Dynamic Programming O(n²)
+
+<ApproachTag tag="recommended" />
+
+dp[i] = length of the longest increasing subsequence ending at index i.
+
+For each i, check all previous indices j where nums[j] < nums[i], and extend the best LIS found.
+
+<ComplexityBadges time="O(n²)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Nested loops" spaceNote="DP array" />
+
+### Pseudocode
+
+```plaintext
+function lisDP(nums):
+    n = len(nums)
+    dp = array of size n, all initialized to 1
+    
+    for i from 1 to n - 1:
+        for j from 0 to i - 1:
+            if nums[j] < nums[i]:
+                dp[i] = max(dp[i], dp[j] + 1)
+    
+    return max(dp)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDP} lang="python" title="longest_increasing_subsequence_dp_n2.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDP} lang="cpp" title="lis_dp_n2.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDP} lang="java" title="LIsDpN2.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDP} lang="javascript" title="lis_dp_n2.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDP} lang="rust" title="lis_dp_n2.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDP} lang="go" title="lis_dp_n2.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Binary Search O(n log n)
+
+<ApproachTag tag="interview" />
+
+Maintain a `tails` array where `tails[i]` is the smallest tail element of all LIS of length i+1.
+
+For each number, use binary search to find its position in `tails`. If the position is at the end, we extend the longest LIS; otherwise, we update the tail to possibly get a better LIS.
+
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Binary search per element" spaceNote="Tails array" />
+
+### Key Insight
+
+The tails array maintains the invariant that tails is strictly increasing and sorted. At any point, tails[i] contains the smallest possible tail value for an LIS of length i+1. This allows us to use binary search to efficiently find where a new number fits.
+
+### Pseudocode
+
+```plaintext
+function lisBinarySearch(nums):
+    tails = empty array
+    
+    for num in nums:
+        pos = binary_search_left(tails, num)
+        if pos == len(tails):
+            tails.append(num)
+        else:
+            tails[pos] = num
+    
+    return len(tails)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBS} lang="python" title="longest_increasing_subsequence_bs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBS} lang="cpp" title="lis_binary_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBS} lang="java" title="LIsBinarySearch.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBS} lang="javascript" title="lis_binary_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBS} lang="rust" title="lis_binary_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBS} lang="go" title="lis_binary_search.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Confusing "subsequence" (non-contiguous, order-preserving) with "subarray" (contiguous).
+- Initializing dp array to 0 instead of 1 (every element is a LIS of length 1).
+- In binary search approach, using the wrong comparison or update logic.
+- Forgetting that binary search requires the tails array to remain strictly increasing.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="longest_increasing_subsequence_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="longest_increasing_subsequence_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="LongestIncreasingSubsequenceSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="longest_increasing_subsequence_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="longest_increasing_subsequence_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="longest_increasing_subsequence_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 674, title: 'Longest Continuous Increasing Subsequence', difficulty: 'Easy', leetcodeSlug: 'longest-continuous-increasing-subsequence' },
+  { number: 1143, title: 'Longest Common Subsequence', difficulty: 'Medium', leetcodeSlug: 'longest-common-subsequence' },
+  { number: 354, title: 'Russian Doll Envelopes', difficulty: 'Hard', leetcodeSlug: 'russian-doll-envelopes' },
+  { number: 198, title: 'House Robber', difficulty: 'Medium', slug: 'problems/house-robber', leetcodeSlug: 'house-robber' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **DP simplicity vs Binary Search efficiency:** DP is easier to code but slower. Binary Search is faster but requires understanding of the tails invariant.
+- **Reconstructing the actual subsequence:** Both approaches can be modified to track the actual indices. The DP version is slightly easier.
+- **Why binary search works:** The tails array maintains a sorted, strictly increasing sequence. Inserting a smaller value at a position doesn't break the invariant.
+- **Space optimization:** Both use O(n) space. DP stores the full state; binary search stores minimal necessary information.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 299, title: "Bulls and Cows", slug: "bulls-and-cows" }}
+  nextProblem={{ number: 301, title: "Remove Invalid Parentheses", slug: "remove-invalid-parentheses" }}
+/>

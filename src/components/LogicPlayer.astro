@@ -1,0 +1,71 @@
+---
+interface StepItem {
+  label: string;
+  state?: 'default' | 'active' | 'match';
+  index?: number;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  target?: string;
+  steps: {
+    title: string;
+    note: string;
+    formula?: string;
+    callout?: string;
+    items?: StepItem[];
+    memory?: string[];
+  }[];
+}
+
+const { title, description, target, steps } = Astro.props;
+const playerId = `lc-player-${Math.random().toString(36).slice(2, 10)}`;
+---
+
+<section class="lc-logic-player" id={playerId} data-logic-player data-steps={JSON.stringify(steps)}>
+  <div class="lc-logic-player__header">
+    <div>
+      <p class="lc-logic-player__eyebrow">Animated walkthrough</p>
+      <div class="lc-logic-player__title">{title}</div>
+      {description && <p class="lc-logic-player__description">{description}</p>}
+    </div>
+    <div class="lc-logic-player__controls">
+      <button type="button" data-action="prev" class="lc-logic-player__button">Back</button>
+      <button type="button" data-action="play" class="lc-logic-player__button lc-logic-player__button--ghost">Autoplay</button>
+      <button type="button" data-action="next" class="lc-logic-player__button lc-logic-player__button--primary">Next</button>
+      <button type="button" data-action="reset" class="lc-logic-player__button">Reset</button>
+    </div>
+  </div>
+
+  <div class="lc-logic-player__meta">
+    <div class="lc-logic-player__meta-row">
+      <span class="lc-logic-player__step-count">Step <span data-current-step>1</span> of {steps.length}</span>
+      {target && <span class="lc-logic-player__target">Target: {target}</span>}
+    </div>
+    <div class="lc-logic-player__progress" aria-hidden="true">
+      <span data-progress-bar></span>
+    </div>
+  </div>
+
+  <div class="lc-logic-player__formula" data-formula>
+    Waiting to begin...
+  </div>
+
+  <div class="lc-logic-player__panel">
+    <div>
+      <div class="lc-logic-player__panel-label">Array state</div>
+      <div class="lc-logic-player__items" data-items></div>
+    </div>
+    <div>
+      <div class="lc-logic-player__panel-label">Memory / lookup state</div>
+      <div class="lc-logic-player__memory" data-memory></div>
+    </div>
+  </div>
+
+  <div class="lc-logic-player__note">
+    <strong data-step-title></strong>
+    <p data-step-note></p>
+    <p class="lc-logic-player__callout" data-step-callout></p>
+  </div>
+</section>

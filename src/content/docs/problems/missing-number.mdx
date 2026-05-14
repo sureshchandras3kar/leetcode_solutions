@@ -1,0 +1,308 @@
+---
+title: Missing Number
+description: Find the missing value from 0 to n. Two approaches — hash set O(n)/O(n) and Gauss sum formula O(n)/O(1) — in six languages.
+leetcodeNumber: 268
+difficulty: Easy
+leetcodeSlug: missing-number
+tags: [Array, Hash Table, Math]
+prev:
+  label: "#242 Valid Anagram"
+  link: "../valid-anagram/"
+next:
+  label: "#290 Word Pattern"
+  link: "../word-pattern/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySet    from '@solutions/Python/missing_number_hash_set.py?raw';
+import cppSet   from '@solutions/C++/missing_number_hash_set.cpp?raw';
+import javaSet  from '@solutions/Java/missing_number_hash_set.java?raw';
+import jsSet    from '@solutions/JavaScript/missing_number_hash_set.js?raw';
+import rustSet  from '@solutions/Rust/missing_number_hash_set.rs?raw';
+import goSet    from '@solutions/Golang/missing_number_hash_set.go?raw';
+import pySpaceOptimized from '@solutions/Python/missing_number_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/missing_number_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/MissingNumberSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/missing_number_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/missing_number_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/missing_number_space_optimized.go?raw';
+
+import pyMath   from '@solutions/Python/missing_number_math.py?raw';
+import cppMath  from '@solutions/C++/missing_number_math.cpp?raw';
+import javaMath from '@solutions/Java/missing_number_math.java?raw';
+import jsMath   from '@solutions/JavaScript/missing_number_math.js?raw';
+import rustMath from '@solutions/Rust/missing_number_math.rs?raw';
+import goMath   from '@solutions/Golang/missing_number_math.go?raw';
+
+## Problem Statement
+
+Given an array `nums` containing `n` distinct numbers in the range `[0, n]`, return the **only number** in that range that is missing from the array.
+
+<Aside type="tip" title="What to notice first">
+- The array has exactly `n` elements but covers a range of `n+1` values (0 through n), so exactly one is missing.
+- The Gauss sum formula computes the expected total for 0..n in one line — subtract the actual sum and the difference is the missing number.
+- Distinct elements are guaranteed, so no duplicates complicate the count.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[3, 0, 1]` | `2` | Range 0–3, `2` is missing |
+| `[0, 1]` | `2` | Range 0–2, `2` is missing |
+| `[9,6,4,2,3,5,7,0,1]` | `8` | Range 0–9, `8` is missing |
+
+## Constraints
+
+- `n == nums.length`
+- `1 <= n <= 10^4`
+- `0 <= nums[i] <= n`
+- All numbers in `nums` are unique.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Sequence gap detection** — find the missing invoice number in an accounting sequence.
+- **Packet loss detection** — given a list of received packet sequence numbers, identify which one was dropped.
+- **Employee ID audit** — confirm which ID in a contiguous range was never assigned.
+- **Memory address validation** — check that all expected memory page indices are accounted for.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Hash Set | O(n) | O(n) | Quick to write and easy to understand |
+| Gauss Sum | O(n) | O(1) | Memory is constrained; elegant one-liner |
+
+## Which approach should you learn first?
+
+- Learn **Gauss Sum** first — it demonstrates a beautiful mathematical insight and is O(1) space.
+- Use **Hash Set** as a fallback if you forget the formula; it is correct and the same time complexity.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Elegant &amp; Optimal</div>
+    <div class="lc-approach-quick__name">Gauss Sum</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Easy to Remember</div>
+    <div class="lc-approach-quick__name">Hash Set</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Gauss Sum (Math)
+
+<ApproachTag tag="recommended" />
+
+The sum of all integers from 0 to n is given by the Gauss formula: `n * (n + 1) / 2`. Subtract the actual sum of `nums` from this expected total. The difference is precisely the missing number.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="One pass to sum" spaceNote="Two integer variables" />
+
+### Step-by-step Example
+
+**Input:** `[3, 0, 1]`, n = 3
+
+| Step | Calculation | Value |
+| --- | --- | --- |
+| Expected sum (0+1+2+3) | 3 × 4 / 2 | `6` |
+| Actual sum (3+0+1) | 3 + 0 + 1 | `4` |
+| Missing | 6 − 4 | **`2`** |
+
+<LogicPlayer
+  title="How the Gauss formula pinpoints the missing number"
+  description="Use Next or Autoplay to see the expected total computed, the actual sum accumulated, and the difference revealed."
+  steps={[
+    {
+      title: 'n = 3 → expected sum = 3 × 4 / 2 = 6',
+      note: 'Gauss tells us the complete range 0..3 should sum to 6. This is our target.',
+      formula: 'expected = n × (n + 1) / 2 = 6',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '0', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['expected: 6'],
+    },
+    {
+      title: 'Sum all elements in nums',
+      note: 'Add up everything in the array: 3 + 0 + 1 = 4.',
+      formula: 'actual = sum(nums) = 3 + 0 + 1 = 4',
+      items: [
+        { label: '3', state: 'active', index: 0 },
+        { label: '0', state: 'active', index: 1 },
+        { label: '1', state: 'active', index: 2 },
+      ],
+      memory: ['expected: 6', 'actual: 4'],
+    },
+    {
+      title: 'missing = expected − actual = 6 − 4 = 2',
+      note: 'The gap between the expected complete sum and the actual sum is the missing number.',
+      formula: 'missing = 6 − 4 = 2',
+      callout: 'Because all numbers are distinct and exactly one is missing, this arithmetic always gives the right answer.',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '0', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['expected: 6', 'actual: 4', 'missing: 2 ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function missingNumber(nums):
+    n = len(nums)
+    expected = n * (n + 1) / 2
+    return expected - sum(nums)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyMath} lang="python" title="missing_number_math.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppMath} lang="cpp" title="missing_number_math.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaMath} lang="java" title="missing_number_math.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsMath} lang="javascript" title="missing_number_math.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustMath} lang="rust" title="missing_number_math.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goMath} lang="go" title="missing_number_math.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Hash Set
+
+<ApproachTag tag="simple" />
+
+Build a set from `nums`, then iterate 0 through n and return the first value that is not in the set.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Two passes" spaceNote="Set stores n elements" />
+
+### Step-by-step Example
+
+**Input:** `[3, 0, 1]`
+
+| Check | In set? |
+| --- | --- |
+| 0 | Yes |
+| 1 | Yes |
+| 2 | **No → return `2`** |
+
+### Pseudocode
+
+```plaintext
+function missingNumber(nums):
+    seen = set(nums)
+    for value in range(len(nums) + 1):
+        if value not in seen:
+            return value
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySet} lang="python" title="missing_number_hash_set.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSet} lang="cpp" title="missing_number_hash_set.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSet} lang="java" title="missing_number_hash_set.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSet} lang="javascript" title="missing_number_hash_set.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSet} lang="rust" title="missing_number_hash_set.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSet} lang="go" title="missing_number_hash_set.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Integer overflow: for very large n, `n * (n + 1)` can overflow a 32-bit integer in C++ and Java — use `long` or `long long`.
+- The hash set approach adds O(n) space; the sum approach uses only two variables.
+- XOR is another O(n)/O(1) approach: XOR every index 0..n with every element — the missing value remains. Worth mentioning as a bonus.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="missing_number_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="missing_number_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="MissingNumberSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="missing_number_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="missing_number_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="missing_number_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum' },
+  { number: 217, title: 'Contains Duplicate', difficulty: 'Easy', slug: 'problems/contains-duplicate' },
+  { number: 41, title: 'First Missing Positive', difficulty: 'Hard', leetcodeSlug: 'first-missing-positive' },
+  { number: 287, title: 'Find the Duplicate Number', difficulty: 'Medium', leetcodeSlug: 'find-the-duplicate-number' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why Gauss sum?** It is O(1) space and a single arithmetic expression — demonstrates mathematical thinking.
+- **XOR alternative:** XOR every index 0..n with every element. Pairs cancel; the missing number is left. Equally O(1) space — worth knowing for a follow-up.
+- **Edge cases:** `n = 1` with `[0]` → missing is 1; `[1]` → missing is 0. Both formulas handle these correctly.
+- **Overflow:** always mention the 32-bit overflow risk for `n × (n+1)` when n is near 10^4.
+
+
+<PrevNextNav
+  prevProblem={ number: 242, title: "Valid Anagram", slug: "valid-anagram" }
+  nextProblem={ number: 290, title: "Word Pattern", slug: "word-pattern" }
+/></Aside>
