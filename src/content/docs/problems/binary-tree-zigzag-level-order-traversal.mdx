@@ -54,6 +54,15 @@ Given the `root` of a binary tree, return the zigzag level order traversal of it
 - The number of nodes in the tree is in the range `[0, 2000]`.
 - `-1000 <= Node.val <= 1000`
 
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- File system hierarchies and directory structures
+- DOM tree manipulation in web browsers
+- XML/JSON parsing and configuration management
+- Organizational hierarchies and permission trees
+</Aside>
+
 ## Complexity Comparison
 
 | Approach | Time | Space |
@@ -159,5 +168,19 @@ function approach3():
     <Code code={gobfs_iterative} lang="go" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.go" />
   </TabItem>
 </Tabs>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- Time vs. space trade-offs between approaches
+- Handling edge cases (empty inputs, single elements, duplicates)
+- Optimization opportunities and when they matter
+- Follow-up variations and constraint changes
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>
 
 

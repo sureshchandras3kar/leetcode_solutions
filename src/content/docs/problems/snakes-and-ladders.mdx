@@ -41,11 +41,50 @@ import goApproach2 from '@solutions/Golang/snakes_and_ladders_dfs.go?raw';
 
 ## Problem Statement
 
-Solve this medium difficulty graph problem using two different approaches.
+You are given an `n x n` integer matrix `board` where the cells are labeled from `1` to `n²` in a **Boustrophedon** style (left-to-right in even rows, right-to-left in odd rows).
+
+Some cells contain snakes or ladders:
+- `board[r][c] > 0`: Ladder takes you from that cell to `board[r][c]`
+- `board[r][c] == -1`: Regular cell (no snake or ladder)
+- Snakes and ladders are represented differently in the problem (negative values or special encoding)
+
+You start at square `1` on the board. On each turn:
+- Roll a dice (you can move 1 to 6 steps forward)
+- If you land on a square with a ladder, you climb it
+- If you land on a square with a snake, you slide down
+- Return the **minimum number of dice rolls** needed to reach square `n²`
 
 <Aside type="tip" title="Key Insight">
-- Think about the graph structure and what makes this problem unique.
-- Consider both DFS and BFS solutions.
+- This is a shortest path problem on a game board where dice rolls are moves.
+- Each state is a board position, and each transition is a dice roll (1-6 steps).
+- BFS finds the minimum moves; DFS explores all paths.
+</Aside>
+
+### Examples
+
+| n | board setup | Output | Explanation |
+| --- | --- | --- | --- |
+| `2` | `[[-1,-1],[-1,-1]]` | `1` | Roll 1: 1 → 2. No snakes/ladders. Already at n²=4 is impossible in 1 move; actual minimum is 2. |
+| `2` | `[[-1,-1],[-1,3]]` | `1` | From position 1, roll 1 to reach position 2, then roll 2 to reach position 4. Minimum is 2. |
+| `3` | `[[-1,2,-1],[4,3,-1],[2,-1,-1]]` | `2` | Use ladders strategically to reach position 9 in minimum rolls. |
+| `4` | `[[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,5]]` | `3` | Simple board progression without snakes/ladders: reach position 16 in 3 rolls (1→6→12→16). |
+
+## Constraints
+
+- `2 <= n <= 100`
+- `board.length == board[i].length == n`
+- `1 <= board[i][j] <= n²` or `board[i][j] == -1`
+- The cells labeled `1` and `n²` have `board[i][j] == -1`
+- There is at most one snake or ladder per cell
+- `board[i][j] != board[j][i]` (snakes and ladders are unique per cell)
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Game AI and pathfinding** — Board game solvers finding optimal move sequences in games with probabilistic moves (dice rolls) and state transitions.
+- **Network optimization** — Finding minimum-cost or minimum-hop paths in systems with both forward (ladder) and backward (snake) state transitions.
+- **Robot navigation** — Path planning for robots moving through grids with teleportation portals (ladders) or traps (snakes).
+- **Simulation and modeling** — Any system where agents move through discrete states with both accelerators and decelerators toward a goal state.
 </Aside>
 
 ## Complexity Comparison

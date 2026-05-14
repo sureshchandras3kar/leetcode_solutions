@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyTwoPtr   from '@solutions/Python/valid_palindrome_two_pointer.py?raw';
 import cppTwoPtr  from '@solutions/C++/valid_palindrome_two_pointer.cpp?raw';
@@ -305,4 +306,9 @@ function approach3():
 - Clarify "alphanumeric" immediately — it includes digits, not just letters.
 - Lead with the two-pointer approach (O(1) space) — it is the expected answer in most interviews.
 - The clean-then-check approach is fine as a first step to understand the problem before optimizing to O(1) space.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 124, title: "Binary Tree Maximum Path Sum", slug: "binary-tree-maximum-path-sum" }
+  nextProblem={ number: 127, title: "Word Ladder", slug: "word-ladder" }
+/></Aside>

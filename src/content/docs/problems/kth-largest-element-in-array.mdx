@@ -19,6 +19,27 @@ import ApproachTag from '../../../components/ApproachTag.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
 import PrevNextNav from '../../../components/PrevNextNav.astro';
 
+import pyBruteForce     from '@solutions/Python/kth_largest_element_in_array_brute_force.py?raw';
+import cppBruteForce    from '@solutions/C++/kth_largest_element_in_array_brute_force.cpp?raw';
+import javaBruteForce   from '@solutions/Java/kth_largest_element_in_array_brute_force.java?raw';
+import jsBruteForce     from '@solutions/JavaScript/kth_largest_element_in_array_brute_force.js?raw';
+import rustBruteForce   from '@solutions/Rust/kth_largest_element_in_array_brute_force.rs?raw';
+import goBruteForce     from '@solutions/Golang/kth_largest_element_in_array_brute_force.go?raw';
+
+import pyMinHeap     from '@solutions/Python/kth_largest_element_in_array_min_heap.py?raw';
+import cppMinHeap    from '@solutions/C++/kth_largest_element_in_array_min_heap.cpp?raw';
+import javaMinHeap   from '@solutions/Java/kth_largest_element_in_array_min_heap.java?raw';
+import jsMinHeap     from '@solutions/JavaScript/kth_largest_element_in_array_min_heap.js?raw';
+import rustMinHeap   from '@solutions/Rust/kth_largest_element_in_array_min_heap.rs?raw';
+import goMinHeap     from '@solutions/Golang/kth_largest_element_in_array_min_heap.go?raw';
+
+import pyQuickSelect     from '@solutions/Python/kth_largest_element_in_array_quickselect.py?raw';
+import cppQuickSelect    from '@solutions/C++/kth_largest_element_in_array_quickselect.cpp?raw';
+import javaQuickSelect   from '@solutions/Java/kth_largest_element_in_array_quickselect.java?raw';
+import jsQuickSelect     from '@solutions/JavaScript/kth_largest_element_in_array_quickselect.js?raw';
+import rustQuickSelect   from '@solutions/Rust/kth_largest_element_in_array_quickselect.rs?raw';
+import goQuickSelect     from '@solutions/Golang/kth_largest_element_in_array_quickselect.go?raw';
+
 ## Problem Statement
 
 ### LeetCode #215 - Kth Largest Element in Array
@@ -57,159 +78,124 @@ Solve this classic coding interview problem efficiently using multiple approache
 
 | Approach | Time | Space | Best When |
 | --- | --- | --- | --- |
-| Approach 1 | O(n) | O(1) or O(n) | General case |
-| Approach 2 | O(n log n) | O(n) | Alternative |
-| Approach 3 | O(n²) | O(1) | Educational |
+| Min Heap | O(n log k) | O(k) | Most cases — k is small |
+| QuickSelect | O(n) | O(1) | Average case optimal |
+| Brute Force (Sort) | O(n log n) | O(1) | Learning or small arrays |
 
 ## Which approach should you learn first?
 
-- Pick **Approach 1** if you want the optimal solution.
-- Pick **Approach 3** if you are learning the fundamentals.
-- Pick **Approach 2** for interview preparation.
+- Pick **Min Heap** for a balanced, interview-ready solution.
+- Pick **QuickSelect** if you want the theoretical average case optimal solution.
+- Pick **Brute Force** if you are learning the problem from scratch.
 
 <div class="lc-approach-quick">
   <div class="lc-approach-quick__card lc-approach-quick__card--best">
-    <div class="lc-approach-quick__label">Recommended</div>
-    <div class="lc-approach-quick__name">Approach 1</div>
-    <div class="lc-approach-quick__stats">O(n) time · Minimal space</div>
+    <div class="lc-approach-quick__label">Best For Most Cases</div>
+    <div class="lc-approach-quick__name">Min Heap</div>
+    <div class="lc-approach-quick__stats">O(n log k) time &middot; O(k) space</div>
   </div>
   <div class="lc-approach-quick__card">
-    <div class="lc-approach-quick__label">Alternative</div>
-    <div class="lc-approach-quick__name">Approach 2</div>
-    <div class="lc-approach-quick__stats">O(n log n) time · More space</div>
+    <div class="lc-approach-quick__label">Optimal Average Case</div>
+    <div class="lc-approach-quick__name">QuickSelect</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
   </div>
   <div class="lc-approach-quick__card">
-    <div class="lc-approach-quick__label">Learning</div>
-    <div class="lc-approach-quick__name">Approach 3</div>
-    <div class="lc-approach-quick__stats">O(n²) time · No extra space</div>
+    <div class="lc-approach-quick__label">Simple to Learn</div>
+    <div class="lc-approach-quick__name">Brute Force</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(1) space</div>
   </div>
 </div>
 
-## Approach 1: Optimal Strategy
+## Approach 1: Min Heap (Recommended)
 
 <ApproachTag tag="recommended" />
 
-Core algorithm explanation goes here.
+Maintain a min heap of size k containing the k largest elements. Iterate through the array and keep only the k largest elements in the heap. The root of the heap is the kth largest.
 
-<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Constant" />
-
-### Step-by-step Example
-
-**Input:** `[example input]`
-
-Detailed walkthrough of the algorithm with state changes.
-
-### Pseudocode
-
-```plaintext
-function solve(input):
-    // Algorithm implementation
-    return result
-```
+<ComplexityBadges time="O(n log k)" space="O(k)" timeColor="green" spaceColor="yellow" timeNote="n iterations, each O(log k)" spaceNote="Heap of k elements" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve(arr):
-    # Implementation here
-    pass
-    `}
+    <Code code={pyMinHeap} lang="python" title="kth_largest_element_in_array_min_heap.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solve(vector<int>& arr) {
-        // Implementation here
-        return 0;
-    }
-};
-    `}
+    <Code code={cppMinHeap} lang="cpp" title="kth_largest_element_in_array_min_heap.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solve(int[] arr) {
-        // Implementation here
-        return 0;
-    }
-}
-    `}
+    <Code code={javaMinHeap} lang="java" title="kth_largest_element_in_array_min_heap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsMinHeap} lang="javascript" title="kth_largest_element_in_array_min_heap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustMinHeap} lang="rust" title="kth_largest_element_in_array_min_heap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goMinHeap} lang="go" title="kth_largest_element_in_array_min_heap.go" />
   </TabItem>
 </Tabs>
 
-## Approach 2: Alternative Method
+## Approach 2: QuickSelect
 
 <ApproachTag tag="interview" />
 
-Alternative approach explanation.
+Use the QuickSelect algorithm (based on QuickSort partition) to find the kth largest element without fully sorting. Average time is O(n).
 
-<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Processing" spaceNote="Working space" />
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Average case" spaceNote="Constant" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve_alt(arr):
-    # Alternative implementation
-    pass
-    `}
+    <Code code={pyQuickSelect} lang="python" title="kth_largest_element_in_array_quickselect.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solveAlt(vector<int>& arr) {
-        // Alternative implementation
-        return 0;
-    }
-};
-    `}
+    <Code code={cppQuickSelect} lang="cpp" title="kth_largest_element_in_array_quickselect.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solveAlt(int[] arr) {
-        // Alternative implementation
-        return 0;
-    }
-}
-    `}
+    <Code code={javaQuickSelect} lang="java" title="kth_largest_element_in_array_quickselect.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsQuickSelect} lang="javascript" title="kth_largest_element_in_array_quickselect.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustQuickSelect} lang="rust" title="kth_largest_element_in_array_quickselect.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goQuickSelect} lang="go" title="kth_largest_element_in_array_quickselect.go" />
   </TabItem>
 </Tabs>
 
-## Approach 3: Brute Force
+## Approach 3: Brute Force (Sort)
 
 <ApproachTag tag="simple" />
 
-Straightforward approach for learning purposes.
+Sort the array in descending order and return the element at index k-1. Simple and straightforward for learning.
 
-<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="Exhaustive" spaceColor="Minimal" />
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Sorting dominant" spaceNote="Constant" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve_brute(arr):
-    # Brute force implementation
-    pass
-    `}
+    <Code code={pyBruteForce} lang="python" title="kth_largest_element_in_array_brute_force.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solveBrute(vector<int>& arr) {
-        // Brute force implementation
-        return 0;
-    }
-};
-    `}
+    <Code code={cppBruteForce} lang="cpp" title="kth_largest_element_in_array_brute_force.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solveBrute(int[] arr) {
-        // Brute force implementation
-        return 0;
-    }
-}
-    `}
+    <Code code={javaBruteForce} lang="java" title="kth_largest_element_in_array_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBruteForce} lang="javascript" title="kth_largest_element_in_array_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBruteForce} lang="rust" title="kth_largest_element_in_array_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBruteForce} lang="go" title="kth_largest_element_in_array_brute_force.go" />
   </TabItem>
 </Tabs>
 

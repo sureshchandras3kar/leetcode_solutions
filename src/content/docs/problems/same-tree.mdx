@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyDFS    from '@solutions/Python/same_tree_dfs.py?raw';
 import cppDFS   from '@solutions/C++/same_tree_dfs.cpp?raw';
@@ -339,4 +340,9 @@ function approach3():
 - **Null nodes matter:** In some problems, two null nodes are considered "the same." Here they explicitly are — be clear on this.
 - **Follow-up:** "How would you modify this to check if p is a subtree of q?" (Problem #572) — great discussion point.
 - **Tree validation:** This pattern is foundational for tree comparison, cloning verification, and DOM reconciliation in frameworks.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 98, title: "Validate Binary Search Tree", slug: "validate-binary-search-tree" }
+  nextProblem={ number: 101, title: "Symmetric Tree", slug: "symmetric-tree" }
+/></Aside>

@@ -71,6 +71,15 @@ Calling hasNext() will return whether there are any more elements in the iterato
 - `next()` and `hasNext()` should run in O(1) amortized and O(1) time respectively.
 - The total number of calls to `next()` is not more than the number of nodes.
 
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Expression evaluation and parsing
+- Browser back button and navigation stack
+- Function call stack and recursion
+- Bracket matching in compilers
+</Aside>
+
 ## Complexity Comparison
 
 | Approach | Time: next() | Space | Best When |
@@ -184,3 +193,17 @@ function approach3():
   { number: 143, title: 'Reorder List', difficulty: 'Medium', leetcodeSlug: 'reorder-list' },
   { number: 270, title: 'Closest Binary Search Tree Value', difficulty: 'Easy', leetcodeSlug: 'closest-binary-search-tree-value' },
 ]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- Time vs. space trade-offs between approaches
+- Handling edge cases (empty inputs, single elements, duplicates)
+- Optimization opportunities and when they matter
+- Follow-up variations and constraint changes
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyTwoPtr    from '@solutions/Python/trapping_rain_water_two_pointer.py?raw';
 import cppTwoPtr   from '@solutions/C++/trapping_rain_water_two_pointer.cpp?raw';
@@ -416,4 +417,9 @@ function trap(height):
 - **Then present two pointers** as the O(1) space optimization — explain the "bottleneck" reasoning: "if max_left is smaller, it doesn't matter how tall the right wall is"
 - **The stack approach impresses** but is harder to explain — save it as a bonus if asked for alternatives
 - **The hardest interview question:** "Prove two pointers never misses a position" → each position is processed exactly once from whichever side has the smaller max; we never skip a position, we only skip computing it from the wrong side
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 41, title: "First Missing Positive", slug: "first-missing-positive" }
+  nextProblem={ number: 45, title: "Jump Game II", slug: "jump-game-ii" }
+/></Aside>

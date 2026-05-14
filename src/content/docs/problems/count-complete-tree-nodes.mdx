@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyLevel    from '@solutions/Python/count_complete_tree_nodes_level_calculation.py?raw';
 import cppLevel   from '@solutions/C++/count_complete_tree_nodes_level_calculation.cpp?raw';
@@ -63,6 +64,15 @@ A complete binary tree is a binary tree in which every level, except possibly th
 
 - The number of nodes is in the range `[1, 5 * 10^4]`.
 - `0 <= Node.val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- File system hierarchies and directory structures
+- DOM tree manipulation in web browsers
+- XML/JSON parsing and configuration management
+- Organizational hierarchies and permission trees
+</Aside>
 
 ## Complexity Comparison
 
@@ -200,4 +210,9 @@ function approach3():
 - **Level Calculation:** Simpler logic, uses perfect subtree formula directly.
 - **Binary Search:** More complex but searches for actual position; demonstrates binary search skill.
 - **Complete Tree Property:** Key insight is that checking left/right heights determines subtree structure.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 221, title: "Maximal Square", slug: "maximal-square" }
+  nextProblem={ number: 224, title: "Basic Calculator", slug: "basic-calculator" }
+/></Aside>

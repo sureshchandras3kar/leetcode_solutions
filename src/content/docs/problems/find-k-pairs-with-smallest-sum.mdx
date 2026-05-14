@@ -19,6 +19,27 @@ import ApproachTag from '../../../components/ApproachTag.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
 import PrevNextNav from '../../../components/PrevNextNav.astro';
 
+import pyBruteForce     from '@solutions/Python/find_k_pairs_with_smallest_sum_brute_force.py?raw';
+import cppBruteForce    from '@solutions/C++/find_k_pairs_with_smallest_sum_brute_force.cpp?raw';
+import javaBruteForce   from '@solutions/Java/find_k_pairs_with_smallest_sum_brute_force.java?raw';
+import jsBruteForce     from '@solutions/JavaScript/find_k_pairs_with_smallest_sum_brute_force.js?raw';
+import rustBruteForce   from '@solutions/Rust/find_k_pairs_with_smallest_sum_brute_force.rs?raw';
+import goBruteForce     from '@solutions/Golang/find_k_pairs_with_smallest_sum_brute_force.go?raw';
+
+import pyMinHeap     from '@solutions/Python/find_k_pairs_with_smallest_sum_min_heap.py?raw';
+import cppMinHeap    from '@solutions/C++/find_k_pairs_with_smallest_sum_min_heap.cpp?raw';
+import javaMinHeap   from '@solutions/Java/find_k_pairs_with_smallest_sum_min_heap.java?raw';
+import jsMinHeap     from '@solutions/JavaScript/find_k_pairs_with_smallest_sum_min_heap.js?raw';
+import rustMinHeap   from '@solutions/Rust/find_k_pairs_with_smallest_sum_min_heap.rs?raw';
+import goMinHeap     from '@solutions/Golang/find_k_pairs_with_smallest_sum_min_heap.go?raw';
+
+import pyTwoPointer     from '@solutions/Python/find_k_pairs_with_smallest_sum_two_pointer.py?raw';
+import cppTwoPointer    from '@solutions/C++/find_k_pairs_with_smallest_sum_two_pointer.cpp?raw';
+import javaTwoPointer   from '@solutions/Java/find_k_pairs_with_smallest_sum_two_pointer.java?raw';
+import jsTwoPointer     from '@solutions/JavaScript/find_k_pairs_with_smallest_sum_two_pointer.js?raw';
+import rustTwoPointer   from '@solutions/Rust/find_k_pairs_with_smallest_sum_two_pointer.rs?raw';
+import goTwoPointer     from '@solutions/Golang/find_k_pairs_with_smallest_sum_two_pointer.go?raw';
+
 ## Problem Statement
 
 ### LeetCode #373 - Find K Pairs with Smallest Sums
@@ -83,93 +104,65 @@ Solve this classic coding interview problem efficiently using multiple approache
   </div>
 </div>
 
-## Approach 1: Optimal Strategy
+## Approach 1: Min Heap (Recommended)
 
 <ApproachTag tag="recommended" />
 
-Core algorithm explanation goes here.
+Use a min heap to efficiently track the k smallest pairs. Start with the pair (nums1[0], nums2[0]) and explore neighboring pairs in increasing order.
 
-<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Constant" />
-
-### Step-by-step Example
-
-**Input:** `[example input]`
-
-Detailed walkthrough of the algorithm with state changes.
-
-### Pseudocode
-
-```plaintext
-function solve(input):
-    // Algorithm implementation
-    return result
-```
+<ComplexityBadges time="O(k log n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="k iterations" spaceNote="Heap storage" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve(arr):
-    # Implementation here
-    pass
-    `}
+    <Code code={pyMinHeap} lang="python" title="find_k_pairs_with_smallest_sum_min_heap.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solve(vector<int>& arr) {
-        // Implementation here
-        return 0;
-    }
-};
-    `}
+    <Code code={cppMinHeap} lang="cpp" title="find_k_pairs_with_smallest_sum_min_heap.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solve(int[] arr) {
-        // Implementation here
-        return 0;
-    }
-}
-    `}
+    <Code code={javaMinHeap} lang="java" title="find_k_pairs_with_smallest_sum_min_heap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsMinHeap} lang="javascript" title="find_k_pairs_with_smallest_sum_min_heap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustMinHeap} lang="rust" title="find_k_pairs_with_smallest_sum_min_heap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goMinHeap} lang="go" title="find_k_pairs_with_smallest_sum_min_heap.go" />
   </TabItem>
 </Tabs>
 
-## Approach 2: Alternative Method
+## Approach 2: Two-Pointer
 
 <ApproachTag tag="interview" />
 
-Alternative approach explanation.
+Place one pointer at the end of the first array and one at the beginning of the second array. Adjust pointers based on the pair sum.
 
-<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Processing" spaceNote="Working space" />
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Pointer movement" spaceNote="No extra space" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve_alt(arr):
-    # Alternative implementation
-    pass
-    `}
+    <Code code={pyTwoPointer} lang="python" title="find_k_pairs_with_smallest_sum_two_pointer.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solveAlt(vector<int>& arr) {
-        // Alternative implementation
-        return 0;
-    }
-};
-    `}
+    <Code code={cppTwoPointer} lang="cpp" title="find_k_pairs_with_smallest_sum_two_pointer.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solveAlt(int[] arr) {
-        // Alternative implementation
-        return 0;
-    }
-}
-    `}
+    <Code code={javaTwoPointer} lang="java" title="find_k_pairs_with_smallest_sum_two_pointer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPointer} lang="javascript" title="find_k_pairs_with_smallest_sum_two_pointer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPointer} lang="rust" title="find_k_pairs_with_smallest_sum_two_pointer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPointer} lang="go" title="find_k_pairs_with_smallest_sum_two_pointer.go" />
   </TabItem>
 </Tabs>
 
@@ -177,37 +170,30 @@ public:
 
 <ApproachTag tag="simple" />
 
-Straightforward approach for learning purposes.
+Generate all possible pairs and sort them by sum. Return the first k pairs.
 
-<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="Exhaustive" spaceColor="Minimal" />
+<ComplexityBadges time="O(n² log n)" space="O(n²)" timeColor="red" spaceColor="red" timeNote="All pairs" spaceNote="All pairs stored" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve_brute(arr):
-    # Brute force implementation
-    pass
-    `}
+    <Code code={pyBruteForce} lang="python" title="find_k_pairs_with_smallest_sum_brute_force.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solveBrute(vector<int>& arr) {
-        // Brute force implementation
-        return 0;
-    }
-};
-    `}
+    <Code code={cppBruteForce} lang="cpp" title="find_k_pairs_with_smallest_sum_brute_force.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solveBrute(int[] arr) {
-        // Brute force implementation
-        return 0;
-    }
-}
-    `}
+    <Code code={javaBruteForce} lang="java" title="find_k_pairs_with_smallest_sum_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBruteForce} lang="javascript" title="find_k_pairs_with_smallest_sum_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBruteForce} lang="rust" title="find_k_pairs_with_smallest_sum_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBruteForce} lang="go" title="find_k_pairs_with_smallest_sum_brute_force.go" />
   </TabItem>
 </Tabs>
 

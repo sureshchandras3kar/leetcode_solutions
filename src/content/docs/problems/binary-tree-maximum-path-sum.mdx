@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyPost    from '@solutions/Python/binary_tree_maximum_path_sum_postorder_dfs.py?raw';
 import cppPost   from '@solutions/C++/binary_tree_maximum_path_sum_postorder_dfs.cpp?raw';
@@ -62,6 +63,15 @@ The path sum of a path is the sum of the node's values in the path. Return the m
 
 - The number of nodes is in the range `[1, 3000]`.
 - `-1000 <= Node.val <= 1000`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- File system hierarchies and directory structures
+- DOM tree manipulation in web browsers
+- XML/JSON parsing and configuration management
+- Organizational hierarchies and permission trees
+</Aside>
 
 ## Complexity Comparison
 
@@ -184,4 +194,9 @@ function approach3():
 - **Negative handling:** Reject negative contributions with max(0, gain).
 - **Path bending:** Only possible at each node (left + node + right).
 - **Edge cases:** Single negative node, all negative tree, negative subtrees.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 123, title: "Best Time to Buy and Sell Stock III", slug: "best-time-to-buy-and-sell-stock-iii" }
+  nextProblem={ number: 125, title: "Valid Palindrome", slug: "valid-palindrome" }
+/></Aside>

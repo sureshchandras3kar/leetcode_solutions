@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyHashSet   from '@solutions/Python/longest_consecutive_hash_set.py?raw';
 import cppHashSet  from '@solutions/C++/longest_consecutive_hash_set.cpp?raw';
@@ -354,4 +355,9 @@ function approach3():
 - The "only start at sequence beginnings" trick is the key insight — explain why it avoids redundant work.
 - The while loop looks like O(n²) but it is amortised O(n) because each element is counted at most once across all sequence expansions.
 - Common follow-up: "What if values can be negative?" — the algorithm handles it fine since the set membership check works for any integer.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 127, title: "Word Ladder", slug: "word-ladder" }
+  nextProblem={ number: 129, title: "Sum Root to Leaf Numbers", slug: "sum-root-to-leaf-numbers" }
+/></Aside>

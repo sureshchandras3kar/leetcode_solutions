@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyPre    from '@solutions/Python/flatten_binary_tree_to_linked_list_preorder_dfs.py?raw';
 import cppPre   from '@solutions/C++/flatten_binary_tree_to_linked_list_preorder_dfs.cpp?raw';
@@ -59,6 +60,15 @@ Flatten a binary tree into a "linked list" where the linked list is represented 
 
 - The number of nodes is in the range `[0, 2000]`.
 - `-100 <= Node.val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- File system hierarchies and directory structures
+- DOM tree manipulation in web browsers
+- XML/JSON parsing and configuration management
+- Organizational hierarchies and permission trees
+</Aside>
 
 ## Complexity Comparison
 
@@ -218,4 +228,9 @@ function approach3():
 - **Pre-Order:** More intuitive, easier to visualize where to attach subtrees.
 - **Post-Order:** More elegant, single pass with previous tracking; demonstrates understanding of reverse traversal.
 - **Difference:** Pre-order requires finding rightmost; post-order does it implicitly via reverse order.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 112, title: "Path Sum", slug: "path-sum" }
+  nextProblem={ number: 117, title: "Populating Next Right Pointers in Each Node II", slug: "populating-next-right-pointers-ii" }
+/></Aside>

@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pySortKey  from '@solutions/Python/group_anagrams_sort_key.py?raw';
 import cppSortKey from '@solutions/C++/group_anagrams_sort_key.cpp?raw';
@@ -333,4 +334,9 @@ function approach3():
 - The sort key approach is the clearest to explain in an interview. Lead with it.
 - Mention the char count optimisation as a follow-up: it removes the log k factor for long strings.
 - Edge cases: empty string (valid group of its own), single character strings, all strings identical.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 46, title: "Permutations", slug: "permutations" }
+  nextProblem={ number: 50, title: "Pow(x, n)", slug: "powx-n" }
+/></Aside>

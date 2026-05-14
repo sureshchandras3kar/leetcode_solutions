@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyDFS    from '@solutions/Python/path_sum_dfs_recursive.py?raw';
 import cppDFS   from '@solutions/C++/path_sum_dfs_recursive.cpp?raw';
@@ -63,6 +64,15 @@ A leaf is a node with no children.
 - The number of nodes is in the range `[0, 5000]`.
 - `-1000 <= Node.val <= 1000`
 - `-1000 <= targetSum <= 1000`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- File system hierarchies and directory structures
+- DOM tree manipulation in web browsers
+- XML/JSON parsing and configuration management
+- Organizational hierarchies and permission trees
+</Aside>
 
 ## Complexity Comparison
 
@@ -220,4 +230,9 @@ function approach3():
 - **Early termination:** Both can return true immediately upon finding a valid path.
 - **Space:** DFS uses O(h) for recursion; BFS uses O(w) for queue.
 - **Edge cases:** Empty root, single node, all negative/positive values.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 108, title: "Convert Sorted Array to Binary Search Tree", slug: "convert-sorted-array-to-bst" }
+  nextProblem={ number: 114, title: "Flatten Binary Tree to Linked List", slug: "flatten-binary-tree-to-linked-list" }
+/></Aside>

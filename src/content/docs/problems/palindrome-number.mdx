@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyWithout    from '@solutions/Python/palindrome_number_without_string.py?raw';
 import cppWithout   from '@solutions/C++/palindrome_number_without_string.cpp?raw';
@@ -62,6 +63,15 @@ A palindrome reads the same forwards and backwards.
 ## Constraints
 
 - `-2^31 <= x <= 2^31 - 1`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- Database indexing and query optimization
+- Buffer management in system memory
+- Time-series data analysis and sliding windows
+- Image pixel manipulation and batch processing
+</Aside>
 
 ## Complexity Comparison
 
@@ -325,7 +335,12 @@ function approach3():
 - Treating negative numbers as valid palindromes.
 - Forgetting the special case where a non-zero number ends in `0`.
 - Describing the string solution as O(1) space when it creates a new string.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 5, title: "Longest Palindromic Substring", slug: "longest-palindromic-substring" }
+  nextProblem={ number: 11, title: "Container With Most Water", slug: "container-with-most-water" }
+/></Aside>
 
 <RelatedProblems problems={[
   { number: 125, title: 'Valid Palindrome',            difficulty: 'Easy',   leetcodeSlug: 'valid-palindrome' },

@@ -1,0 +1,23 @@
+---
+interface Props {
+  number: number;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  leetcodeSlug: string;
+}
+const { number, difficulty, leetcodeSlug } = Astro.props;
+const diffClass = difficulty.toLowerCase();
+const lcUrl = `https://leetcode.com/problems/${leetcodeSlug}/`;
+---
+<div class="lc-problem-meta">
+  <span class="lc-problem-meta__number">#{number}</span>
+  <span class={`lc-problem-meta__diff lc-problem-meta__diff--${diffClass}`}>{difficulty}</span>
+  <a
+    href={lcUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="lc-problem-meta__link"
+    aria-label={`Try problem ${number} on LeetCode`}
+  >
+    ▶ Try on LeetCode
+  </a>
+</div>

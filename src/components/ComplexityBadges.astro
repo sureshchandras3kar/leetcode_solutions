@@ -1,0 +1,30 @@
+---
+interface Props {
+  time: string;
+  space: string;
+  timeColor?: 'green' | 'yellow' | 'red';
+  spaceColor?: 'green' | 'yellow' | 'red';
+  timeNote?: string;
+  spaceNote?: string;
+}
+const {
+  time,
+  space,
+  timeColor = 'green',
+  spaceColor = 'green',
+  timeNote,
+  spaceNote,
+} = Astro.props;
+---
+<div class="lc-complexity-row">
+  <span class={`lc-badge lc-badge--${timeColor}`}>
+    <span class="lc-badge__label">⏱ Time</span>
+    <span class="lc-badge__value">{time}</span>
+    {timeNote && <span class="lc-badge__note">{timeNote}</span>}
+  </span>
+  <span class={`lc-badge lc-badge--${spaceColor}`}>
+    <span class="lc-badge__label">💾 Space</span>
+    <span class="lc-badge__value">{space}</span>
+    {spaceNote && <span class="lc-badge__note">{spaceNote}</span>}
+  </span>
+</div>

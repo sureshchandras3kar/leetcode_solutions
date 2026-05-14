@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyPrefixSuffix   from '@solutions/Python/product_except_self_prefix_suffix.py?raw';
 import cppPrefixSuffix  from '@solutions/C++/product_except_self_prefix_suffix.cpp?raw';
@@ -356,4 +357,9 @@ function approach3():
 - Always mention the O(1) space follow-up unprompted — it signals awareness of the classic progression.
 - The output array is considered O(1) extra space per the problem statement (it is the return value).
 - Zero handling: ask "what if the array contains zeros?" — this approach handles it correctly, division would not.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 236, title: "Lowest Common Ancestor of a Binary Tree", slug: "lowest-common-ancestor-of-a-binary-tree" }
+  nextProblem={ number: 242, title: "Valid Anagram", slug: "valid-anagram" }
+/></Aside>

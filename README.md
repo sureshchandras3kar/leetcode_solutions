@@ -22,7 +22,7 @@ LeetCode is a platform for practicing coding problems, and this repository aims 
 
 ## Features
 
-- **Solutions to LeetCode problems**: Find solutions to various LeetCode problems implemented in Python, Java, C++, JavaScript, Rust, and more.
+- **Solutions to LeetCode problems**: Find solutions to LeetCode problems implemented in Python, Java, C++, JavaScript, Rust, and more.
 - **Detailed documentation**: Each solution is accompanied by detailed documentation explaining the approach and solution.
 - **Easy navigation**: The project structure is well-organized, making it easy to navigate between different languages and solutions.
 - **Continuous updates**: The repository is continuously updated with new solutions and improvements.
@@ -69,7 +69,7 @@ Contributions are welcome! If you'd like to contribute to this project, please f
 
 ## License
 
-This project is licensed -Please see the [LICENSE](LICENSE) file for details.
+This project is licensed — please see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 

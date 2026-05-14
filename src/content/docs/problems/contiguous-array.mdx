@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyPrefixSum   from '@solutions/Python/contiguous_array_prefix_sum.py?raw';
 import cppPrefixSum  from '@solutions/C++/contiguous_array_prefix_sum.cpp?raw';
@@ -56,6 +57,14 @@ Given a binary array `nums`, return the maximum length of a contiguous subarray 
 - **Signal balancing** — longest run of a binary signal that is perfectly balanced.
 - **Load balancing** — find time windows with equal load on two servers.
 </Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Prefix Sum with 0→-1 Transform | O(n) | O(n) | Optimal solution, single pass |
+
+\* n = length of the input array
 
 ## The Key Transform
 
@@ -235,3 +244,8 @@ function findMaxLength(nums):
 - **Works in O(n) with a single pass** — there is no better asymptotic solution since every element must be read at least once.
 - **Edge cases:** an all-zeros or all-ones array returns 0. An array of length 1 always returns 0. The algorithm handles both correctly.
 </Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 502, title: "IPO", slug: "ipo" }}
+  nextProblem={{ number: 530, title: "Minimum Absolute Difference in BST", slug: "minimum-absolute-difference-in-bst" }}
+/>

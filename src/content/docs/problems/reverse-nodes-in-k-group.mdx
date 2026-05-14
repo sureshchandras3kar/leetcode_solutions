@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyIterative     from '@solutions/Python/reverse_nodes_in_k_group_iterative.py?raw';
 import cppIterative    from '@solutions/C++/reverse_nodes_in_k_group_iterative.cpp?raw';
@@ -446,7 +447,12 @@ function approach3():
 - Walk through a **concrete example** step-by-step to show clarity.
 - Mention **complexity trade-offs** — O(1) space vs. O(n/k) stack usage.
 - If asked to optimize, explain why **iterative is preferred** in production (less stack overhead).
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 23, title: "Merge k Sorted Lists", slug: "merge-k-sorted-lists" }
+  nextProblem={ number: 26, title: "Remove Duplicates from Sorted Array", slug: "remove-duplicates-from-sorted-array" }
+/></Aside>
 
 ## Related Problems
 

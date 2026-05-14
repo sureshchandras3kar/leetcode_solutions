@@ -41,11 +41,44 @@ import goApproach2 from '@solutions/Golang/minimum_genetic_mutation_dfs.go?raw';
 
 ## Problem Statement
 
-Solve this medium difficulty graph problem using two different approaches.
+A gene string can be represented by an 8-character long string, with choices from `'A'`, `'C'`, `'G'`, and `'T'`.
+
+Suppose we need to investigate a mutation from a `startGene` to an `endGene` where one mutation is defined as one single character changed in the gene string.
+
+- There is a `bank` of valid gene mutations. Only mutations in the bank are allowed.
+- Return the minimum number of mutations needed to mutate from `startGene` to `endGene`. If there is no such mutation sequence, return `-1`.
 
 <Aside type="tip" title="Key Insight">
-- Think about the graph structure and what makes this problem unique.
-- Consider both DFS and BFS solutions.
+- This is a shortest path problem on a graph where each gene is a node.
+- Two genes are connected if they differ by exactly one character and the target gene is in the bank.
+- BFS finds the shortest path; DFS explores all possibilities.
+</Aside>
+
+### Examples
+
+| startGene | endGene | bank | Output | Explanation |
+| --- | --- | --- | --- | --- |
+| `"AACCCCCC"` | `"AACCCCTA"` | `["AACCCCTA"]` | `1` | Direct mutation from start to end in one step. |
+| `"AACCCCCC"` | `"AAACCCTA"` | `["AACCCCTA","AACCCCCA","AAACCCTA","AAACCCCA","AAACCCTA"]` | `2` | Path: AACCCCCC → AACCCCTA → AAACCCTA |
+| `"AAAAAAAA"` | `"CCCCCCCC"` | `["AAAAAAAC","AAAAAACA","AAAAACC","AAAAACCC","AAAACCCC","AACACCCC","ACCACCCC","ACCCCCCC","CCCCCCCC"]` | `4` | Multiple valid mutation paths exist. |
+| `"AACCCCCC"` | `"AACCCCCB"` | `["AACCCCTA"]` | `-1` | End gene not in bank or unreachable. |
+
+## Constraints
+
+- `startGene.length == 8`
+- `endGene.length == 8`
+- `0 <= bank.length <= 10`
+- `bank[i].length == 8`
+- `startGene`, `endGene`, and `bank[i]` consist of only the characters `'A'`, `'C'`, `'G'`, and `'T'`.
+- `startGene != endGene`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Bioinformatics and genomics** — Finding minimum evolutionary distance between DNA or protein sequences in phylogenetic analysis.
+- **Chemical structure transformation** — Computing shortest transformation paths between chemical compounds where each bond/atom change is one mutation.
+- **Network routing** — Finding minimum hop count paths in communication networks where each valid transition is a known route.
+- **State space exploration** — Any problem requiring shortest path through valid state transitions with restricted moves (word ladder, chemical synthesis).
 </Aside>
 
 ## Complexity Comparison

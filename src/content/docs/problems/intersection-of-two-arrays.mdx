@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pySet      from '@solutions/Python/intersection_of_two_arrays_hash_set.py?raw';
 import cppSet     from '@solutions/C++/intersection_of_two_arrays_hash_set.cpp?raw';
@@ -335,4 +336,9 @@ function approach3():
 - **Follow-up — if one array is very large and the other is small?** Build the set from the smaller array to minimise memory.
 - **Follow-up — if the arrays are already sorted?** Skip the sort cost and go directly to the two-pointer scan.
 - **Follow-up — intersection with duplicates (#350)?** Replace the result set with a frequency map and take the minimum count of each common element.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 347, title: "Top K Frequent Elements", slug: "top-k-frequent-elements" }
+  nextProblem={ number: 373, title: "Find K Pairs with Smallest Sums", slug: "find-k-pairs-with-smallest-sum" }
+/></Aside>

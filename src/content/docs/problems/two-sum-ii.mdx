@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyTwoPtr   from '@solutions/Python/two_sum_ii_two_pointer.py?raw';
 import cppTwoPtr  from '@solutions/C++/two_sum_ii_two_pointer.cpp?raw';
@@ -195,4 +196,9 @@ function twoSum(numbers, target):
 - Compare to Two Sum (#1): same problem but sorted input enables O(n) time with O(1) space instead of requiring an O(n) space hash map.
 - Follow-up: "What if the array were not sorted?" → Fall back to the hash map approach from Two Sum #1.
 - Follow-up: "What about binary search?" → Binary search per element gives O(n log n) which is worse than two pointers O(n).
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 162, title: "Find Peak Element", slug: "find-peak-element" }
+  nextProblem={ number: 169, title: "Majority Element", slug: "majority-element" }
+/></Aside>

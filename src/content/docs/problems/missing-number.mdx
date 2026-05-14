@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pySet    from '@solutions/Python/missing_number_hash_set.py?raw';
 import cppSet   from '@solutions/C++/missing_number_hash_set.cpp?raw';
@@ -299,4 +300,9 @@ function approach3():
 - **XOR alternative:** XOR every index 0..n with every element. Pairs cancel; the missing number is left. Equally O(1) space — worth knowing for a follow-up.
 - **Edge cases:** `n = 1` with `[0]` → missing is 1; `[1]` → missing is 0. Both formulas handle these correctly.
 - **Overflow:** always mention the 32-bit overflow risk for `n × (n+1)` when n is near 10^4.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 242, title: "Valid Anagram", slug: "valid-anagram" }
+  nextProblem={ number: 290, title: "Word Pattern", slug: "word-pattern" }
+/></Aside>

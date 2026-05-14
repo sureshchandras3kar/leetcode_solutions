@@ -19,6 +19,27 @@ import ApproachTag from '../../../components/ApproachTag.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
 import PrevNextNav from '../../../components/PrevNextNav.astro';
 
+import pyDP     from '@solutions/Python/ipo_dp.py?raw';
+import cppDP    from '@solutions/C++/ipo_dp.cpp?raw';
+import javaDP   from '@solutions/Java/ipo_dp.java?raw';
+import jsDP     from '@solutions/JavaScript/ipo_dp.js?raw';
+import rustDP   from '@solutions/Rust/ipo_dp.rs?raw';
+import goDP     from '@solutions/Golang/ipo_dp.go?raw';
+
+import pyGreedyMaxHeap     from '@solutions/Python/ipo_greedy_max_heap.py?raw';
+import cppGreedyMaxHeap    from '@solutions/C++/ipo_greedy_max_heap.cpp?raw';
+import javaGreedyMaxHeap   from '@solutions/Java/ipo_greedy_max_heap.java?raw';
+import jsGreedyMaxHeap     from '@solutions/JavaScript/ipo_greedy_max_heap.js?raw';
+import rustGreedyMaxHeap   from '@solutions/Rust/ipo_greedy_max_heap.rs?raw';
+import goGreedyMaxHeap     from '@solutions/Golang/ipo_greedy_max_heap.go?raw';
+
+import pyGreedySorted     from '@solutions/Python/ipo_greedy_sorted.py?raw';
+import cppGreedySorted    from '@solutions/C++/ipo_greedy_sorted.cpp?raw';
+import javaGreedySorted   from '@solutions/Java/ipo_greedy_sorted.java?raw';
+import jsGreedySorted     from '@solutions/JavaScript/ipo_greedy_sorted.js?raw';
+import rustGreedySorted   from '@solutions/Rust/ipo_greedy_sorted.rs?raw';
+import goGreedySorted     from '@solutions/Golang/ipo_greedy_sorted.go?raw';
+
 ## Problem Statement
 
 ### LeetCode #502 - IPO
@@ -55,159 +76,124 @@ Solve this classic coding interview problem efficiently using multiple approache
 
 | Approach | Time | Space | Best When |
 | --- | --- | --- | --- |
-| Approach 1 | O(n) | O(1) or O(n) | General case |
-| Approach 2 | O(n log n) | O(n) | Alternative |
-| Approach 3 | O(n²) | O(1) | Educational |
+| Greedy (Max Heap) | O(n log n) | O(n) | Interview — clear greedy logic |
+| Greedy (Sorted) | O(n log n) | O(n) | Alternative sorting approach |
+| Dynamic Programming | O(n²) | O(n) | Learning or analysis |
 
 ## Which approach should you learn first?
 
-- Pick **Approach 1** if you want the optimal solution.
-- Pick **Approach 3** if you are learning the fundamentals.
-- Pick **Approach 2** for interview preparation.
+- Pick **Greedy (Max Heap)** for the best interview answer — it is intuitive and efficient.
+- Pick **Greedy (Sorted)** for a simpler greedy approach.
+- Pick **Dynamic Programming** if you want to understand the problem structure.
 
 <div class="lc-approach-quick">
   <div class="lc-approach-quick__card lc-approach-quick__card--best">
-    <div class="lc-approach-quick__label">Recommended</div>
-    <div class="lc-approach-quick__name">Approach 1</div>
-    <div class="lc-approach-quick__stats">O(n) time · Minimal space</div>
+    <div class="lc-approach-quick__label">Best Interview</div>
+    <div class="lc-approach-quick__name">Greedy (Max Heap)</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(n) space</div>
   </div>
   <div class="lc-approach-quick__card">
-    <div class="lc-approach-quick__label">Alternative</div>
-    <div class="lc-approach-quick__name">Approach 2</div>
-    <div class="lc-approach-quick__stats">O(n log n) time · More space</div>
+    <div class="lc-approach-quick__label">Simpler Greedy</div>
+    <div class="lc-approach-quick__name">Greedy (Sorted)</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(n) space</div>
   </div>
   <div class="lc-approach-quick__card">
-    <div class="lc-approach-quick__label">Learning</div>
-    <div class="lc-approach-quick__name">Approach 3</div>
-    <div class="lc-approach-quick__stats">O(n²) time · No extra space</div>
+    <div class="lc-approach-quick__label">Educational</div>
+    <div class="lc-approach-quick__name">Dynamic Programming</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(n) space</div>
   </div>
 </div>
 
-## Approach 1: Optimal Strategy
+## Approach 1: Greedy with Max Heap (Recommended)
 
 <ApproachTag tag="recommended" />
 
-Core algorithm explanation goes here.
+Greedily select projects with highest profit that we can afford. Use a max heap to track available projects by profit.
 
-<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Constant" />
-
-### Step-by-step Example
-
-**Input:** `[example input]`
-
-Detailed walkthrough of the algorithm with state changes.
-
-### Pseudocode
-
-```plaintext
-function solve(input):
-    // Algorithm implementation
-    return result
-```
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Sorting + heap ops" spaceNote="Heap storage" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve(arr):
-    # Implementation here
-    pass
-    `}
+    <Code code={pyGreedyMaxHeap} lang="python" title="ipo_greedy_max_heap.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solve(vector<int>& arr) {
-        // Implementation here
-        return 0;
-    }
-};
-    `}
+    <Code code={cppGreedyMaxHeap} lang="cpp" title="ipo_greedy_max_heap.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solve(int[] arr) {
-        // Implementation here
-        return 0;
-    }
-}
-    `}
+    <Code code={javaGreedyMaxHeap} lang="java" title="ipo_greedy_max_heap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedyMaxHeap} lang="javascript" title="ipo_greedy_max_heap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedyMaxHeap} lang="rust" title="ipo_greedy_max_heap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedyMaxHeap} lang="go" title="ipo_greedy_max_heap.go" />
   </TabItem>
 </Tabs>
 
-## Approach 2: Alternative Method
+## Approach 2: Greedy with Sorting
 
 <ApproachTag tag="interview" />
 
-Alternative approach explanation.
+Sort projects by capital and select k projects with highest profits greedily.
 
-<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Processing" spaceNote="Working space" />
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Sorting" spaceNote="Storage" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve_alt(arr):
-    # Alternative implementation
-    pass
-    `}
+    <Code code={pyGreedySorted} lang="python" title="ipo_greedy_sorted.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solveAlt(vector<int>& arr) {
-        // Alternative implementation
-        return 0;
-    }
-};
-    `}
+    <Code code={cppGreedySorted} lang="cpp" title="ipo_greedy_sorted.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solveAlt(int[] arr) {
-        // Alternative implementation
-        return 0;
-    }
-}
-    `}
+    <Code code={javaGreedySorted} lang="java" title="ipo_greedy_sorted.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedySorted} lang="javascript" title="ipo_greedy_sorted.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedySorted} lang="rust" title="ipo_greedy_sorted.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedySorted} lang="go" title="ipo_greedy_sorted.go" />
   </TabItem>
 </Tabs>
 
-## Approach 3: Brute Force
+## Approach 3: Dynamic Programming
 
 <ApproachTag tag="simple" />
 
-Straightforward approach for learning purposes.
+Use DP to explore all possible combinations of projects and track maximum profit.
 
-<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="Exhaustive" spaceColor="Minimal" />
+<ComplexityBadges time="O(n²)" space="O(n)" timeColor="red" spaceColor="yellow" timeNote="All subsets" spaceNote="DP table" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve_brute(arr):
-    # Brute force implementation
-    pass
-    `}
+    <Code code={pyDP} lang="python" title="ipo_dp.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solveBrute(vector<int>& arr) {
-        // Brute force implementation
-        return 0;
-    }
-};
-    `}
+    <Code code={cppDP} lang="cpp" title="ipo_dp.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solveBrute(int[] arr) {
-        // Brute force implementation
-        return 0;
-    }
-}
-    `}
+    <Code code={javaDP} lang="java" title="ipo_dp.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDP} lang="javascript" title="ipo_dp.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDP} lang="rust" title="ipo_dp.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDP} lang="go" title="ipo_dp.go" />
   </TabItem>
 </Tabs>
 

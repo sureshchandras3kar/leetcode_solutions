@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyIter    from '@solutions/Python/reverse_linked_list_ii_iterative.py?raw';
 import cppIter   from '@solutions/C++/reverse_linked_list_ii_iterative.cpp?raw';
@@ -364,4 +365,9 @@ function approach3():
 - **Dummy node trick:** Mention this pattern applies to many linked list problems (removing nodes, reversing, etc.).
 - **Edge cases:** Always test left=1 (reversal at head), right=n (reversal at tail), and left=right (no reversal).
 - **Pointer safety:** Talk about null checks — ensure curr.next exists before accessing it.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 86, title: "Partition List", slug: "partition-list" }
+  nextProblem={ number: 97, title: "Interleaving String", slug: "interleaving-string" }
+/></Aside>

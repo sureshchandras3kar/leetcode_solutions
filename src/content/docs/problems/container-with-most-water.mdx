@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyTwoPtr   from '@solutions/Python/container_with_most_water_two_pointer.py?raw';
 import cppTwoPtr  from '@solutions/C++/container_with_most_water_two_pointer.cpp?raw';
@@ -337,4 +338,9 @@ function approach3():
 - State the greedy proof immediately: "Moving the taller pointer can never improve the area — the shorter wall is always the bottleneck"
 - This is O(n) which is optimal — any algorithm must consider each line at least once
 - Common follow-up: "Can you prove the two-pointer never misses the optimal pair?" → yes, because we only discard pairs that are guaranteed suboptimal (any pair involving the shorter pointer with anything between the pointers produces a smaller area)
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 9, title: "Palindrome Number", slug: "palindrome-number" }
+  nextProblem={ number: 15, title: "3Sum", slug: "three-sum" }
+/></Aside>

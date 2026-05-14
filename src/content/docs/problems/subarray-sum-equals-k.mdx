@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyPrefixSum   from '@solutions/Python/subarray_sum_equals_k_prefix_sum.py?raw';
 import cppPrefixSum  from '@solutions/C++/subarray_sum_equals_k_prefix_sum.cpp?raw';
@@ -322,4 +323,9 @@ function approach3():
 - **Why not a sliding window?** — the array can contain negative numbers and zeros, so shrinking the window does not reliably reduce the sum. The hash map handles all cases in one pass.
 - **Follow-up: "What if all numbers are positive?"** — then a two-pointer sliding window works and uses O(1) extra space.
 - **Order of operations matters:** check `count[prefix - k]` before inserting `prefix`, otherwise a subarray of length zero could be counted.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 530, title: "Minimum Absolute Difference in BST", slug: "minimum-absolute-difference-in-bst" }
+  nextProblem={ number: 637, title: "Average of Levels in Binary Tree", slug: "average-of-levels-in-binary-tree" }
+/></Aside>

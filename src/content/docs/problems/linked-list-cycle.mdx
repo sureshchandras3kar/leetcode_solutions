@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyFloyd    from '@solutions/Python/linked_list_cycle_floyd.py?raw';
 import cppFloyd   from '@solutions/C++/linked_list_cycle_floyd.cpp?raw';
@@ -382,4 +383,9 @@ function approach3():
 - **Proof of correctness:** Floyd's algorithm works because in a circular list, the difference in speeds guarantees eventual collision. The relative speed of 2 vs. 1 means the fast pointer "laps" the slow pointer.
 - **Edge cases:** Empty list, single node, two-node cycle, and late-cycle entry all test your implementation thoroughly.
 - **Follow-up:** Problem #142 asks for the cycle start node — Floyd's algorithm can be extended to find it in two phases.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 139, title: "Word Break", slug: "word-break" }
+  nextProblem={ number: 146, title: "LRU Cache", slug: "lru-cache" }
+/></Aside>

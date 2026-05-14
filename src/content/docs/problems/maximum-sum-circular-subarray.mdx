@@ -17,6 +17,27 @@ import ApproachTag from '../../../components/ApproachTag.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
 import PrevNextNav from '../../../components/PrevNextNav.astro';
 
+import pyBruteForce     from '@solutions/Python/maximum_sum_circular_subarray_brute_force.py?raw';
+import cppBruteForce    from '@solutions/C++/maximum_sum_circular_subarray_brute_force.cpp?raw';
+import javaBruteForce   from '@solutions/Java/maximum_sum_circular_subarray_brute_force.java?raw';
+import jsBruteForce     from '@solutions/JavaScript/maximum_sum_circular_subarray_brute_force.js?raw';
+import rustBruteForce   from '@solutions/Rust/maximum_sum_circular_subarray_brute_force.rs?raw';
+import goBruteForce     from '@solutions/Golang/maximum_sum_circular_subarray_brute_force.go?raw';
+
+import pyKadaneCircular     from '@solutions/Python/maximum_sum_circular_subarray_kadane_circular.py?raw';
+import cppKadaneCircular    from '@solutions/C++/maximum_sum_circular_subarray_kadane_circular.cpp?raw';
+import javaKadaneCircular   from '@solutions/Java/maximum_sum_circular_subarray_kadane_circular.java?raw';
+import jsKadaneCircular     from '@solutions/JavaScript/maximum_sum_circular_subarray_kadane_circular.js?raw';
+import rustKadaneCircular   from '@solutions/Rust/maximum_sum_circular_subarray_kadane_circular.rs?raw';
+import goKadaneCircular     from '@solutions/Golang/maximum_sum_circular_subarray_kadane_circular.go?raw';
+
+import pyTotalMinusMin     from '@solutions/Python/maximum_sum_circular_subarray_total_minus_minimum.py?raw';
+import cppTotalMinusMin    from '@solutions/C++/maximum_sum_circular_subarray_total_minus_minimum.cpp?raw';
+import javaTotalMinusMin   from '@solutions/Java/maximum_sum_circular_subarray_total_minus_minimum.java?raw';
+import jsTotalMinusMin     from '@solutions/JavaScript/maximum_sum_circular_subarray_total_minus_minimum.js?raw';
+import rustTotalMinusMin   from '@solutions/Rust/maximum_sum_circular_subarray_total_minus_minimum.rs?raw';
+import goTotalMinusMin     from '@solutions/Golang/maximum_sum_circular_subarray_total_minus_minimum.go?raw';
+
 ## Problem Statement
 
 ### LeetCode #918 - Maximum Sum Circular Subarray
@@ -53,121 +74,93 @@ Solve this classic coding interview problem efficiently using multiple approache
 
 | Approach | Time | Space | Best When |
 | --- | --- | --- | --- |
-| Approach 1 | O(n) | O(1) or O(n) | General case |
-| Approach 2 | O(n log n) | O(n) | Alternative |
-| Approach 3 | O(n²) | O(1) | Educational |
+| Total - Min | O(n) | O(1) | Optimal — clever formula |
+| Kadane Circular | O(n) | O(1) | Alternative O(n) |
+| Brute Force | O(n²) | O(1) | Learning |
 
 ## Which approach should you learn first?
 
-- Pick **Approach 1** if you want the optimal solution.
-- Pick **Approach 3** if you are learning the fundamentals.
-- Pick **Approach 2** for interview preparation.
+- Pick **Total - Min** for the optimal solution — it is elegant and efficient.
+- Pick **Kadane Circular** for a pure Kadane extension.
+- Pick **Brute Force** if you are learning from scratch.
 
 <div class="lc-approach-quick">
   <div class="lc-approach-quick__card lc-approach-quick__card--best">
-    <div class="lc-approach-quick__label">Recommended</div>
-    <div class="lc-approach-quick__name">Approach 1</div>
-    <div class="lc-approach-quick__stats">O(n) time · Minimal space</div>
+    <div class="lc-approach-quick__label">Optimal</div>
+    <div class="lc-approach-quick__name">Total - Min</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
   </div>
   <div class="lc-approach-quick__card">
-    <div class="lc-approach-quick__label">Alternative</div>
-    <div class="lc-approach-quick__name">Approach 2</div>
-    <div class="lc-approach-quick__stats">O(n log n) time · More space</div>
+    <div class="lc-approach-quick__label">Kadane Extended</div>
+    <div class="lc-approach-quick__name">Kadane Circular</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
   </div>
   <div class="lc-approach-quick__card">
-    <div class="lc-approach-quick__label">Learning</div>
-    <div class="lc-approach-quick__name">Approach 3</div>
-    <div class="lc-approach-quick__stats">O(n²) time · No extra space</div>
+    <div class="lc-approach-quick__label">Simple to Learn</div>
+    <div class="lc-approach-quick__name">Brute Force</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(1) space</div>
   </div>
 </div>
 
-## Approach 1: Optimal Strategy
+## Approach 1: Total - Minimum Subarray (Recommended)
 
 <ApproachTag tag="recommended" />
 
-Core algorithm explanation goes here.
+The maximum circular sum is either the maximum non-circular sum OR the total sum minus the minimum subarray sum.
 
 <ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Constant" />
 
-### Step-by-step Example
-
-**Input:** `[example input]`
-
-Detailed walkthrough of the algorithm with state changes.
-
-### Pseudocode
-
-```plaintext
-function solve(input):
-    // Algorithm implementation
-    return result
-```
-
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve(arr):
-    # Implementation here
-    pass
-    `}
+    <Code code={pyTotalMinusMin} lang="python" title="maximum_sum_circular_subarray_total_minus_minimum.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solve(vector<int>& arr) {
-        // Implementation here
-        return 0;
-    }
-};
-    `}
+    <Code code={cppTotalMinusMin} lang="cpp" title="maximum_sum_circular_subarray_total_minus_minimum.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solve(int[] arr) {
-        // Implementation here
-        return 0;
-    }
-}
-    `}
+    <Code code={javaTotalMinusMin} lang="java" title="maximum_sum_circular_subarray_total_minus_minimum.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTotalMinusMin} lang="javascript" title="maximum_sum_circular_subarray_total_minus_minimum.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTotalMinusMin} lang="rust" title="maximum_sum_circular_subarray_total_minus_minimum.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTotalMinusMin} lang="go" title="maximum_sum_circular_subarray_total_minus_minimum.go" />
   </TabItem>
 </Tabs>
 
-## Approach 2: Alternative Method
+## Approach 2: Kadane's Algorithm (Circular)
 
 <ApproachTag tag="interview" />
 
-Alternative approach explanation.
+Extend Kadane's algorithm to handle the circular case by also tracking the minimum subarray.
 
-<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Processing" spaceNote="Working space" />
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Constant" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve_alt(arr):
-    # Alternative implementation
-    pass
-    `}
+    <Code code={pyKadaneCircular} lang="python" title="maximum_sum_circular_subarray_kadane_circular.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solveAlt(vector<int>& arr) {
-        // Alternative implementation
-        return 0;
-    }
-};
-    `}
+    <Code code={cppKadaneCircular} lang="cpp" title="maximum_sum_circular_subarray_kadane_circular.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solveAlt(int[] arr) {
-        // Alternative implementation
-        return 0;
-    }
-}
-    `}
+    <Code code={javaKadaneCircular} lang="java" title="maximum_sum_circular_subarray_kadane_circular.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsKadaneCircular} lang="javascript" title="maximum_sum_circular_subarray_kadane_circular.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustKadaneCircular} lang="rust" title="maximum_sum_circular_subarray_kadane_circular.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goKadaneCircular} lang="go" title="maximum_sum_circular_subarray_kadane_circular.go" />
   </TabItem>
 </Tabs>
 
@@ -175,37 +168,30 @@ public:
 
 <ApproachTag tag="simple" />
 
-Straightforward approach for learning purposes.
+Check all possible subarrays (including those that wrap around the circular array).
 
-<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="Exhaustive" spaceColor="Minimal" />
+<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="All pairs" spaceNote="Constant" />
 
 ### Solution Code
 
 <Tabs>
   <TabItem label="Python">
-    {`def solve_brute(arr):
-    # Brute force implementation
-    pass
-    `}
+    <Code code={pyBruteForce} lang="python" title="maximum_sum_circular_subarray_brute_force.py" />
   </TabItem>
   <TabItem label="C++">
-    {`class Solution {
-public:
-    int solveBrute(vector<int>& arr) {
-        // Brute force implementation
-        return 0;
-    }
-};
-    `}
+    <Code code={cppBruteForce} lang="cpp" title="maximum_sum_circular_subarray_brute_force.cpp" />
   </TabItem>
   <TabItem label="Java">
-    {`class Solution {
-    public int solveBrute(int[] arr) {
-        // Brute force implementation
-        return 0;
-    }
-}
-    `}
+    <Code code={javaBruteForce} lang="java" title="maximum_sum_circular_subarray_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBruteForce} lang="javascript" title="maximum_sum_circular_subarray_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBruteForce} lang="rust" title="maximum_sum_circular_subarray_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBruteForce} lang="go" title="maximum_sum_circular_subarray_brute_force.go" />
   </TabItem>
 </Tabs>
 

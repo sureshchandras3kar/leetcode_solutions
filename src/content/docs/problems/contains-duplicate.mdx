@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyHashSet  from '@solutions/Python/contains_duplicate_hash_set.py?raw';
 import cppHashSet from '@solutions/C++/contains_duplicate_hash_set.cpp?raw';
@@ -330,4 +331,9 @@ function approach3():
 - **Why hash set over sorting?** O(n) vs O(n log n), and the hash set exits as soon as the first duplicate is found — often much earlier in practice.
 - **Follow-up — no extra space?** The sorting approach is the answer. Be ready to discuss that it mutates the input and takes O(n log n) time.
 - **Edge cases to mention:** single-element array (always false), all identical elements (immediately true after the first element is added), negative numbers (handled transparently by a hash set).
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 215, title: "Kth Largest Element in Array", slug: "kth-largest-element-in-array" }
+  nextProblem={ number: 219, title: "Contains Duplicate II", slug: "contains-duplicate-ii" }
+/></Aside>

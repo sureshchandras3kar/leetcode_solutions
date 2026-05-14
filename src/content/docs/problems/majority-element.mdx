@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyMap       from '@solutions/Python/majority_element_hash_map.py?raw';
 import cppMap      from '@solutions/C++/majority_element_hash_map.cpp?raw';
@@ -328,4 +329,9 @@ function approach3():
 - **Why does it work?** The guarantee that the majority element appears more than n/2 times means its votes can never all be cancelled by the minority.
 - **What if the majority element is not guaranteed?** Add a second pass to count the candidate's actual occurrences and verify it exceeds n/2.
 - **Follow-up — Majority Element II (> n/3)?** Boyer-Moore generalises: maintain two candidates and two counts for finding elements appearing more than n/3 times.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 167, title: "Two Sum II – Input Array Is Sorted", slug: "two-sum-ii" }
+  nextProblem={ number: 172, title: "Factorial Trailing Zeroes", slug: "factorial-trailing-zeroes" }
+/></Aside>

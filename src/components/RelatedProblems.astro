@@ -1,0 +1,28 @@
+---
+interface Problem {
+  number: number;
+  title: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  slug?: string;          // internal doc slug (if we have a page)
+  leetcodeSlug: string;   // for external LeetCode link
+}
+interface Props {
+  problems: Problem[];
+}
+const { problems } = Astro.props;
+---
+<div class="lc-related">
+  <h3 class="lc-related__heading">Related Problems</h3>
+  <ul class="lc-related__list">
+    {problems.map((p) => (
+      <li class="lc-related__item">
+        {p.slug
+          ? <a href={`/leetcode_solutions/${p.slug.replace(/^\//, '').replace(/^\.\//, '')}/`} class="lc-related__title">{p.title}</a>
+          : <a href={`https://leetcode.com/problems/${p.leetcodeSlug}/`} target="_blank" rel="noopener noreferrer" class="lc-related__title lc-related__title--ext">{p.title} ↗</a>
+        }
+        <span class={`lc-problem-meta__diff lc-problem-meta__diff--${p.difficulty.toLowerCase()}`}>{p.difficulty}</span>
+        <span class="lc-related__num">#{p.number}</span>
+      </li>
+    ))}
+  </ul>
+</div>

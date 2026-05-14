@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyMap   from '@solutions/Python/valid_anagram_hash_map.py?raw';
 import cppMap  from '@solutions/C++/valid_anagram_hash_map.cpp?raw';
@@ -325,4 +326,9 @@ function approach3():
 - **Constant space claim:** with only lowercase English letters the map has at most 26 keys — technically O(1) space even though a map is used.
 - **Follow-up — Unicode strings?** The same hash map approach works; the bound on map size increases but the algorithm stays O(n).
 - **Follow-up — streams?** You cannot sort a stream, so the hash map approach is the only viable one for streaming input.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 238, title: "Product of Array Except Self", slug: "product-except-self" }
+  nextProblem={ number: 268, title: "Missing Number", slug: "missing-number" }
+/></Aside>

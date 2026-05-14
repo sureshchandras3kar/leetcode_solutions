@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pySet    from '@solutions/Python/remove_duplicates_from_sorted_list_ii_hash_set.py?raw';
 import cppSet   from '@solutions/C++/remove_duplicates_from_sorted_list_ii_hash_set.cpp?raw';
@@ -438,4 +439,9 @@ function approach3():
 - **Dummy node insight:** Using a sentinel node simplifies edge cases (e.g., duplicate at head).
 - **When to use which:** Ask the interviewer about space constraints; if O(n) space is acceptable, the hash set approach is easier to code error-free.
 - **Edge case:** A list of all duplicates (e.g., `1 → 1 → 1`) should return an empty list—verify this works in your implementation.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 80, title: "Remove Duplicates from Sorted Array II", slug: "remove-duplicates-from-sorted-array-ii" }
+  nextProblem={ number: 86, title: "Partition List", slug: "partition-list" }
+/></Aside>

@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pySortTwoPtr  from '@solutions/Python/three_sum_sort_two_pointer.py?raw';
 import cppSortTwoPtr from '@solutions/C++/three_sum_sort_two_pointer.cpp?raw';
@@ -376,4 +377,9 @@ function approach3():
 - **Time complexity is O(n²) and that is optimal** — no known algorithm does better for 3Sum.
 - **The `if nums[i] > 0: break` optimization** — after sorting, if the smallest remaining number is positive, no triplet can sum to zero.
 - **Follow-up — 4Sum (#18)?** Add one more outer loop and reduce to 3Sum. The pattern generalizes to k-Sum recursively.
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 11, title: "Container With Most Water", slug: "container-with-most-water" }
+  nextProblem={ number: 17, title: "Letter Combinations of a Phone Number", slug: "letter-combinations-of-a-phone-number" }
+/></Aside>

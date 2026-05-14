@@ -50,12 +50,32 @@ Before contributing, please review and adhere to our [Code of Conduct](CODE_OF_C
 - Write efficient and optimized solutions, considering edge cases.
 - Ensure backward compatibility with existing solutions.
 
-## 🐞 Reporting Issues
+## �️ Local Development
 
-Encountered a bug or issue? [Open a new issue](https://github.com/your-username/leetcode_solutions/issues/new) with detailed steps to reproduce it.
+### Setting Up the Development Environment
+
+1. Once cloned, install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Open `http://localhost:3000/leetcode_solutions/` in your browser to view the site.
+
+### Known Development Limitations
+
+- **Search is disabled in dev mode**: The website uses Pagefind for search indexing, which only works in production builds. When running `npm run dev`, the Search button (⌘K) will open a modal stating "Search is only available in production builds." This is expected behavior and not a bug.
+
+## �🐞 Reporting Issues
+
+Encountered a bug or issue? [Open a new issue](https://github.com/sureshchandras3kar/leetcode_solutions/issues/new) with detailed steps to reproduce it.
 
 ## 💡 Feature Requests
 
-Have an idea or feature request? [Open a new issue](https://github.com/your-username/leetcode_solutions/issues/new) and share your thoughts with us.
+Have an idea or feature request? [Open a new issue](https://github.com/sureshchandras3kar/leetcode_solutions/issues/new) and share your thoughts with us.
 
 Let's make LeetCode Solutions the go-to resource for mastering coding challenges! Happy coding! 🎉

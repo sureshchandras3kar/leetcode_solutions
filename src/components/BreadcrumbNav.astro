@@ -1,0 +1,60 @@
+---
+/**
+ * BreadcrumbNav.astro
+ * Displays breadcrumb navigation trail
+ * Example: Home > Problems > Two Sum
+ */
+
+interface Props {
+  currentPage: string; // e.g., "Two Sum"
+  category?: string;   // e.g., "Problems" or "Roadmaps"
+  slug?: string;       // Current page slug
+}
+
+const { currentPage, category = "Problems", slug } = Astro.props;
+---
+
+<nav class="lc-breadcrumb" aria-label="Breadcrumb navigation">
+  <a href="/leetcode_solutions/">Home</a>
+  <span class="lc-breadcrumb--separator">/</span>
+
+  {category && (
+    <>
+      <a href={`/leetcode_solutions/${category.toLowerCase()}/`}>
+        {category}
+      </a>
+      <span class="lc-breadcrumb--separator">/</span>
+    </>
+  )}
+
+  <span>{currentPage}</span>
+</nav>
+
+<style>
+  .lc-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--sl-color-gray-2);
+    margin-bottom: 1rem;
+    padding: 0 0 1rem 0;
+    border-bottom: 1px solid var(--sl-color-hairline);
+  }
+
+  a {
+    color: var(--sl-color-accent);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--sl-color-accent-high);
+    text-decoration: underline;
+  }
+
+  .lc-breadcrumb--separator {
+    color: var(--sl-color-gray-3);
+    margin: 0 0.25rem;
+  }
+</style>

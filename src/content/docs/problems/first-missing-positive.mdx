@@ -18,6 +18,7 @@ import ComplexityBadges from '../../../components/ComplexityBadges.astro';
 import ApproachTag from '../../../components/ApproachTag.astro';
 import LogicPlayer from '../../../components/LogicPlayer.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyHash   from '@solutions/Python/first_missing_positive_index_hash.py?raw';
 import cppHash  from '@solutions/C++/first_missing_positive_index_hash.cpp?raw';
@@ -356,4 +357,9 @@ function approach3():
 - The answer MUST be in [1, n+1] — use this bound to justify using the array as storage
 - The index-as-hash approach is more commonly expected; cycle sort is a nice variant to mention
 - For index-as-hash, emphasize that `abs()` in Phase 2 is necessary because earlier iterations may have already negated the value
-</Aside>
+
+
+<PrevNextNav
+  prevProblem={ number: 39, title: "Combination Sum", slug: "combination-sum" }
+  nextProblem={ number: 42, title: "Trapping Rain Water", slug: "trapping-rain-water" }
+/></Aside>
