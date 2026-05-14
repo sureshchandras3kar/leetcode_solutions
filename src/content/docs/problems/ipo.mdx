@@ -1,0 +1,232 @@
+---
+title: IPO
+description: Complete solution for LeetCode #502 - IPO. Multiple approaches in twelve languages.
+leetcodeNumber: 502
+difficulty: Hard
+leetcodeSlug: ipo
+tags: [Array, Heap, Dynamic Programming]
+prev: false
+next: false
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+## Problem Statement
+
+### LeetCode #502 - IPO
+
+Solve this classic coding interview problem efficiently using multiple approaches.
+
+<Aside type="tip" title="What to notice first">
+- Understand the problem constraints and requirements.
+- Consider multiple approaches with different trade-offs.
+- Pattern mastery comes from knowing when to use each technique.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[example1]` | `result1` | Explanation goes here |
+| `[example2]` | `result2` | Explanation goes here |
+
+## Constraints
+
+- Standard LeetCode constraints
+- Refer to the official problem statement for exact details
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Application 1** — describe where this is used
+- **Application 2** — describe where this is used
+- **Application 3** — describe where this is used
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Approach 1 | O(n) | O(1) or O(n) | General case |
+| Approach 2 | O(n log n) | O(n) | Alternative |
+| Approach 3 | O(n²) | O(1) | Educational |
+
+## Which approach should you learn first?
+
+- Pick **Approach 1** if you want the optimal solution.
+- Pick **Approach 3** if you are learning the fundamentals.
+- Pick **Approach 2** for interview preparation.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Recommended</div>
+    <div class="lc-approach-quick__name">Approach 1</div>
+    <div class="lc-approach-quick__stats">O(n) time · Minimal space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Alternative</div>
+    <div class="lc-approach-quick__name">Approach 2</div>
+    <div class="lc-approach-quick__stats">O(n log n) time · More space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Learning</div>
+    <div class="lc-approach-quick__name">Approach 3</div>
+    <div class="lc-approach-quick__stats">O(n²) time · No extra space</div>
+  </div>
+</div>
+
+## Approach 1: Optimal Strategy
+
+<ApproachTag tag="recommended" />
+
+Core algorithm explanation goes here.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Constant" />
+
+### Step-by-step Example
+
+**Input:** `[example input]`
+
+Detailed walkthrough of the algorithm with state changes.
+
+### Pseudocode
+
+```plaintext
+function solve(input):
+    // Algorithm implementation
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    {`def solve(arr):
+    # Implementation here
+    pass
+    `}
+  </TabItem>
+  <TabItem label="C++">
+    {`class Solution {
+public:
+    int solve(vector<int>& arr) {
+        // Implementation here
+        return 0;
+    }
+};
+    `}
+  </TabItem>
+  <TabItem label="Java">
+    {`class Solution {
+    public int solve(int[] arr) {
+        // Implementation here
+        return 0;
+    }
+}
+    `}
+  </TabItem>
+</Tabs>
+
+## Approach 2: Alternative Method
+
+<ApproachTag tag="interview" />
+
+Alternative approach explanation.
+
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Processing" spaceNote="Working space" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    {`def solve_alt(arr):
+    # Alternative implementation
+    pass
+    `}
+  </TabItem>
+  <TabItem label="C++">
+    {`class Solution {
+public:
+    int solveAlt(vector<int>& arr) {
+        // Alternative implementation
+        return 0;
+    }
+};
+    `}
+  </TabItem>
+  <TabItem label="Java">
+    {`class Solution {
+    public int solveAlt(int[] arr) {
+        // Alternative implementation
+        return 0;
+    }
+}
+    `}
+  </TabItem>
+</Tabs>
+
+## Approach 3: Brute Force
+
+<ApproachTag tag="simple" />
+
+Straightforward approach for learning purposes.
+
+<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="Exhaustive" spaceColor="Minimal" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    {`def solve_brute(arr):
+    # Brute force implementation
+    pass
+    `}
+  </TabItem>
+  <TabItem label="C++">
+    {`class Solution {
+public:
+    int solveBrute(vector<int>& arr) {
+        // Brute force implementation
+        return 0;
+    }
+};
+    `}
+  </TabItem>
+  <TabItem label="Java">
+    {`class Solution {
+    public int solveBrute(int[] arr) {
+        // Brute force implementation
+        return 0;
+    }
+}
+    `}
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Mistake 1 — explain what to watch for
+- Mistake 2 — explain what to watch for
+- Mistake 3 — explain what to watch for
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 217, title: 'Contains Duplicate', difficulty: 'Easy', leetcodeSlug: 'contains-duplicate' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key discussion points">
+- Trade-offs between different approaches
+- Edge cases to consider
+- Possible follow-up questions
+- How to extend the solution
+</Aside>
+
+<PrevNextNav prevProblem={false} nextProblem={false} />
