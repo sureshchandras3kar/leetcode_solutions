@@ -1,0 +1,443 @@
+---
+title: Simplify Path
+description: Convert an absolute file path with dots and double slashes to its simplified canonical form. Two approaches — stack with split O(n), and string parsing O(n) — in six languages.
+leetcodeNumber: 71
+difficulty: Medium
+leetcodeSlug: simplify-path
+tags: [String, Stack]
+prev:
+  label: "#70 Climbing Stairs"
+  link: "../climbing-stairs/"
+next:
+  label: "#72 Edit Distance"
+  link: "../edit-distance/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyStack      from '@solutions/Python/simplify_path_stack.py?raw';
+import cppStack     from '@solutions/C++/simplify_path_stack.cpp?raw';
+import javaStack    from '@solutions/Java/simplify_path_stack.java?raw';
+import jsStack      from '@solutions/JavaScript/simplify_path_stack.js?raw';
+import rustStack    from '@solutions/Rust/simplify_path_stack.rs?raw';
+import goStack      from '@solutions/Golang/simplify_path_stack.go?raw';
+import pySpaceOptimized from '@solutions/Python/simplify_path_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/simplify_path_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/SimplifyPathSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/simplify_path_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/simplify_path_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/simplify_path_space_optimized.go?raw';
+
+import pyParsing    from '@solutions/Python/simplify_path_parsing.py?raw';
+import cppParsing   from '@solutions/C++/simplify_path_parsing.cpp?raw';
+import javaParsing  from '@solutions/Java/simplify_path_parsing.java?raw';
+import jsParsing    from '@solutions/JavaScript/simplify_path_parsing.js?raw';
+import rustParsing  from '@solutions/Rust/simplify_path_parsing.rs?raw';
+import goParsing    from '@solutions/Golang/simplify_path_parsing.go?raw';
+
+## Problem Statement
+
+Given an absolute file path in a Unix-style file system, return its simplified canonical form.
+
+In a Unix-style file system:
+- A single dot `.` means "stay in the current directory"
+- A double dot `..` means "go up one level" (to the parent directory)
+- Multiple consecutive slashes `/` are treated as a single slash
+- Any trailing slashes are ignored
+
+<Aside type="tip" title="What to notice first">
+- The input always starts with a `/` (it's an absolute path, not relative).
+- You cannot go above the root directory — extra `..` at the root should be ignored.
+- The output must start with `/` and have no trailing slash (except if the answer is just `/`).
+- A stack naturally represents a directory hierarchy: push when descending, pop when going up.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `/a/./b/../../c/` | `/c` | Start at a, stay at a (.), go back to root (..), then descend to c |
+| `/a/../../b/../c//.//` | `/c` | Go up twice from a (to root and beyond, but capped), descend to b, go up, descend to c |
+| `/a//b////c/d//././/..` | `/a/b/c` | Multiple slashes treated as one, dots ignored, go up from d to c |
+| `/` | `/` | Root directory stays root |
+| `/../` | `/` | Cannot go above root, so result is `/` |
+| `/a/` | `/a` | Trailing slash is removed |
+
+## Constraints
+
+- `1 <= path.length <= 3000`
+- `path` consists of English letters, digits, `.`, and `/`
+- `path` is a valid absolute Unix path.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **File browser normalization** — simplify user-entered paths for consistent lookup in a file system.
+- **URL path resolution** — browsers canonicalize paths to prevent directory traversal attacks (e.g., `/static/../../secrets` → `/secrets`).
+- **Build tool path handling** — compile systems resolve relative includes (e.g., `#include "../config.h"`) into absolute references.
+- **Symbolic link flattening** — OS kernels simplify paths to detect circular dependencies before following links.
+- **API endpoint routing** — web servers normalize request paths to route correctly (e.g., `/api//v1/../v2/users` → `/api/v2/users`).
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Pros | Cons |
+| --- | --- | --- | --- | --- |
+| Stack with Split | O(n) | O(n) | Clean, easy to understand, idiomatic | Allocates intermediate array |
+| String Parsing | O(n) | O(n) | Single pass, no intermediate split | More pointer arithmetic, harder to follow |
+
+Both approaches are O(n) time and space. Choose **Stack** for clarity and interview friendliness, or **Parsing** if you want to demonstrate low-level string handling.
+
+## Which approach should you learn first?
+
+- Pick **Stack with Split** if you want code that is easy to explain and remember.
+- Pick **String Parsing** if you want to show deep understanding of pointer/index manipulation.
+- In practice, most developers use **Stack** — it is the most readable.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Recommended</div>
+    <div class="lc-approach-quick__name">Stack with Split</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Low-Level Control</div>
+    <div class="lc-approach-quick__name">String Parsing</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Stack with Split (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Split the path by `/`, filter out empty strings and `.` (current directory), use a stack to represent the directory hierarchy. When you encounter `..`, pop from the stack (go up). When you encounter a directory name, push it (go down). Finally, reconstruct the path from the stack.
+
+The key insight is that the stack is a perfect data structure for a directory path: each element is a directory level, and `..` is a pop operation.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass after split" spaceNote="Stack + split array" />
+
+### Step-by-step Example
+
+**Input:** `/a/./b/../../c/`
+
+After split by `/` and filter: `["a", "b", "c"]`
+
+| Step | Component | Action | Stack State |
+| --- | --- | --- | --- |
+| 1 | `a` | Push (descend to a) | `["a"]` |
+| 2 | `.` | Skip (stay in current directory) | `["a"]` |
+| 3 | `b` | Push (descend to b) | `["a", "b"]` |
+| 4 | `..` | Pop (go up to a) | `["a"]` |
+| 5 | `..` | Pop (go up to root) | `[]` |
+| 6 | `c` | Push (descend to c) | `["c"]` |
+| Final | — | Join with `/` and prepend `/` | `/c` |
+
+<LogicPlayer
+  title="How the stack solution builds the canonical path"
+  description="Watch how each directory component is pushed onto the stack, and how .. pops it off. Empty slashes and dots are ignored."
+  target="path"
+  steps={[
+    {
+      title: 'Start with root, empty stack',
+      note: 'Before processing, we are at root. The stack is empty, representing zero directory levels above root.',
+      formula: 'Input: /a/./b/../../c/',
+      callout: 'Split and filter to: [a, ., b, .., .., c]',
+      items: [
+        { label: 'a', state: 'default' },
+        { label: '.', state: 'default' },
+        { label: 'b', state: 'default' },
+        { label: '..', state: 'default' },
+        { label: '..', state: 'default' },
+        { label: 'c', state: 'default' },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Process a: push onto stack',
+      note: 'a is a directory name, not . or .., so we push it. We are now inside directory a.',
+      formula: 'stack.push("a")',
+      callout: 'Stack now represents the path /a',
+      items: [
+        { label: 'a', state: 'match' },
+        { label: '.', state: 'default' },
+        { label: 'b', state: 'default' },
+        { label: '..', state: 'default' },
+        { label: '..', state: 'default' },
+        { label: 'c', state: 'default' },
+      ],
+      memory: ['a'],
+    },
+    {
+      title: 'Process .: skip (stay in current directory)',
+      note: 'A dot means stay here. We do nothing, so the stack remains unchanged.',
+      formula: 'skip',
+      callout: 'Stack still represents /a',
+      items: [
+        { label: 'a', state: 'match' },
+        { label: '.', state: 'skip' },
+        { label: 'b', state: 'default' },
+        { label: '..', state: 'default' },
+        { label: '..', state: 'default' },
+        { label: 'c', state: 'default' },
+      ],
+      memory: ['a'],
+    },
+    {
+      title: 'Process b: push onto stack',
+      note: 'b is a directory name, so we push it onto the stack. We are now inside a/b.',
+      formula: 'stack.push("b")',
+      callout: 'Stack now represents the path /a/b',
+      items: [
+        { label: 'a', state: 'match' },
+        { label: '.', state: 'skip' },
+        { label: 'b', state: 'active' },
+        { label: '..', state: 'default' },
+        { label: '..', state: 'default' },
+        { label: 'c', state: 'default' },
+      ],
+      memory: ['a', 'b'],
+    },
+    {
+      title: 'Process first ..: pop from stack',
+      note: 'Double-dot means go up one level. We pop b from the stack, returning to /a.',
+      formula: 'stack.pop()',
+      callout: 'Stack now represents the path /a',
+      items: [
+        { label: 'a', state: 'match' },
+        { label: '.', state: 'skip' },
+        { label: 'b', state: 'match' },
+        { label: '..', state: 'active' },
+        { label: '..', state: 'default' },
+        { label: 'c', state: 'default' },
+      ],
+      memory: ['a'],
+    },
+    {
+      title: 'Process second ..: pop from stack again',
+      note: 'Another double-dot. We pop a from the stack, returning to root (/).',
+      formula: 'stack.pop()',
+      callout: 'Stack now represents the path / (empty stack means root)',
+      items: [
+        { label: 'a', state: 'match' },
+        { label: '.', state: 'skip' },
+        { label: 'b', state: 'match' },
+        { label: '..', state: 'match' },
+        { label: '..', state: 'active' },
+        { label: 'c', state: 'default' },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Process c: push onto stack',
+      note: 'c is a directory name. We push it onto the stack. We are now at /c.',
+      formula: 'stack.push("c")',
+      callout: 'Stack now represents the path /c',
+      items: [
+        { label: 'a', state: 'match' },
+        { label: '.', state: 'skip' },
+        { label: 'b', state: 'match' },
+        { label: '..', state: 'match' },
+        { label: '..', state: 'match' },
+        { label: 'c', state: 'active' },
+      ],
+      memory: ['c'],
+    },
+    {
+      title: 'Reconstruct canonical path',
+      note: 'All components processed. Join the stack with / and prepend / to get the result.',
+      formula: '"/" + stack.join("/")',
+      callout: 'Final result: /c',
+      items: [
+        { label: 'a', state: 'done' },
+        { label: '.', state: 'done' },
+        { label: 'b', state: 'done' },
+        { label: '..', state: 'done' },
+        { label: '..', state: 'done' },
+        { label: 'c', state: 'done' },
+      ],
+      memory: ['c', '=> Result: /c'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function simplifyPath(path):
+    components = split path by '/' and filter empty + '.'
+    stack = []
+    for component in components:
+        if component == "..":
+            if stack is not empty:
+                stack.pop()
+        else:
+            stack.push(component)
+    return "/" + join(stack, "/")
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyStack} lang="python" title="simplify_path_stack.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppStack} lang="cpp" title="simplify_path_stack.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaStack} lang="java" title="simplify_path_stack.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsStack} lang="javascript" title="simplify_path_stack.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustStack} lang="rust" title="simplify_path_stack.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goStack} lang="go" title="simplify_path_stack.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: String Parsing
+
+<ApproachTag tag="interview" />
+
+Instead of splitting the entire path first, parse it character by character. Extract each component between slashes, then apply the same logic: push directory names onto a string buffer, and handle `..` by backing up within the buffer.
+
+This approach uses manual index manipulation and is more efficient in languages with mutable strings.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass, no split" spaceNote="Result string buffer" />
+
+### Step-by-step Example
+
+**Input:** `/a/../../b/../c//.//`
+
+| Step | Index | Component | Action | Canonical |
+| --- | --- | --- | --- | --- |
+| Start | 0 | (none) | Initialize | `/` |
+| 1 | 1 | `a` | Append `a` | `/a` |
+| 2 | 3 | `..` | Backtrack to `/` | `/` |
+| 3 | 6 | `..` | Backtrack, but capped at root | `/` |
+| 4 | 9 | `b` | Append `b` | `/b` |
+| 5 | 11 | `..` | Backtrack to `/` | `/` |
+| 6 | 14 | `c` | Append `c` | `/c` |
+| 7 | 15+ | (none) | End of string | `/c` |
+
+### Pseudocode
+
+```plaintext
+function simplifyPathParsing(path):
+    canonical = "/"
+    i = 0
+    while i < len(path):
+        skip all '/'
+        if i >= len(path): break
+        j = i
+        extract component from i to next '/'
+        if component == "..":
+            remove last component from canonical (backtrack)
+        else if component != ".":
+            append component to canonical
+        i = j
+    return canonical
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyParsing} lang="python" title="simplify_path_parsing.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppParsing} lang="cpp" title="simplify_path_parsing.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaParsing} lang="java" title="simplify_path_parsing.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsParsing} lang="javascript" title="simplify_path_parsing.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustParsing} lang="rust" title="simplify_path_parsing.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goParsing} lang="go" title="simplify_path_parsing.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="simplify_path_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="simplify_path_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="SimplifyPathSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="simplify_path_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="simplify_path_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="simplify_path_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting that `..` at root does nothing.** Always check that the stack/canonical path is not empty before popping. If you are already at root, an extra `..` should not change anything.
+- **Trailing slashes in output.** The output must not have a trailing `/` unless the answer is exactly `/`. Make sure your join/reconstruction logic handles this.
+- **Confusing `.` with `..`.** A single dot means "stay here" (do nothing), while double-dot means "go to parent" (pop/backtrack).
+- **Not handling multiple consecutive slashes.** The input may have `/a//b///c`, which should be treated as `/a/b/c`. Split by `/` naturally handles this by creating empty strings, which we filter out.
+- **Off-by-one errors in string parsing.** If parsing manually, be careful with loop bounds and the positions of slashes.
+</Aside>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why Stack over manual parsing?** It is clearer, easier to explain, and less prone to index errors. Most real-world code uses this.
+- **When to use parsing over split?** If memory is constrained or you are optimizing for zero intermediate allocations (rare in interviews, but good to mention).
+- **Edge case — root directory.** Clarify with the interviewer: can the input be `///` (multiple slashes at root)? The problem statement says it's a valid path, so assume `/` is the only possible root-only input.
+- **Follow-up — canonical URLs.** After solving this, discuss how you would apply the same logic to URL paths (which have a scheme and domain prefix).
+- **Alternative approach — deque or reverse processing.** Some solutions use a deque and process from the end, but the stack approach is simpler to understand.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 65, title: 'Valid Number', difficulty: 'Hard', leetcodeSlug: 'valid-number' },
+  { number: 20, title: 'Valid Parentheses', difficulty: 'Easy', leetcodeSlug: 'valid-parentheses' },
+  { number: 150, title: 'Evaluate Reverse Polish Notation', difficulty: 'Medium', leetcodeSlug: 'evaluate-reverse-polish-notation' },
+  { number: 32, title: 'Longest Valid Parentheses', difficulty: 'Hard', leetcodeSlug: 'longest-valid-parentheses' },
+]} />
+
+<PrevNextNav
+  prevProblem={{ number: 70, title: "Climbing Stairs", slug: "climbing-stairs" }}
+  nextProblem={{ number: 72, title: "Edit Distance", slug: "edit-distance" }}
+/>

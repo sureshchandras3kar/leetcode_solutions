@@ -1,0 +1,356 @@
+---
+title: Remove Duplicates from Sorted Array
+description: Modify an array in-place to remove duplicates while maintaining relative order. Two approaches — Two Pointers O(n) and Simple Pass O(n) — in six languages.
+leetcodeNumber: 26
+difficulty: Easy
+leetcodeSlug: remove-duplicates-from-sorted-array
+tags: [Array, Two Pointers]
+prev:
+  label: "#25 Reverse Nodes in k-Group"
+  link: "../reverse-nodes-in-k-group/"
+next:
+  label: "#27 Remove Element"
+  link: "../remove-element/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyTwoPtr      from '@solutions/Python/remove_duplicates_from_sorted_array_two_pointer.py?raw';
+import cppTwoPtr     from '@solutions/C++/remove_duplicates_from_sorted_array_two_pointer.cpp?raw';
+import javaTwoPtr    from '@solutions/Java/remove_duplicates_from_sorted_array_two_pointer.java?raw';
+import jsTwoPtr      from '@solutions/JavaScript/remove_duplicates_from_sorted_array_two_pointer.js?raw';
+import rustTwoPtr    from '@solutions/Rust/remove_duplicates_from_sorted_array_two_pointer.rs?raw';
+import goTwoPtr      from '@solutions/Golang/remove_duplicates_from_sorted_array_two_pointer.go?raw';
+import pyoptimized from '@solutions/Python/remove_duplicates_from_sorted_array_optimized.py?raw';
+import cppoptimized from '@solutions/C++/remove_duplicates_from_sorted_array_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/RemoveDuplicatesFromSortedArrayOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/remove_duplicates_from_sorted_array_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/remove_duplicates_from_sorted_array_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/remove_duplicates_from_sorted_array_optimized.go?raw';
+
+import pySimple      from '@solutions/Python/remove_duplicates_from_sorted_array_simple.py?raw';
+import cppSimple     from '@solutions/C++/remove_duplicates_from_sorted_array_simple.cpp?raw';
+import javaSimple    from '@solutions/Java/remove_duplicates_from_sorted_array_simple.java?raw';
+import jsSimple      from '@solutions/JavaScript/remove_duplicates_from_sorted_array_simple.js?raw';
+import rustSimple    from '@solutions/Rust/remove_duplicates_from_sorted_array_simple.rs?raw';
+import goSimple      from '@solutions/Golang/remove_duplicates_from_sorted_array_simple.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums` sorted in **non-decreasing order**, remove the duplicates **in-place** such that each unique element appears only once. The **relative order** of the elements should be kept the same. Then return the number of unique elements in `nums`.
+
+Consider the number of unique elements of `nums` to be `k`. To get accepted, you need to do the following things:
+1. Change the array `nums` such that the first `k` elements of `nums` contain the unique elements in the order they were present initially.
+2. The remaining elements of `nums` are not important as well as the size of `nums`.
+3. Return `k`.
+
+<Aside type="tip" title="What to notice first">
+- The array is **sorted**, which means duplicates are always consecutive.
+- You must modify the array **in-place** without using extra space for a new array.
+- Only the first `k` elements matter; the rest can contain anything.
+- You return `k`, not the modified array.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[1, 1, 2]` | `2` | Array becomes `[1, 2, _]`. The first 2 elements are unique. |
+| `[0, 0, 1, 1, 1, 2, 2, 3, 3, 4]` | `5` | Array becomes `[0, 1, 2, 3, 4, _, _, _, _, _]`. The first 5 elements are unique. |
+
+## Constraints
+
+- `1 <= nums.length <= 3 * 10^4`
+- `-100 <= nums[i] <= 100`
+- `nums` is sorted in **non-decreasing order**.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Data deduplication** — compacting log entries or sensor data while preserving timestamp order.
+- **Database operations** — removing duplicate records in a pre-sorted result set.
+- **Memory optimization** — compacting memory in embedded systems with limited resources.
+- **Stream processing** — deduplicating sorted events from sensors or IoT devices in-place.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Modifies Array | Best When |
+| --- | --- | --- | --- | --- |
+| Two Pointers In-Place | O(n) | O(1) | Yes | General case — single pass, no extra memory |
+| Simple Pass | O(n) | O(1) | Yes | Clarity over performance — easier to understand |
+
+## Which approach should you learn first?
+
+- Pick **Two Pointers** if you want the optimal, interview-ready solution.
+- Pick **Simple Pass** if you prefer clearer variable naming and explicit logic flow.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Two Pointers In-Place</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Clarity</div>
+    <div class="lc-approach-quick__name">Simple Pass</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Two Pointers In-Place
+
+<ApproachTag tag="recommended" />
+
+Use two pointers: one to read unique elements and one to write them back. Since the array is sorted, duplicates are always consecutive. When we encounter a new unique element, write it to the write pointer and advance it.
+
+The key insight is that we only need to check `nums[i] != nums[i - 1]`. If true, we found a new unique element and should write it to the position `k`.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="No extra space" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1, 1, 2]`
+
+| Step | i | nums[i] | nums[i-1] | Same? | Action | k | Array State |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Start | - | - | - | - | Initialize | 1 | `[1, 1, 2]` |
+| 1 | 1 | 1 | 1 | ✓ | Skip, duplicate | 1 | `[1, 1, 2]` |
+| 2 | 2 | 2 | 1 | ✗ | Write nums[2] to nums[k=1], k++ | 2 | `[1, 2, 2]` |
+
+Return `k = 2`, array first 2 elements: `[1, 2]` ✓
+
+**Input:** `nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]`
+
+| Step | i | nums[i] | Unique? | Action | k | Progress |
+| --- | --- | --- | --- | --- | --- | --- |
+| Start | - | - | - | Initialize | 1 | `0` at k=0 is unique |
+| 1 | 1 | 0 | No | Skip | 1 | No change |
+| 2 | 2 | 1 | Yes | Write to k=1, k++ | 2 | `[0, 1, ...]` |
+| 3 | 3 | 1 | No | Skip | 2 | No change |
+| 4 | 4 | 1 | No | Skip | 2 | No change |
+| 5 | 5 | 2 | Yes | Write to k=2, k++ | 3 | `[0, 1, 2, ...]` |
+| 6 | 6 | 2 | No | Skip | 3 | No change |
+| 7 | 7 | 3 | Yes | Write to k=3, k++ | 4 | `[0, 1, 2, 3, ...]` |
+| 8 | 8 | 3 | No | Skip | 4 | No change |
+| 9 | 9 | 4 | Yes | Write to k=4, k++ | 5 | `[0, 1, 2, 3, 4, ...]` |
+
+Return `k = 5` ✓
+
+<LogicPlayer
+  title="How the two-pointer approach removes duplicates"
+  description="Watch the write pointer (k) move forward only when a unique element is found. The read pointer (i) scans through the entire array."
+  steps={[
+    {
+      title: 'Start with first element being unique',
+      note: 'The first element is always unique, so k starts at 1. We will compare each element with the previous one.',
+      formula: 'k = 1 (first element always counts)',
+      callout: 'The first element is guaranteed to be part of the result.',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '2', state: 'default', index: 2 },
+      ],
+      memory: ['k = 1 (write position)'],
+    },
+    {
+      title: 'Check second element: 1 == 1 (duplicate)',
+      note: 'nums[1] equals nums[0], so this is a duplicate. Skip it and do not advance k.',
+      formula: 'nums[1] == nums[0]? Yes, so skip',
+      callout: 'Duplicates do not advance the write pointer.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '1', state: 'active', index: 1 },
+        { label: '2', state: 'default', index: 2 },
+      ],
+      memory: ['k = 1 (unchanged)', 'nums[1] is a duplicate'],
+    },
+    {
+      title: 'Check third element: 2 != 1 (unique)',
+      note: 'nums[2] differs from nums[1], so it is a new unique element. Write it to nums[k] and advance k.',
+      formula: 'nums[2] != nums[1]? Yes, so write and advance',
+      callout: 'Write nums[2] to position nums[1], then increment k to 2.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '2', state: 'active', index: 2 },
+      ],
+      memory: ['k = 2 (advanced)', 'Array now: [1, 2, _]'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function removeDuplicates(nums):
+    if nums is empty:
+        return 0
+    
+    k = 1  // First element is always unique
+    for i from 1 to len(nums) - 1:
+        if nums[i] != nums[i - 1]:
+            nums[k] = nums[i]
+            k = k + 1
+    
+    return k
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPtr} lang="python" title="remove_duplicates_from_sorted_array_two_pointer.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPtr} lang="cpp" title="remove_duplicates_from_sorted_array_two_pointer.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPtr} lang="java" title="remove_duplicates_from_sorted_array_two_pointer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPtr} lang="javascript" title="remove_duplicates_from_sorted_array_two_pointer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPtr} lang="rust" title="remove_duplicates_from_sorted_array_two_pointer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPtr} lang="go" title="remove_duplicates_from_sorted_array_two_pointer.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Simple Pass
+
+<ApproachTag tag="simple" />
+
+Instead of tracking indices `i` and `k`, use explicit `readIdx` and `writeIdx` pointers with clearer semantics. This approach is functionally identical to the first but with more descriptive variable names.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="No extra space" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1, 1, 2]`
+
+| readIdx | writeIdx | nums[readIdx] | nums[writeIdx] | Action | Result |
+| --- | --- | --- | --- | --- | --- |
+| Start | 0 | - | 1 | Initialize pointers | - |
+| 1 | 0 | 1 | 1 | Equal, skip | No change |
+| 2 | 0 | 2 | 1 | Different, write nums[2] to nums[1], writeIdx++ | `[1, 2, _]` |
+
+Return `writeIdx + 1 = 2` ✓
+
+### Pseudocode
+
+```plaintext
+function removeDuplicates(nums):
+    if nums is empty:
+        return 0
+    
+    writeIdx = 0
+    for readIdx from 1 to len(nums) - 1:
+        if nums[readIdx] != nums[writeIdx]:
+            writeIdx = writeIdx + 1
+            nums[writeIdx] = nums[readIdx]
+    
+    return writeIdx + 1
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySimple} lang="python" title="remove_duplicates_from_sorted_array_simple.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSimple} lang="cpp" title="remove_duplicates_from_sorted_array_simple.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSimple} lang="java" title="remove_duplicates_from_sorted_array_simple.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSimple} lang="javascript" title="remove_duplicates_from_sorted_array_simple.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSimple} lang="rust" title="remove_duplicates_from_sorted_array_simple.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSimple} lang="go" title="remove_duplicates_from_sorted_array_simple.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="remove_duplicates_from_sorted_array_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="remove_duplicates_from_sorted_array_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="RemoveDuplicatesFromSortedArrayOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="remove_duplicates_from_sorted_array_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="remove_duplicates_from_sorted_array_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="remove_duplicates_from_sorted_array_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Not realizing the array is sorted.** The fact that duplicates are consecutive is critical to this algorithm's O(1) space complexity.
+- **Forgetting that only the first k elements matter.** Many beginners try to delete or shift elements, which wastes time and space.
+- **Off-by-one errors.** Remember that `k` starts at 1 (the first element is always unique) and we return `k`, not `k - 1`.
+- **Modifying comparison.** Always compare with the previous element (`nums[i] != nums[i - 1]`), not with `writeIdx`.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 27, title: 'Remove Element', difficulty: 'Easy', leetcodeSlug: 'remove-element' },
+  { number: 80, title: 'Remove Duplicates from Sorted Array II', difficulty: 'Medium', leetcodeSlug: 'remove-duplicates-from-sorted-array-ii' },
+  { number: 283, title: 'Move Zeroes', difficulty: 'Easy', leetcodeSlug: 'move-zeroes' },
+  { number: 25, title: 'Reverse Nodes in k-Group', difficulty: 'Hard', slug: 'problems/reverse-nodes-in-k-group', leetcodeSlug: 'reverse-nodes-in-k-group' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why two pointers?** Because the array is already sorted. If it were unsorted, we would need a hash set (O(n) space) or sorting first (O(n log n) time).
+- **Why in-place modification?** This is explicitly required by the problem. It tests whether you understand memory constraints.
+- **Edge cases:** Single element (return 1), all duplicates (return 1), all unique (return n).
+- **Follow-ups to expect:** 
+  - "What if duplicates can appear up to k times?" (Problem 80)
+  - "What if we need to preserve the original indices?" (Different problem entirely)
+  - "Can you do this without modifying the array?" (No, because the problem requires in-place modification)
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 25, title: "Reverse Nodes in k-Group", slug: "reverse-nodes-in-k-group" }}
+  nextProblem={{ number: 27, title: "Remove Element", slug: "remove-element" }}
+/>

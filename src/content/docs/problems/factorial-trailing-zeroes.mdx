@@ -1,0 +1,182 @@
+---
+title: Factorial Trailing Zeroes
+description: Given an integer n, return the number of trailing zeroes in n!.
+leetcodeNumber: 172
+difficulty: Medium
+leetcodeSlug: factorial-trailing-zeroes
+tags: ["Math"]
+prev:
+  label: "#169 Majority Element"
+  link: "../majority-element/"
+next:
+  label: "#173 Binary Search Tree Iterator"
+  link: "../binary-search-tree-iterator/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyCountfives from '@solutions/Python/factorial_trailing_zeroes_count_fives.py?raw';
+import cppCountfives from '@solutions/C++/factorial_trailing_zeroes_count_fives.cpp?raw';
+import javaCountfives from '@solutions/Java/factorial_trailing_zeroes_count_fives.java?raw';
+import jsCountfives from '@solutions/JavaScript/factorial_trailing_zeroes_count_fives.js?raw';
+import rustCountfives from '@solutions/Rust/factorial_trailing_zeroes_count_fives.rs?raw';
+import goCountfives from '@solutions/Golang/factorial_trailing_zeroes_count_fives.go?raw';
+
+import pyIterative from '@solutions/Python/factorial_trailing_zeroes_iterative.py?raw';
+import cppIterative from '@solutions/C++/factorial_trailing_zeroes_iterative.cpp?raw';
+import javaIterative from '@solutions/Java/factorial_trailing_zeroes_iterative.java?raw';
+import jsIterative from '@solutions/JavaScript/factorial_trailing_zeroes_iterative.js?raw';
+import rustIterative from '@solutions/Rust/factorial_trailing_zeroes_iterative.rs?raw';
+import goIterative from '@solutions/Golang/factorial_trailing_zeroes_iterative.go?raw';
+
+import pyFormula from '@solutions/Python/factorial_trailing_zeroes_formula.py?raw';
+import cppFormula from '@solutions/C++/factorial_trailing_zeroes_formula.cpp?raw';
+import javaFormula from '@solutions/Java/factorial_trailing_zeroes_formula.java?raw';
+import jsFormula from '@solutions/JavaScript/factorial_trailing_zeroes_formula.js?raw';
+import rustFormula from '@solutions/Rust/factorial_trailing_zeroes_formula.rs?raw';
+import goFormula from '@solutions/Golang/factorial_trailing_zeroes_formula.go?raw';
+
+
+
+## Problem Statement
+
+Given an integer n, return the number of trailing zeroes in n!.
+
+You need to solve this problem efficiently.
+
+<Aside type="tip" title="What to notice first">
+- Key insight 1 for Factorial Trailing Zeroes
+- Key insight 2 for solving this problem
+- Key insight 3 specific to the approach
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation for example 1 |
+| Example 2 | Result 2 | Explanation for example 2 |
+
+## Constraints
+
+- Constraint 1 for Factorial Trailing Zeroes
+- Constraint 2
+- Constraint 3
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Count Fives | O(n) | O(1) | When applicable |
+| Iterative | O(n) | O(1) | When applicable |
+| Formula | O(n) | O(1) | When applicable |
+
+
+## Approach 1: Count Fives
+
+<ApproachTag tag="recommended" />
+
+This approach provides an efficient solution for factorial trailing zeroes.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyCountfives}} lang="python" title="factorial_trailing_zeroes_count_fives.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppCountfives}} lang="cpp" title="factorial_trailing_zeroes_count_fives.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaCountfives}} lang="java" title="factorial_trailing_zeroes_count_fives.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsCountfives}} lang="javascript" title="factorial_trailing_zeroes_count_fives.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustCountfives}} lang="rust" title="factorial_trailing_zeroes_count_fives.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goCountfives}} lang="go" title="factorial_trailing_zeroes_count_fives.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative
+
+<ApproachTag tag="interview" />
+
+This approach provides an efficient solution for factorial trailing zeroes.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyIterative}} lang="python" title="factorial_trailing_zeroes_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppIterative}} lang="cpp" title="factorial_trailing_zeroes_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaIterative}} lang="java" title="factorial_trailing_zeroes_iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsIterative}} lang="javascript" title="factorial_trailing_zeroes_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustIterative}} lang="rust" title="factorial_trailing_zeroes_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goIterative}} lang="go" title="factorial_trailing_zeroes_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Formula
+
+<ApproachTag tag="simple" />
+
+This approach provides an efficient solution for factorial trailing zeroes.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyFormula}} lang="python" title="factorial_trailing_zeroes_formula.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppFormula}} lang="cpp" title="factorial_trailing_zeroes_formula.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaFormula}} lang="java" title="factorial_trailing_zeroes_formula.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsFormula}} lang="javascript" title="factorial_trailing_zeroes_formula.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustFormula}} lang="rust" title="factorial_trailing_zeroes_formula.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goFormula}} lang="go" title="factorial_trailing_zeroes_formula.go" />
+  </TabItem>
+</Tabs>
+
+
+
+<RelatedProblems problems={{
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 9, title: 'Palindrome Number', difficulty: 'Easy', leetcodeSlug: 'palindrome-number' },
+}} />
+
+<PrevNextNav
+  prevProblem={ number: 69, title: "Sqrt(x)", slug: "sqrtx" }
+  nextProblem=undefined
+/>

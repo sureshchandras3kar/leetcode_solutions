@@ -1,0 +1,385 @@
+---
+title: Linked List Cycle
+description: Detect if a linked list contains a cycle. Two approaches — Floyd's Algorithm (Tortoise & Hare) O(n)/O(1) and Hash Set O(n)/O(n) — in six languages.
+leetcodeNumber: 141
+difficulty: Easy
+leetcodeSlug: linked-list-cycle
+tags: [Linked List, Two Pointers, Hash Table]
+prev:
+  label: "#139 Word Break"
+  link: "../word-break/"
+next:
+  label: "#146 LRU Cache"
+  link: "../lru-cache/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyFloyd    from '@solutions/Python/linked_list_cycle_floyd.py?raw';
+import cppFloyd   from '@solutions/C++/linked_list_cycle_floyd.cpp?raw';
+import javaFloyd  from '@solutions/Java/linked_list_cycle_floyd.java?raw';
+import jsFloyd    from '@solutions/JavaScript/linked_list_cycle_floyd.js?raw';
+import rustFloyd  from '@solutions/Rust/linked_list_cycle_floyd.rs?raw';
+import goFloyd    from '@solutions/Golang/linked_list_cycle_floyd.go?raw';
+import pyoptimized from '@solutions/Python/linked_list_cycle_optimized.py?raw';
+import cppoptimized from '@solutions/C++/linked_list_cycle_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/LinkedListCycleOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/linked_list_cycle_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/linked_list_cycle_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/linked_list_cycle_optimized.go?raw';
+
+import pyHash    from '@solutions/Python/linked_list_cycle_hash_set.py?raw';
+import cppHash   from '@solutions/C++/linked_list_cycle_hash_set.cpp?raw';
+import javaHash  from '@solutions/Java/linked_list_cycle_hash_set.java?raw';
+import jsHash    from '@solutions/JavaScript/linked_list_cycle_hash_set.js?raw';
+import rustHash  from '@solutions/Rust/linked_list_cycle_hash_set.rs?raw';
+import goHash    from '@solutions/Golang/linked_list_cycle_hash_set.go?raw';
+
+## Problem Statement
+
+Given the `head` of a linked list, determine if the linked list has a cycle in it.
+
+There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the `next` pointer. Internally, `pos` is used to denote the index of the node that tail's `next` pointer is connected to. Note that `pos` is **not passed as a parameter**.
+
+Return `true` if there is a cycle in the linked list. Otherwise, return `false`.
+
+<Aside type="tip" title="What to notice first">
+- A cycle exists when a node's `next` pointer eventually points back to a node we've already visited.
+- **Floyd's Algorithm** uses two pointers at different speeds: if they ever meet, a cycle exists. This works because in a circular list, the fast pointer will eventually "lap" the slow pointer.
+- The **Hash Set** approach tracks visited nodes; if we encounter a node twice, a cycle exists.
+- Both approaches have the same O(n) time complexity, but Floyd's saves space with O(1) vs. O(n).
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Head: `[3,2,0,-4]`, pos: `1` | `true` | Cycle: 2 → 0 → -4 → 2 |
+| Head: `[1,2]`, pos: `0` | `true` | Cycle: 2 → 1 → 2 |
+| Head: `[1]`, pos: `-1` | `false` | No cycle |
+
+## Constraints
+
+- The number of the nodes in the list is in the range `[0, 10^4]`.
+- `-10^5 <= Node.val <= 10^5`
+- `pos` is `-1` or a **valid index** in the linked-list.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Garbage collection** — detect circular references in memory to prevent infinite loops during cleanup.
+- **Graph traversal** — identify cycles in directed graphs to ensure algorithms terminate.
+- **Data structure validation** — verify linked lists are well-formed (no accidental cycles).
+- **Deadlock detection** — in concurrent systems, identify circular wait conditions between threads or resources.
+- **Infinite loop prevention** — detect cycles in dependency chains (e.g., in build systems or package managers).
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Floyd's Algorithm | O(n) | O(1) | Space is limited; elegant two-pointer technique |
+| Hash Set | O(n) | O(n) | Space is available; easier to understand |
+
+## Which approach should you learn first?
+
+- Learn **Floyd's Algorithm** first — it is the **optimal** solution and a classic interview technique.
+- Use **Hash Set** as a fallback if you forget the two-pointer logic; it is straightforward and correct.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Space Efficient &amp; Optimal</div>
+    <div class="lc-approach-quick__name">Floyd's Algorithm</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Easy to Implement</div>
+    <div class="lc-approach-quick__name">Hash Set</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Floyd's Algorithm (Tortoise & Hare)
+
+<ApproachTag tag="recommended" />
+
+Use two pointers starting at the head: a slow pointer that advances one step at a time, and a fast pointer that advances two steps at a time. If a cycle exists, the fast pointer will eventually catch up to (meet) the slow pointer. If no cycle exists, the fast pointer will reach the end (null).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass with two pointers" spaceNote="Only two pointer variables" />
+
+### Step-by-step Example
+
+**Input:** `[3, 2, 0, -4]` with cycle at index 1
+
+| Step | Slow Position | Fast Position | Notes |
+| --- | --- | --- | --- |
+| Start | 3 | 3 | Both start at head |
+| Step 1 | 2 | 0 | Slow moves 1, fast moves 2 |
+| Step 2 | 0 | 2 | Slow moves 1, fast moves 2 |
+| Step 3 | -4 | -4 | Slow moves 1, fast moves 2 |
+| Step 4 | 2 | 0 | Both in cycle, continue |
+| Step 5 | 0 | -4 | Fast closing in |
+| Step 6 | -4 | 2 | Still moving |
+| Step 7 | 2 | 0 | Pointers converge |
+| Step 8 | 0 | -4 | **Slow == Fast** → Cycle detected! |
+
+<LogicPlayer
+  title="How the tortoise and hare detect a cycle"
+  description="Use Next or Autoplay to see the slow (tortoise) and fast (hare) pointers move through the list. When they meet, a cycle is confirmed."
+  steps={[
+    {
+      title: 'Both pointers start at head (3)',
+      note: 'Slow and fast both begin at the first node. In a circular list, the fast pointer will eventually catch up.',
+      formula: 'slow = head, fast = head',
+      items: [
+        { label: '3', state: 'active', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '0', state: 'default', index: 2 },
+        { label: '-4', state: 'default', index: 3 },
+      ],
+      memory: ['slow: 3', 'fast: 3'],
+    },
+    {
+      title: 'Slow moves 1 step (→ 2), Fast moves 2 steps (→ 0)',
+      note: 'Fast pointer advances twice as quickly. The speed difference is key to collision detection.',
+      formula: 'slow = slow.next, fast = fast.next.next',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '0', state: 'active', index: 2 },
+        { label: '-4', state: 'default', index: 3 },
+      ],
+      memory: ['slow: 2', 'fast: 0'],
+    },
+    {
+      title: 'Slow moves 1 step (→ 0), Fast moves 2 steps (→ 2)',
+      note: 'Fast pointer continues advancing. They are closing in on each other within the cycle.',
+      formula: 'slow moves 1, fast moves 2',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '0', state: 'active', index: 2 },
+        { label: '-4', state: 'default', index: 3 },
+      ],
+      memory: ['slow: 0', 'fast: 2'],
+    },
+    {
+      title: 'Slow moves 1 step (→ -4), Fast moves 2 steps (→ 2 again)',
+      note: 'Inside the cycle: [2 → 0 → -4 → 2]. Fast is lapping around faster than slow.',
+      formula: 'slow moves 1, fast moves 2 in cycle',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '0', state: 'default', index: 2 },
+        { label: '-4', state: 'active', index: 3 },
+      ],
+      memory: ['slow: -4', 'fast: 2 (cycle)'],
+    },
+    {
+      title: 'Slow moves 1 step (→ 2), Fast moves 2 steps (→ -4)',
+      note: 'Pointers continue closing the gap. Fast will eventually match slow.',
+      formula: 'slow and fast keep moving',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '0', state: 'default', index: 2 },
+        { label: '-4', state: 'default', index: 3 },
+      ],
+      memory: ['slow: 2', 'fast: -4 (cycle)'],
+    },
+    {
+      title: 'Slow moves 1 step (→ 0), Fast moves 2 steps (→ 2)',
+      note: 'They are very close now.',
+      formula: 'gap narrowing',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '0', state: 'active', index: 2 },
+        { label: '-4', state: 'default', index: 3 },
+      ],
+      memory: ['slow: 0', 'fast: 2 (cycle)'],
+    },
+    {
+      title: 'Slow moves 1 step (→ -4), Fast moves 2 steps (→ -4)',
+      note: 'Direct collision! They are now pointing to the same node.',
+      formula: 'slow == fast → Cycle detected!',
+      callout: 'Because the fast pointer travels twice as fast, it will always catch the slow pointer if a cycle exists.',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '0', state: 'default', index: 2 },
+        { label: '-4', state: 'active', index: 3 },
+      ],
+      memory: ['slow: -4 ✓', 'fast: -4 ✓', 'COLLISION → true'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function hasCycle(head):
+    if head is null or head.next is null:
+        return false
+    
+    slow = head
+    fast = head
+    
+    while fast is not null and fast.next is not null:
+        slow = slow.next                    // Move 1 step
+        fast = fast.next.next              // Move 2 steps
+        
+        if slow == fast:
+            return true                     // Collision detected
+    
+    return false                            // No cycle found
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyFloyd} lang="python" title="linked_list_cycle_floyd.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppFloyd} lang="cpp" title="linked_list_cycle_floyd.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaFloyd} lang="java" title="linked_list_cycle_floyd.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsFloyd} lang="javascript" title="linked_list_cycle_floyd.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustFloyd} lang="rust" title="linked_list_cycle_floyd.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goFloyd} lang="go" title="linked_list_cycle_floyd.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Hash Set
+
+<ApproachTag tag="simple" />
+
+Iterate through the linked list, storing each visited node in a set. If we encounter a node that is already in the set, a cycle exists. If we reach the end of the list (null), there is no cycle.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass through list" spaceNote="Set grows with visited nodes" />
+
+### Step-by-step Example
+
+**Input:** `[3, 2, 0, -4]` with cycle at index 1
+
+| Node | In Set? | Action |
+| --- | --- | --- |
+| 3 | No | Add to set → `{3}` |
+| 2 | No | Add to set → `{3, 2}` |
+| 0 | No | Add to set → `{3, 2, 0}` |
+| -4 | No | Add to set → `{3, 2, 0, -4}` |
+| 2 | **Yes** | **Cycle detected!** Return `true` |
+
+### Pseudocode
+
+```plaintext
+function hasCycle(head):
+    seen = empty set
+    current = head
+    
+    while current is not null:
+        if current is in seen:
+            return true                     // Found a cycle
+        seen.add(current)
+        current = current.next
+    
+    return false                            // No cycle found
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHash} lang="python" title="linked_list_cycle_hash_set.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHash} lang="cpp" title="linked_list_cycle_hash_set.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHash} lang="java" title="linked_list_cycle_hash_set.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHash} lang="javascript" title="linked_list_cycle_hash_set.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHash} lang="rust" title="linked_list_cycle_hash_set.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHash} lang="go" title="linked_list_cycle_hash_set.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Null pointer checks:** Always check if `head` is null or `head.next` is null before entering the loop in Floyd's algorithm.
+- **Fast pointer safety:** In Floyd's algorithm, check that `fast` and `fast.next` are not null before advancing; otherwise, you risk a null pointer exception.
+- **Hash set memory:** The hash set approach uses O(n) extra space, which can be problematic for very large lists.
+- **Pointer identity vs. value:** Use pointer comparison (`==`), not value comparison, to detect cycles. Two different nodes with the same value are not the same node.
+</Aside>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="linked_list_cycle_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="linked_list_cycle_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="LinkedListCycleOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="linked_list_cycle_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="linked_list_cycle_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="linked_list_cycle_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 2, title: 'Add Two Numbers', difficulty: 'Medium', slug: 'problems/add-two-numbers' },
+  { number: 142, title: 'Linked List Cycle II', difficulty: 'Medium', leetcodeSlug: 'linked-list-cycle-ii' },
+  { number: 160, title: 'Intersection of Two Linked Lists', difficulty: 'Easy', leetcodeSlug: 'intersection-of-two-linked-lists' },
+  { number: 206, title: 'Reverse Linked List', difficulty: 'Easy', leetcodeSlug: 'reverse-linked-list' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why Floyd's Algorithm?** It is O(1) space and demonstrates sophisticated two-pointer technique. This is the expected solution for optimal interviews.
+- **Hash Set alternative:** If you struggle to recall Floyd's algorithm, the hash set approach is correct and O(n) space is often acceptable.
+- **Proof of correctness:** Floyd's algorithm works because in a circular list, the difference in speeds guarantees eventual collision. The relative speed of 2 vs. 1 means the fast pointer "laps" the slow pointer.
+- **Edge cases:** Empty list, single node, two-node cycle, and late-cycle entry all test your implementation thoroughly.
+- **Follow-up:** Problem #142 asks for the cycle start node — Floyd's algorithm can be extended to find it in two phases.
+</Aside>

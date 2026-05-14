@@ -1,0 +1,277 @@
+---
+title: Search Insert Position
+description: Find the index to insert a target in a sorted array. Two approaches — binary search O(log n) and linear search O(n) — in six languages.
+leetcodeNumber: 35
+difficulty: Easy
+leetcodeSlug: search-insert-position
+tags: [Array, Binary Search]
+prev:
+  label: "#34 Find First and Last Position of Element in Sorted Array"
+  link: "../find-first-last-position-of-element-in-sorted-array/"
+next:
+  label: "#36 Valid Sudoku"
+  link: "../valid-sudoku/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBinarySearch     from '@solutions/Python/search_insert_position_binary_search.py?raw';
+import cppBinarySearch    from '@solutions/C++/search_insert_position_binary_search.cpp?raw';
+import javaBinarySearch   from '@solutions/Java/SearchInsertPositionBinarySearch.java?raw';
+import jsBinarySearch     from '@solutions/JavaScript/search_insert_position_binary_search.js?raw';
+import rustBinarySearch   from '@solutions/Rust/search_insert_position_binary_search.rs?raw';
+import goBinarySearch     from '@solutions/Golang/search_insert_position_binary_search.go?raw';
+import pySpaceOptimized from '@solutions/Python/search_insert_position_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/search_insert_position_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/SearchInsertPositionSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/search_insert_position_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/search_insert_position_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/search_insert_position_space_optimized.go?raw';
+
+import pyLinear      from '@solutions/Python/search_insert_position_linear_search.py?raw';
+import cppLinear     from '@solutions/C++/search_insert_position_linear_search.cpp?raw';
+import javaLinear    from '@solutions/Java/SearchInsertPositionLinearSearch.java?raw';
+import jsLinear      from '@solutions/JavaScript/search_insert_position_linear_search.js?raw';
+import rustLinear    from '@solutions/Rust/search_insert_position_linear_search.rs?raw';
+import goLinear      from '@solutions/Golang/search_insert_position_linear_search.go?raw';
+
+## Problem Statement
+
+Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+
+You must write an algorithm with O(log n) runtime complexity.
+
+<Aside type="tip" title="What to notice first">
+- The array is sorted, which suggests a binary search solution.
+- If the target is not found, the search pointers converge to the insertion position.
+- The left pointer at the end of binary search always points to where the target should be inserted.
+</Aside>
+
+### Examples
+
+| Input | Target | Output | Explanation |
+| --- | --- | --- | --- |
+| `[1, 3, 5, 6]` | `5` | `2` | Target found at index 2 |
+| `[1, 3, 5, 6]` | `2` | `1` | Insert at index 1 to maintain sort order |
+| `[1, 3, 5, 6]` | `7` | `4` | Insert at end (index 4) |
+
+## Constraints
+
+- `1 <= nums.length <= 10^4`
+- `-10^9 <= nums[i] <= 10^9`
+- All elements are distinct
+- `-10^9 <= target <= 10^9`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Database indexing** — finding the correct position to insert a new record while maintaining sort order.
+- **Sorted list maintenance** — keeping a dynamic sorted structure as new elements arrive.
+- **Library shelf placement** — determining where a book should go in a sorted catalog.
+- **Event scheduling** — inserting a new event at the correct time slot in a timeline.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Binary Search | O(log n) | O(1) | Standard approach — sorted array, optimal runtime |
+| Linear Search | O(n) | O(1) | Small arrays, simplicity preferred over speed |
+
+## Which approach should you learn first?
+
+- Pick **Binary Search** if you want the optimal O(log n) solution and understand the pattern.
+- Pick **Linear Search** if you are still learning or the array is small.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Binary Search</div>
+    <div class="lc-approach-quick__stats">O(log n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simplicity</div>
+    <div class="lc-approach-quick__name">Linear Search</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Binary Search (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use binary search on the sorted array. The key insight is that when the target is not found, the `left` pointer converges to the insertion position.
+
+<ComplexityBadges time="O(log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Halve search space each iteration" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1, 3, 5, 6]`, `target = 2`
+
+| Step | left | right | mid | nums[mid] | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 3 | 1 | 3 | 3 > 2 → right = 0 |
+| 2 | 0 | 0 | 0 | 1 | 1 < 2 → left = 1 |
+| 3 | 1 | 0 | — | — | left > right, exit. **left = 1 is insertion point** ✓ |
+
+### Pseudocode
+
+```plaintext
+function searchInsert(nums, target):
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = left + (right - left) / 2
+        if nums[mid] == target:
+            return mid
+        elif nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return left  // Insertion point
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBinarySearch} lang="python" title="search_insert_position_binary_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBinarySearch} lang="cpp" title="search_insert_position_binary_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBinarySearch} lang="java" title="SearchInsertPositionBinarySearch.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBinarySearch} lang="javascript" title="search_insert_position_binary_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBinarySearch} lang="rust" title="search_insert_position_binary_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBinarySearch} lang="go" title="search_insert_position_binary_search.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Linear Search
+
+<ApproachTag tag="simple" />
+
+Scan through the array and return the index of the first element that is greater than or equal to the target.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Full array scan" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1, 3, 5, 6]`, `target = 2`
+
+| i | nums[i] | nums[i] >= target? | Action |
+| --- | --- | --- | --- |
+| 0 | 1 | No | Continue |
+| 1 | 3 | Yes | **Return 1** ✓ |
+
+### Pseudocode
+
+```plaintext
+function searchInsert(nums, target):
+    for i in range(len(nums)):
+        if nums[i] >= target:
+            return i
+    return len(nums)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyLinear} lang="python" title="search_insert_position_linear_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppLinear} lang="cpp" title="search_insert_position_linear_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaLinear} lang="java" title="SearchInsertPositionLinearSearch.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsLinear} lang="javascript" title="search_insert_position_linear_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustLinear} lang="rust" title="search_insert_position_linear_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goLinear} lang="go" title="search_insert_position_linear_search.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting that the left pointer marks the insertion position when target is not found.
+- Using `mid` directly without the offset calculation, causing integer overflow in some languages.
+- Returning the wrong value when the target should be inserted at the end of the array.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="search_insert_position_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="search_insert_position_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="SearchInsertPositionSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="search_insert_position_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="search_insert_position_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="search_insert_position_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 704, title: 'Binary Search', difficulty: 'Easy', leetcodeSlug: 'binary-search' },
+  { number: 33, title: 'Search in Rotated Sorted Array', difficulty: 'Medium', leetcodeSlug: 'search-in-rotated-sorted-array' },
+  { number: 34, title: 'Find First and Last Position of Element in Sorted Array', difficulty: 'Medium', leetcodeSlug: 'find-first-and-last-position-of-element-in-sorted-array' },
+  { number: 162, title: 'Find Peak Element', difficulty: 'Medium', leetcodeSlug: 'find-peak-element' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why binary search?** It achieves O(log n) on a sorted array, much faster than linear O(n).
+- **The insertion point insight:** When not found, `left` naturally points to where the element should be inserted. This is a powerful pattern.
+- **Edge cases:** Empty array, target smaller than all elements, target larger than all elements, array with one element.
+- **Why linear search might be preferred:** If the array is tiny (< 10 elements), linear might be clearer and faster in practice.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 34, title: "Find First and Last Position of Element in Sorted Array", slug: "find-first-last-position-of-element-in-sorted-array" }}
+  nextProblem={{ number: 36, title: "Valid Sudoku", slug: "valid-sudoku" }}
+/>

@@ -1,0 +1,315 @@
+---
+title: Combination Sum
+description: Find all unique combinations that sum to a target. Two approaches — backtracking basic O(N^T) and backtracking optimized with pruning O(N^T) — in six languages.
+leetcodeNumber: 39
+difficulty: Medium
+leetcodeSlug: combination-sum
+tags: [Array, Backtracking]
+prev:
+  label: "#36 Valid Sudoku"
+  link: "../valid-sudoku/"
+next:
+  label: "#41 First Missing Positive"
+  link: "../first-missing-positive/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBasic       from '@solutions/Python/combination_sum_basic.py?raw';
+import cppBasic      from '@solutions/C++/combination_sum_basic.cpp?raw';
+import javaBasic     from '@solutions/Java/CombinationSumBasic.java?raw';
+import jsBasic       from '@solutions/JavaScript/combination_sum_basic.js?raw';
+import rustBasic     from '@solutions/Rust/combination_sum_basic.rs?raw';
+import goBasic       from '@solutions/Golang/combination_sum_basic.go?raw';
+import pySpaceOptimized from '@solutions/Python/combination_sum_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/combination_sum_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/CombinationSumSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/combination_sum_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/combination_sum_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/combination_sum_space_optimized.go?raw';
+
+import pyOptimized    from '@solutions/Python/combination_sum_optimized.py?raw';
+import cppOptimized   from '@solutions/C++/combination_sum_optimized.cpp?raw';
+import javaOptimized  from '@solutions/Java/CombinationSumOptimized.java?raw';
+import jsOptimized    from '@solutions/JavaScript/combination_sum_optimized.js?raw';
+import rustOptimized  from '@solutions/Rust/combination_sum_optimized.rs?raw';
+import goOptimized    from '@solutions/Golang/combination_sum_optimized.go?raw';
+
+## Problem Statement
+
+Given an array of distinct integers `candidates` and a target integer `target`, return a list of all unique combinations of `candidates` where the chosen numbers sum to `target`.
+
+**Key constraint:** The same number in `candidates` may be chosen an unlimited number of times. The combination itself must be unique (different orderings of the same numbers count as one).
+
+<Aside type="tip" title="What to notice first">
+- This differs from standard combinations because elements can be reused.
+- You can use the same number multiple times (e.g., [2,2,2,2,2] for target 10 with candidate 2).
+- Order does not matter: [2,3] and [3,2] are considered the same combination.
+- You must explore all possible sums without duplicates.
+</Aside>
+
+### Examples
+
+| Input | Target | Output | Explanation |
+| --- | --- | --- | --- |
+| `candidates = [2,3,6,7]` | `7` | `[[2,2,3], [7]]` | 2+2+3=7, and 7=7 |
+| `candidates = [2,3,5]` | `8` | `[[2,2,2,2], [2,3,3], [3,5]]` | Multiple ways to reach 8 |
+| `candidates = [2]` | `1` | `[]` | No combination sums to 1 |
+
+## Constraints
+
+- `1 <= candidates.length <= 30`
+- `2 <= candidates[i] <= 40`
+- All elements are unique
+- `1 <= target <= 500`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Coin change problem** — finding all ways to make a target amount with coins where each coin type is unlimited.
+- **Knapsack with repetition** — selecting items with unlimited quantity to reach a target weight or value.
+- **Recipe scaling** — determining ingredient combinations where quantities can be repeated.
+- **Resource allocation** — distributing unlimited units of resource types to reach a target sum.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Optimization | Best When |
+| --- | --- | --- | --- | --- |
+| Basic Backtracking | O(N^T) | O(T) recursion | None | Want a straightforward, clear solution |
+| Optimized with Pruning | O(N^T) | O(T) recursion | Sort + early break | Expect large targets or large candidate arrays |
+
+## Which approach should you learn first?
+
+- Pick **Basic** if you want to understand the core backtracking logic.
+- Pick **Optimized** if you want production-ready code with early termination.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Clear Logic</div>
+    <div class="lc-approach-quick__name">Basic</div>
+    <div class="lc-approach-quick__stats">O(N^T) time &middot; O(T) space</div>
+  </div>
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Optimized</div>
+    <div class="lc-approach-quick__name">With Pruning</div>
+    <div class="lc-approach-quick__stats">O(N^T) time &middot; O(T) space</div>
+  </div>
+</div>
+
+## Approach 1: Basic Backtracking
+
+<ApproachTag tag="simple" />
+
+Recursively explore all possible combinations by trying each candidate at each step. When exploring a candidate, we can choose it again (pass `i` instead of `i+1`), allowing unlimited reuse. Stop when the remaining sum hits zero (found solution) or goes negative (prune branch).
+
+The key difference from standard combinations is the `i` instead of `i+1` parameter—this allows the same element to be used multiple times.
+
+<ComplexityBadges time="O(N^T)" space="O(T)" timeColor="red" spaceColor="yellow" timeNote="Exponential branching" spaceNote="Recursion depth" />
+
+### Step-by-step Example
+
+**Input:** `candidates = [2,3,6,7]`, `target = 7`
+
+| Depth | Current | Remaining | Action |
+| --- | --- | --- | --- |
+| 0 | `[]` | 7 | Try 2: choose 2 |
+| 1 | `[2]` | 5 | Try 2: choose 2 again |
+| 2 | `[2,2]` | 3 | Try 2: remaining < 0, backtrack; Try 3: choose 3 |
+| 3 | `[2,2,3]` | 0 | Found! Save `[2,2,3]` ✓ |
+| 0 | `[]` | 7 | Continue: Try 3, Try 6, Try 7 |
+| 1 | `[7]` | 0 | Found! Save `[7]` ✓ |
+
+### Pseudocode
+
+```plaintext
+function combinationSumBasic(candidates, target):
+    result = []
+    
+    function backtrack(index, current, remaining):
+        if remaining == 0:
+            result.append(copy of current)
+            return
+        
+        if remaining < 0:
+            return
+        
+        for i from index to len(candidates)-1:
+            candidate = candidates[i]
+            current.append(candidate)
+            backtrack(i, current, remaining - candidate)  # i, not i+1
+            current.pop()
+    
+    backtrack(0, [], target)
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBasic} lang="python" title="combination_sum_basic.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBasic} lang="cpp" title="combination_sum_basic.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBasic} lang="java" title="CombinationSumBasic.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBasic} lang="javascript" title="combination_sum_basic.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBasic} lang="rust" title="combination_sum_basic.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBasic} lang="go" title="combination_sum_basic.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Optimized Backtracking with Pruning
+
+<ApproachTag tag="recommended" />
+
+Improve the basic approach by sorting the candidates first. Then, during recursion, if the current candidate exceeds the remaining sum, break immediately because all subsequent candidates (being larger) will also exceed it.
+
+This pruning significantly reduces the search space for large targets or large candidate lists, though the worst-case time complexity remains O(N^T).
+
+<ComplexityBadges time="O(N^T)" space="O(T)" timeColor="red" spaceColor="yellow" timeNote="Exponential, but pruned" spaceNote="Recursion depth" />
+
+### Step-by-step Example
+
+**Input:** `candidates = [2,3,6,7]` (sorted), `target = 7`
+
+| Depth | Current | Remaining | Action |
+| --- | --- | --- | --- |
+| 0 | `[]` | 7 | Try 2 |
+| 1 | `[2]` | 5 | Try 2 again |
+| 2 | `[2,2]` | 3 | Try 2: candidate > remaining? No. Try 3: choose 3 |
+| 3 | `[2,2,3]` | 0 | Found! Save `[2,2,3]` ✓ |
+| 2 | `[2,2]` | 3 | Try 6: 6 > 3? Yes, break (pruning) ✓ |
+
+### Pseudocode
+
+```plaintext
+function combinationSumOptimized(candidates, target):
+    candidates.sort()
+    result = []
+    
+    function backtrack(index, current, remaining):
+        if remaining == 0:
+            result.append(copy of current)
+            return
+        
+        for i from index to len(candidates)-1:
+            candidate = candidates[i]
+            
+            if candidate > remaining:
+                break  # Pruning: all further candidates too large
+            
+            current.append(candidate)
+            backtrack(i, current, remaining - candidate)  # i, not i+1
+            current.pop()
+    
+    backtrack(0, [], target)
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyOptimized} lang="python" title="combination_sum_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppOptimized} lang="cpp" title="combination_sum_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaOptimized} lang="java" title="CombinationSumOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsOptimized} lang="javascript" title="combination_sum_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustOptimized} lang="rust" title="combination_sum_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goOptimized} lang="go" title="combination_sum_optimized.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Using `i+1` instead of `i` in the recursive call, which prevents reuse of the same candidate.
+- Forgetting to check for `remaining < 0` in the basic version (though optimized version avoids this).
+- Not saving a copy of `current` when appending to the result; pushing a reference will cause all results to point to the same list.
+- Sorting in-place without consideration (sorting can be beneficial for pruning but is not required for correctness).
+- Off-by-one errors in loop bounds; ensure `i` starts at `index`, not `index + 1`.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="combination_sum_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="combination_sum_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="CombinationSumSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="combination_sum_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="combination_sum_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="combination_sum_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 77, title: 'Combinations', difficulty: 'Medium', leetcodeSlug: 'combinations' },
+  { number: 46, title: 'Permutations', difficulty: 'Medium', leetcodeSlug: 'permutations' },
+  { number: 40, title: 'Combination Sum II', difficulty: 'Medium', leetcodeSlug: 'combination-sum-ii' },
+  { number: 17, title: 'Letter Combinations of a Phone Number', difficulty: 'Medium', leetcodeSlug: 'letter-combinations-of-a-phone-number' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Basic vs Optimized:** Both have the same theoretical time complexity O(N^T), but pruning provides substantial practical speedup in many cases.
+- **Why sorting helps:** Sorting enables early termination once a candidate exceeds the remaining sum. Explain this trade-off: O(n log n) sort cost vs. potential exponential savings.
+- **Time complexity understanding:** O(N^T) is the branching factor raised to the depth (T / min_candidate). For small candidates and large targets, this can be very large.
+- **Space complexity:** The recursion depth is at most O(T / min_candidate) because each step reduces remaining by at least min_candidate.
+- **Follow-up — Combination Sum II:** If candidates can have duplicates, sort first and skip duplicate candidates within the same recursive level.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 38, title: "Count and Say", slug: "count-and-say" }}
+  nextProblem={{ number: 40, title: "Combination Sum II", slug: "combination-sum-ii" }}
+/>

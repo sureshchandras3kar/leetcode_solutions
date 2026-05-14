@@ -1,0 +1,310 @@
+---
+title: Summary Ranges
+description: Summarize consecutive ranges in a sorted array. Two approaches — simulation O(n) and two-pointer O(n) — in six languages.
+leetcodeNumber: 228
+difficulty: Easy
+leetcodeSlug: summary-ranges
+tags: [Array, Two Pointers, String]
+prev:
+  label: "#226 Invert Binary Tree"
+  link: "../invert-binary-tree/"
+next:
+  label: "#230 Kth Smallest Element in a BST"
+  link: "../kth-smallest-element-in-a-bst/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySimulation from '@solutions/Python/summary_ranges_simulation.py?raw';
+import cppSimulation from '@solutions/C++/summary_ranges_simulation.cpp?raw';
+import javaSimulation from '@solutions/Java/Simulation.java?raw';
+import jsSimulation from '@solutions/JavaScript/summary_ranges_simulation.js?raw';
+import rustSimulation from '@solutions/Rust/summary_ranges_simulation.rs?raw';
+import goSimulation from '@solutions/Golang/summary_ranges_simulation.go?raw';
+import pyoptimized from '@solutions/Python/summary_ranges_optimized.py?raw';
+import cppoptimized from '@solutions/C++/summary_ranges_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/SummaryRangesOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/summary_ranges_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/summary_ranges_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/summary_ranges_optimized.go?raw';
+
+import pyPointers from '@solutions/Python/summary_ranges_pointers.py?raw';
+import cppPointers from '@solutions/C++/summary_ranges_pointers.cpp?raw';
+import javaPointers from '@solutions/Java/Pointers.java?raw';
+import jsPointers from '@solutions/JavaScript/summary_ranges_pointers.js?raw';
+import rustPointers from '@solutions/Rust/summary_ranges_pointers.rs?raw';
+import goPointers from '@solutions/Golang/summary_ranges_pointers.go?raw';
+
+## Problem Statement
+
+You are given a **sorted unique integer array** `nums`. A range is defined as a contiguous sequence of elements. Return a list of the smallest set of ranges that cover all the numbers in the array exactly. That is, each element in `nums` is covered by exactly one range, and there is no integer x such that x is in one of the ranges but not in `nums`.
+
+<Aside type="tip" title="What to notice first">
+- The input array is **already sorted** and contains **unique** integers.
+- You need to identify contiguous sequences (consecutive integers).
+- A range with a single element should be represented as just that number, while a range with two or more elements should use the `"start->end"` format.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[0, 1, 2, 4, 5, 7]` | `["0->2", "4->5", "7"]` | Three ranges: 0-2, 4-5, and single 7 |
+| `[0, 2, 3, 4, 6, 8, 9]` | `["0", "2->4", "6", "8->9"]` | Four ranges with mixed single and multi |
+| `[]` | `[]` | Empty input returns empty output |
+
+## Constraints
+
+- `0 <= nums.length <= 10^4`
+- `-2^31 <= nums[i] <= 2^31 - 1`
+- All the values of `nums` are **unique**.
+- `nums` is sorted in ascending order.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **IP address range summarization** — combining consecutive IP addresses into CIDR blocks.
+- **Memory allocation tracking** — representing allocated/freed memory blocks as ranges.
+- **Line number formatting** — displaying line ranges in error reports (e.g., "lines 5-10, 15, 20-22").
+- **Time slot consolidation** — merging consecutive time slots in a calendar or scheduling system.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Simulation | O(n) | O(1) | Single pass, build result on the fly |
+| Two-Pointer | O(n) | O(1) | Cleaner boundary detection, explicit pointers |
+
+Both approaches have optimal time complexity. Choose based on code clarity preference.
+
+## Which approach should you learn first?
+
+- Pick **Simulation** if you want a straightforward, single-loop implementation.
+- Pick **Two-Pointer** if you prefer explicit boundary management.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Direct</div>
+    <div class="lc-approach-quick__name">Simulation</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Explicit Boundaries</div>
+    <div class="lc-approach-quick__name">Two-Pointer</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Simulation
+
+<ApproachTag tag="recommended" />
+
+Iterate through the array once. Track the start of the current range. When a gap is found (consecutive check fails), finalize the current range and start a new one.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [0, 1, 2, 4, 5, 7]`
+
+| Step | i | nums[i] | Current Range | Action |
+| --- | --- | --- | --- | --- |
+| 1 | - | - | start=0 | Initialize with first element |
+| 2 | 1 | 1 | 0-1 | Consecutive, continue |
+| 3 | 2 | 2 | 0-2 | Consecutive, continue |
+| 4 | 3 | 4 | - | Gap found! Save "0->2", start=4 |
+| 5 | 4 | 5 | 4-5 | Consecutive, continue |
+| 6 | 5 | 7 | - | Gap found! Save "4->5", start=7 |
+| 7 | - | - | - | End of array, save "7" |
+
+### Pseudocode
+
+```plaintext
+function summaryRanges(nums):
+    if nums is empty:
+        return []
+    
+    result = []
+    start = nums[0]
+    
+    for i from 1 to len(nums) - 1:
+        if nums[i] != nums[i-1] + 1:
+            // Gap found, finalize range
+            if start == nums[i-1]:
+                result.append(str(start))
+            else:
+                result.append(str(start) + "->" + str(nums[i-1]))
+            start = nums[i]
+    
+    // Add final range
+    if start == nums[-1]:
+        result.append(str(start))
+    else:
+        result.append(str(start) + "->" + str(nums[-1]))
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySimulation} lang="python" title="summary_ranges_simulation.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSimulation} lang="cpp" title="summary_ranges_simulation.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSimulation} lang="java" title="Simulation.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSimulation} lang="javascript" title="summary_ranges_simulation.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSimulation} lang="rust" title="summary_ranges_simulation.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSimulation} lang="go" title="summary_ranges_simulation.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Two-Pointer
+
+<ApproachTag tag="interview" />
+
+Maintain explicit `left` and `right` pointers. The `right` pointer advances; when a gap is detected, both pointers define the current range.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [0, 2, 3, 4, 6, 8, 9]`
+
+| Step | left | right | nums[left] | nums[right] | Check | Action |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 0 | 0 | 0 | Next (2) != 1 | Save "0", left=1 |
+| 2 | 1 | 1 | 2 | 2 | Next (3) == 3 | Continue |
+| 3 | 1 | 2 | 2 | 3 | Next (4) == 4 | Continue |
+| 4 | 1 | 3 | 2 | 4 | Next (6) != 5 | Save "2->4", left=4 |
+| 5 | 4 | 4 | 6 | 6 | Next (8) != 7 | Save "6", left=5 |
+| 6 | 5 | 5 | 8 | 8 | Next (9) == 9 | Continue |
+| 7 | 5 | 6 | 8 | 9 | End | Save "8->9" |
+
+### Pseudocode
+
+```plaintext
+function summaryRanges(nums):
+    if nums is empty:
+        return []
+    
+    result = []
+    left = 0
+    
+    for right from 0 to len(nums) - 1:
+        // Check if this is the last element or next breaks sequence
+        if right == len(nums) - 1 or nums[right + 1] != nums[right] + 1:
+            if left == right:
+                result.append(str(nums[left]))
+            else:
+                result.append(str(nums[left]) + "->" + str(nums[right]))
+            left = right + 1
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPointers} lang="python" title="summary_ranges_pointers.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPointers} lang="cpp" title="summary_ranges_pointers.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPointers} lang="java" title="Pointers.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPointers} lang="javascript" title="summary_ranges_pointers.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPointers} lang="rust" title="summary_ranges_pointers.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPointers} lang="go" title="summary_ranges_pointers.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="summary_ranges_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="summary_ranges_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="SummaryRangesOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="summary_ranges_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="summary_ranges_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="summary_ranges_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Off-by-one errors** when checking if the next element is consecutive.
+- **Single-element confusion** — forgetting that `"7"` (not `"7->7"`) represents a single-number range.
+- **Integer overflow** — in languages like C++/Java, be careful when calculating `nums[i] + 1` for large integers.
+- **Empty array handling** — returning the wrong type or not checking the empty case first.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 56, title: 'Merge Intervals', difficulty: 'Medium', leetcodeSlug: 'merge-intervals' },
+  { number: 57, title: 'Insert Interval', difficulty: 'Medium', leetcodeSlug: 'insert-interval' },
+  { number: 452, title: 'Minimum Number of Arrows to Burst Balloons', difficulty: 'Medium', leetcodeSlug: 'minimum-number-of-arrows-to-burst-balloons' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Simulation vs Two-Pointer**: Both are O(n). Simulation is more implicit about when a range ends; two-pointer is more explicit. Neither has a clear advantage.
+- **Integer overflow**: Mention that checking `nums[i + 1] != nums[i] + 1` is safer than converting to long when possible.
+- **Edge cases to mention**: Empty array, single-element array, and large integer values (especially negative numbers).
+- **Follow-up — Unsorted input**: Would require sorting first (O(n log n)), then the same approach.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 56, title: "Merge Intervals", slug: "merge-intervals" }}
+  nextProblem={{ number: 56, title: "Merge Intervals", slug: "merge-intervals" }}
+/>

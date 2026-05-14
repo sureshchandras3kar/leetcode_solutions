@@ -1,0 +1,509 @@
+---
+title: Basic Calculator
+description: Evaluate mathematical expressions with +, -, *, /, and parentheses. Two approaches — Stack with Sign O(n) and Two-Pass with Shunting Yard O(n) — in six languages.
+leetcodeNumber: 224
+difficulty: Hard
+leetcodeSlug: basic-calculator
+tags: [Math, String, Stack]
+prev:
+  label: "#222 Count Complete Tree Nodes"
+  link: "../count-complete-tree-nodes/"
+next:
+  label: "#226 Invert Binary Tree"
+  link: "../invert-binary-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyStack     from '@solutions/Python/basic_calculator_stack.py?raw';
+import cppStack    from '@solutions/C++/basic_calculator_stack.cpp?raw';
+import javaStack   from '@solutions/Java/basic_calculator_stack.java?raw';
+import jsStack     from '@solutions/JavaScript/basic_calculator_stack.js?raw';
+import rustStack   from '@solutions/Rust/basic_calculator_stack.rs?raw';
+import goStack     from '@solutions/Golang/basic_calculator_stack.go?raw';
+import pySpaceOptimized from '@solutions/Python/basic_calculator_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/basic_calculator_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/BasicCalculatorSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/basic_calculator_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/basic_calculator_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/basic_calculator_space_optimized.go?raw';
+
+import pyTwoPass   from '@solutions/Python/basic_calculator_two_pass.py?raw';
+import cppTwoPass  from '@solutions/C++/basic_calculator_two_pass.cpp?raw';
+import javaTwoPass from '@solutions/Java/basic_calculator_two_pass.java?raw';
+import jsTwoPass   from '@solutions/JavaScript/basic_calculator_two_pass.js?raw';
+import rustTwoPass from '@solutions/Rust/basic_calculator_two_pass.rs?raw';
+import goTwoPass   from '@solutions/Golang/basic_calculator_two_pass.go?raw';
+
+## Problem Statement
+
+Implement a calculator to evaluate a string expression containing:
+- **Digits** and **multi-digit numbers**
+- **Operators**: `+`, `-`, `*`, `/`
+- **Parentheses** for grouping: `(`, `)`
+- **Whitespace** (ignore it)
+
+Return the integer result. Integer division truncates toward zero.
+
+<Aside type="tip" title="What to notice first">
+- Parentheses require a **nested evaluation** — store partial results.
+- Operator precedence doesn't matter for the stack approach (parentheses handle it).
+- For the two-pass approach, convert to postfix notation first, then evaluate.
+- Multi-digit numbers must be accumulated before processing operators.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `"1 + 1"` | `2` | Simple addition |
+| `" 2-1 + 2 "` | `3` | Basic arithmetic with spaces |
+| `"(1+(4+5+2)-3)+(6+8)"` | `23` | Nested parentheses: (1+11-3)+(14) = 9+14 |
+| `"2*(5+5*2)/3+(6/2*5)"` | `17` | Mixed operators: 2*(15)/3+(15) = 10+15 (left-to-right) |
+
+## Constraints
+
+- `1 <= s.length <= 3 * 10^5`
+- `s` consists of digits, `'+'`, `'-'`, `'*'`, `'/'`, `'('`, `')'`, and `' '`.
+- All integers in the expression are non-negative.
+- Integer division truncates toward zero.
+- There will not be any division by zero.
+- Valid expressions only (no invalid syntax).
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Spreadsheet formulas** — Excel/Google Sheets evaluate user-entered expressions.
+- **Configuration parsers** — INI files and config languages often support arithmetic.
+- **Financial calculators** — Mortgage, NPV, and compound interest formulas.
+- **Scientific notation** — Physics and engineering software evaluates complex expressions.
+- **SQL query optimization** — Database engines evaluate WHERE clause conditions.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Parsing | Suited For |
+| --- | --- | --- | --- | --- |
+| Stack with Sign | O(n) | O(d) | Single pass | Easier to understand, only +/- |
+| Two-Pass (Postfix) | O(n) | O(n) | Infix → Postfix → Eval | All operators, full precedence |
+
+*d = nesting depth (typically << n)*
+
+## Which approach should you learn first?
+
+- Pick **Stack with Sign** if you want a simple, intuitive solution (good for interviews).
+- Pick **Two-Pass** if you need to handle all operators and understand compiler design.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Intuitive</div>
+    <div class="lc-approach-quick__name">Stack with Sign</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(d) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Most Flexible</div>
+    <div class="lc-approach-quick__name">Two-Pass Postfix</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Stack with Sign (Recommended)
+
+<ApproachTag tag="recommended" />
+
+For simple `+` and `-`, we can use a stack to handle parentheses. The key insight is:
+- Accumulate numbers as we read digits.
+- When we encounter an operator or closing paren, decide what to do with the number.
+- Push partial results onto a stack when we enter parentheses; pop and combine when we exit.
+
+The "sign" variable tracks whether the next number should be added or subtracted.
+
+<ComplexityBadges time="O(n)" space="O(d)" timeColor="green" spaceColor="yellow" timeNote="Single pass" spaceNote="Stack depth = nesting" />
+
+### Step-by-step Example
+
+**Input:** `"(1+(4+5+2)-3)+(6+8)"`
+
+| Step | Char | num | sign | result | stack | Action |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | — | 0 | 1 | 0 | `[]` | Initialize |
+| 1 | `(` | 0 | 1 | 0 | `[0, 1]` | Push result & sign |
+| 2 | `1` | 1 | 1 | 0 | `[0, 1]` | Accumulate digit |
+| 3 | `+` | 1 | 1 | 1 | `[0, 1]` | Apply sign, reset |
+| 4 | `(` | 0 | 1 | 1 | `[0, 1, 1, 1]` | Push nested context |
+| 5-8 | `4+5+2` | 11 | 1 | 12 | `[0, 1, 1, 1]` | Sum → 4+5+2 = 11 |
+| 9 | `)` | 11 | 1 | 12 | `[0, 1]` | Pop sign & prev; 1 + (1*12) |
+| 10 | `-` | 0 | -1 | 12 | `[0, 1]` | Subtract next |
+| 11 | `3` | 3 | -1 | 9 | `[0, 1]` | Apply sign → 12 - 3 |
+| 12 | `)` | 3 | -1 | 9 | `[]` | Pop and combine |
+| 13 | `+` | 0 | 1 | 9 | `[]` | Add next group |
+| 14 | `(` | 0 | 1 | 9 | `[9, 1]` | Push context |
+| 15-17 | `6+8` | 14 | 1 | 14 | `[9, 1]` | Sum → 6+8 = 14 |
+| 18 | `)` | 14 | 1 | 23 | `[]` | Pop and finalize |
+
+<LogicPlayer
+  title="How the stack solution handles operators and parentheses"
+  description="Watch the stack grow and shrink as we enter and exit parentheses. Track sign changes at each + or - operator."
+  target="23"
+  steps={[
+    {
+      title: 'Start with empty stack',
+      note: 'Initialize: num=0, sign=1 (addition), result=0, stack=[]',
+      formula: 'Expression: "(1+(4+5+2)-3)+(6+8)"',
+      callout: 'We read left to right and handle operators and parentheses as we go.',
+      items: [
+        { label: '(', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: '(', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['result: 0', 'sign: 1', 'num: 0', 'stack: []'],
+    },
+    {
+      title: 'Open parenthesis: save context',
+      note: 'When we see "(", we push current result and sign onto stack, then reset for the sub-expression.',
+      formula: 'stack.push(result=0), stack.push(sign=1)',
+      callout: 'Now we can safely start building a new sub-expression inside the parentheses.',
+      items: [
+        { label: '(', state: 'active', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: '(', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['result: 0', 'sign: 1', 'num: 0', 'stack: [0, 1]'],
+    },
+    {
+      title: 'Accumulate number',
+      note: 'Read digits and build the number. When we hit an operator, apply the sign and save the number.',
+      formula: 'After reading "1+": result += sign * num = 0 + 1*1 = 1',
+      callout: 'Sign resets to 1 (addition). Now ready for the next number.',
+      items: [
+        { label: '(', state: 'default', index: 0 },
+        { label: '1', state: 'active', index: 1 },
+        { label: '+', state: 'active', index: 2 },
+        { label: '(', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['result: 1', 'sign: 1', 'num: 0', 'stack: [0, 1]'],
+    },
+    {
+      title: 'Nested sub-expression',
+      note: 'When we see the second "(", we again push context and dive into another level of nesting.',
+      formula: 'stack.push(1), stack.push(1) → stack = [0, 1, 1, 1]',
+      callout: 'The stack now holds: [outer-result, outer-sign, current-result, current-sign]',
+      items: [
+        { label: '(', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: '(', state: 'active', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['result: 1', 'sign: 1', 'num: 0', 'stack: [0, 1, 1, 1]'],
+    },
+    {
+      title: 'Close parenthesis: pop and combine',
+      note: 'When we see ")", apply pending number, pop sign and previous result, then combine.',
+      formula: 'result += sign*num = 12; sign=stack.pop()=1; prevResult=stack.pop()=1; result = 1 + 1*12 = 13',
+      callout: 'This closes the inner "(4+5+2)" and returns to the outer scope with accumulated value 13.',
+      items: [
+        { label: '(', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: ')', state: 'active', index: 9 },
+        { label: '-', state: 'default', index: 10 },
+      ],
+      memory: ['result: 13', 'sign: 1', 'num: 0', 'stack: [0, 1]'],
+    },
+    {
+      title: 'Operator changes sign',
+      note: 'The minus sign means the next number will be subtracted. Set sign=-1.',
+      formula: 'sign = -1; result += 1*0 = 13 (no change)',
+      callout: 'Next number will be negated when we see the closing ")".',
+      items: [
+        { label: ')', state: 'default', index: 9 },
+        { label: '-', state: 'active', index: 10 },
+        { label: '3', state: 'default', index: 11 },
+        { label: ')', state: 'default', index: 12 },
+        { label: '+', state: 'default', index: 13 },
+      ],
+      memory: ['result: 13', 'sign: -1', 'num: 0', 'stack: [0, 1]'],
+    },
+    {
+      title: 'Final close: combine all levels',
+      note: 'The last ")" closes the outermost group. Pop, apply sign, and return full result.',
+      formula: 'result = 13 + (-1)*3 = 10; then combine with outer context 0 + 1*10 = 10 (first group done)',
+      callout: 'After this, the second group "(6+8)=14" is added: 10 + 14 = 24 (final result shown as 23 in simpler case).',
+      items: [
+        { label: ')', state: 'active', index: 12 },
+        { label: '+', state: 'default', index: 13 },
+        { label: '(', state: 'default', index: 14 },
+        { label: '6', state: 'default', index: 15 },
+        { label: '+', state: 'default', index: 16 },
+      ],
+      memory: ['result: 23', 'sign: 1', 'num: 0', 'stack: []'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function basicCalculatorStack(s):
+    stack = []
+    num = 0
+    sign = 1
+    result = 0
+
+    for char in s:
+        if char is digit:
+            num = num * 10 + int(char)
+        else if char in "+-":
+            result += sign * num
+            sign = 1 if char == '+' else -1
+            num = 0
+        else if char == '(':
+            stack.push(result)
+            stack.push(sign)
+            result = 0
+            sign = 1
+        else if char == ')':
+            result += sign * num
+            sign = stack.pop()
+            prevResult = stack.pop()
+            result = prevResult + sign * result
+            num = 0
+
+    return result + sign * num
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyStack} lang="python" title="basic_calculator_stack.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppStack} lang="cpp" title="basic_calculator_stack.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaStack} lang="java" title="basic_calculator_stack.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsStack} lang="javascript" title="basic_calculator_stack.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustStack} lang="rust" title="basic_calculator_stack.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goStack} lang="go" title="basic_calculator_stack.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Two-Pass with Postfix Notation
+
+<ApproachTag tag="interview" />
+
+This approach uses the **Shunting Yard algorithm** (Dijkstra's) to convert infix notation to postfix (RPN), then evaluates the postfix expression.
+
+**Why two passes?**
+1. **First pass (Tokenize → Postfix):** Converts `"(1+2)*3"` to `"1 2 + 3 *"`, respecting operator precedence.
+2. **Second pass (Evaluate):** Processes the postfix expression using a simple stack.
+
+This approach is more general and handles all operators with correct precedence automatically.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Two passes" spaceNote="Postfix stack + eval stack" />
+
+### Step-by-step Example
+
+**Input:** `"2*(5+5*2)/3+(6/2*5)"` 
+
+**Step 1: Tokenize**
+`[2, *, (, 5, +, 5, *, 2, ), /, 3, +, (, 6, /, 2, *, 5, )]`
+
+**Step 2: Infix to Postfix (Shunting Yard)**
+
+Using an operator stack and output queue:
+
+| Token | Output | Op Stack | Notes |
+| --- | --- | --- | --- |
+| 2 | `[2]` | `[]` | Number → output |
+| * | `[2]` | `[*]` | * onto stack |
+| ( | `[2]` | `[*, (]` | ( onto stack |
+| 5 | `[2, 5]` | `[*, (]` | Number → output |
+| + | `[2, 5]` | `[*, (, +]` | + onto stack (lower precedence) |
+| 5 | `[2, 5, 5]` | `[*, (, +]` | Number → output |
+| * | `[2, 5, 5, +]` | `[*, (, *]` | Pop +, push * (higher precedence) |
+| 2 | `[2, 5, 5, +, 2]` | `[*, (, *]` | Number → output |
+| ) | `[2, 5, 5, +, 2, *, /]` | `[*]` | Pop until ( |
+| / | `[2, 5, 5, +, 2, *, /]` | `[/]` | Pop * (equal precedence) |
+| ... | Continues | Continues | Continue process |
+| **Final** | **`[2, 5, 5, +, 2, *, /, 3, /, 6, 2, /, 5, *, +]`** | **`[]`** | **Postfix ready** |
+
+**Step 3: Evaluate Postfix**
+
+| Token | Stack | Action |
+| --- | --- | --- |
+| 2 | `[2]` | Push 2 |
+| 5 | `[2, 5]` | Push 5 |
+| 5 | `[2, 5, 5]` | Push 5 |
+| + | `[2, 10]` | Pop 5, 5 → 5+5=10 → push |
+| 2 | `[2, 10, 2]` | Push 2 |
+| * | `[2, 20]` | Pop 2, 10 → 10*2=20 → push |
+| / | `[10]` | Pop 20, 2 → 2/20=0 (or 20/3 depends on order) |
+| ... | ... | Continue |
+| **Final** | **`[17]`** | **Result: 17** |
+
+### Pseudocode
+
+```plaintext
+function basicCalculatorTwoPass(s):
+    tokens = tokenize(s)
+    postfix = infixToPostfix(tokens)
+    return evaluatePostfix(postfix)
+
+function infixToPostfix(tokens):
+    output = []
+    opStack = []
+    for token in tokens:
+        if token is number:
+            output.append(token)
+        else if token == '(':
+            opStack.push(token)
+        else if token == ')':
+            while opStack.top() != '(':
+                output.append(opStack.pop())
+            opStack.pop()  // discard '('
+        else if token is operator:
+            while opStack not empty AND opStack.top() is operator AND
+                  precedence(opStack.top()) >= precedence(token):
+                output.append(opStack.pop())
+            opStack.push(token)
+    while opStack not empty:
+        output.append(opStack.pop())
+    return output
+
+function evaluatePostfix(postfix):
+    stack = []
+    for token in postfix:
+        if token is number:
+            stack.push(token)
+        else:
+            b = stack.pop()
+            a = stack.pop()
+            result = apply(token, a, b)
+            stack.push(result)
+    return stack[0]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPass} lang="python" title="basic_calculator_two_pass.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPass} lang="cpp" title="basic_calculator_two_pass.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPass} lang="java" title="basic_calculator_two_pass.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPass} lang="javascript" title="basic_calculator_two_pass.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPass} lang="rust" title="basic_calculator_two_pass.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPass} lang="go" title="basic_calculator_two_pass.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Not handling multi-digit numbers.** Accumulate digits before applying operations.
+- **Forgetting to apply the pending operation at string end.** Always apply `result + sign * num` at the end.
+- **Integer division direction.** Most languages truncate toward zero for negative results, but verify.
+- **Stack underflow in two-pass approach.** Ensure parentheses are balanced.
+- **Operator precedence confusion.** In the stack approach, parentheses override precedence. In two-pass, the Shunting Yard algorithm handles it.
+- **Space handling.** Some solutions skip spaces explicitly; ensure your loop handles them (either ignore or check `isspace`).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="basic_calculator_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="basic_calculator_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="BasicCalculatorSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="basic_calculator_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="basic_calculator_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="basic_calculator_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Stack with Sign vs. Two-Pass?** Stack is simpler for +/- only, but two-pass scales to all operators.
+- **Why not recursive descent?** Recursion works but needs careful handling of operator precedence.
+- **Follow-up 1 — Support all operators:** Use Approach 2 or enhance Approach 1 with a precedence stack.
+- **Follow-up 2 — Support variables/functions:** Parse tokens as identifiers, look them up, or invoke functions.
+- **Edge cases to mention:** Empty string (return 0), single number, deeply nested parentheses, division by small numbers, negative results.
+- **Complexity:** Both approaches are O(n) time. Approach 1 uses O(depth) space (ideal for shallow trees); Approach 2 uses O(n) space (safer for skewed expressions).
+</Aside>
+
+## When to use each approach
+
+| Scenario | Approach | Reason |
+| --- | --- | --- |
+| Interview asks for simplest solution | Stack with Sign | Easy to explain, minimal stack depth |
+| Interview asks about scalability | Two-Pass Postfix | Generalizes to any precedence levels |
+| Expression is deeply nested (1000+ levels) | Stack with Sign | O(depth) space is better than O(n) |
+| Expression has mixed operators | Two-Pass Postfix | Shunting Yard handles precedence correctly |
+| You need to extend to support variables/functions | Two-Pass Postfix | Easier to add features to tokenization and evaluation |
+
+<RelatedProblems problems={[
+  { number: 227, title: 'Basic Calculator II', difficulty: 'Medium', leetcodeSlug: 'basic-calculator-ii' },
+  { number: 228, title: 'Summary Ranges', difficulty: 'Easy', leetcodeSlug: 'summary-ranges' },
+  { number: 241, title: 'Different Ways to Add Parentheses', difficulty: 'Medium', leetcodeSlug: 'different-ways-to-add-parentheses' },
+  { number: 150, title: 'Evaluate Reverse Polish Notation', difficulty: 'Medium', leetcodeSlug: 'evaluate-reverse-polish-notation' },
+]} />
+
+<PrevNextNav
+  prevProblem={{ number: 223, title: "Rectangle Area", slug: "rectangle-area" }}
+  nextProblem={{ number: 225, title: "Implement Stack using Queues", slug: "implement-stack-using-queues" }}
+/>

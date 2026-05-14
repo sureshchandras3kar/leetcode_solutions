@@ -1,0 +1,182 @@
+---
+title: Sqrt(x)
+description: Given a non-negative integer x, return the square root of x rounded down to the nearest integer.
+leetcodeNumber: 69
+difficulty: Medium
+leetcodeSlug: sqrtx
+tags: ["Math", "Binary Search"]
+prev:
+  label: "#67 Add Binary"
+  link: "../add-binary/"
+next:
+  label: "#70 Climbing Stairs"
+  link: "../climbing-stairs/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBinarysearch from '@solutions/Python/sqrtx_binary_search.py?raw';
+import cppBinarysearch from '@solutions/C++/sqrtx_binary_search.cpp?raw';
+import javaBinarysearch from '@solutions/Java/sqrtx_binary_search.java?raw';
+import jsBinarysearch from '@solutions/JavaScript/sqrtx_binary_search.js?raw';
+import rustBinarysearch from '@solutions/Rust/sqrtx_binary_search.rs?raw';
+import goBinarysearch from '@solutions/Golang/sqrtx_binary_search.go?raw';
+
+import pyNewton from '@solutions/Python/sqrtx_newton.py?raw';
+import cppNewton from '@solutions/C++/sqrtx_newton.cpp?raw';
+import javaNewton from '@solutions/Java/sqrtx_newton.java?raw';
+import jsNewton from '@solutions/JavaScript/sqrtx_newton.js?raw';
+import rustNewton from '@solutions/Rust/sqrtx_newton.rs?raw';
+import goNewton from '@solutions/Golang/sqrtx_newton.go?raw';
+
+import pyIterative from '@solutions/Python/sqrtx_iterative.py?raw';
+import cppIterative from '@solutions/C++/sqrtx_iterative.cpp?raw';
+import javaIterative from '@solutions/Java/sqrtx_iterative.java?raw';
+import jsIterative from '@solutions/JavaScript/sqrtx_iterative.js?raw';
+import rustIterative from '@solutions/Rust/sqrtx_iterative.rs?raw';
+import goIterative from '@solutions/Golang/sqrtx_iterative.go?raw';
+
+
+
+## Problem Statement
+
+Given a non-negative integer x, return the square root of x rounded down to the nearest integer.
+
+You need to solve this problem efficiently.
+
+<Aside type="tip" title="What to notice first">
+- Key insight 1 for Sqrt(x)
+- Key insight 2 for solving this problem
+- Key insight 3 specific to the approach
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation for example 1 |
+| Example 2 | Result 2 | Explanation for example 2 |
+
+## Constraints
+
+- Constraint 1 for Sqrt(x)
+- Constraint 2
+- Constraint 3
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Binary Search | O(n) | O(1) | When applicable |
+| Newton | O(n) | O(1) | When applicable |
+| Iterative | O(n) | O(1) | When applicable |
+
+
+## Approach 1: Binary Search
+
+<ApproachTag tag="recommended" />
+
+This approach provides an efficient solution for sqrt(x).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyBinarysearch}} lang="python" title="sqrtx_binary_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppBinarysearch}} lang="cpp" title="sqrtx_binary_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaBinarysearch}} lang="java" title="sqrtx_binary_search.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsBinarysearch}} lang="javascript" title="sqrtx_binary_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustBinarysearch}} lang="rust" title="sqrtx_binary_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goBinarysearch}} lang="go" title="sqrtx_binary_search.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Newton
+
+<ApproachTag tag="interview" />
+
+This approach provides an efficient solution for sqrt(x).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyNewton}} lang="python" title="sqrtx_newton.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppNewton}} lang="cpp" title="sqrtx_newton.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaNewton}} lang="java" title="sqrtx_newton.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsNewton}} lang="javascript" title="sqrtx_newton.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustNewton}} lang="rust" title="sqrtx_newton.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goNewton}} lang="go" title="sqrtx_newton.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Iterative
+
+<ApproachTag tag="simple" />
+
+This approach provides an efficient solution for sqrt(x).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyIterative}} lang="python" title="sqrtx_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppIterative}} lang="cpp" title="sqrtx_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaIterative}} lang="java" title="sqrtx_iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsIterative}} lang="javascript" title="sqrtx_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustIterative}} lang="rust" title="sqrtx_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goIterative}} lang="go" title="sqrtx_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+
+<RelatedProblems problems={{
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 9, title: 'Palindrome Number', difficulty: 'Easy', leetcodeSlug: 'palindrome-number' },
+}} />
+
+<PrevNextNav
+  prevProblem={ number: 66, title: "Plus One", slug: "plus-one" }
+  nextProblem={ number: 172, title: "Factorial Trailing Zeroes", slug: "factorial-trailing-zeroes" }
+/>

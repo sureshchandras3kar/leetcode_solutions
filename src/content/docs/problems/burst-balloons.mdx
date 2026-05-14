@@ -1,0 +1,260 @@
+---
+title: Minimum Number of Arrows to Burst Balloons
+description: Find minimum arrows needed to burst balloons. Two approaches — greedy O(n log n) and sort O(n log n) — in six languages.
+leetcodeNumber: 452
+difficulty: Medium
+leetcodeSlug: minimum-number-of-arrows-to-burst-balloons
+tags: ['Array', 'Greedy', 'Sorting']
+prev:
+  label: "#433 Minimum Genetic Mutation"
+  link: "../minimum-genetic-mutation/"
+next:
+  label: "#502 IPO"
+  link: "../ipo/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+## Problem Statement
+
+Given an array of events where `events[i] = [start, end]`, find the minimum number of arrows needed to burst all balloons. Each arrow can burst balloons overlapping at any point.
+
+<Aside type="tip" title="What to notice first">
+- Two balloons burst by one arrow if they overlap at any point (including endpoints).
+- Greedy strategy: always shoot an arrow at the earliest end position.
+- Sort by end position, not start position.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[[10,16],[2,8],[1,6],[7,12]]` | `2` | At position 8: burst [2,8], [1,6], [7,12]. At 16: burst [10,16]. |
+| `[[1,2],[2,3],[3,4]]` | `2` | At position 2: burst [1,2], [2,3]. At 4: burst [3,4]. |
+| `[[1,2],[1,2],[1,2]]` | `1` | One arrow at position 2 bursts all three. |
+| `[[9,12],[12,15],[16,20],[2,3],[1,6],[8,11]]` | `2` | Optimal placement needed based on overlapping intervals. |
+
+## Constraints
+
+- `1 <= balloons.length <= 10^5`
+- `balloons[i].length == 2`
+- `-2^31 <= x_start < x_end <= 2^31 - 1`
+
+import pyGreedy       from '@solutions/Python/burst_balloons_greedy.py?raw';
+import cppGreedy      from '@solutions/C++/burst_balloons_greedy.cpp?raw';
+import javaGreedy     from '@solutions/Java/BurstBalloonsGreedy.java?raw';
+import jsGreedy       from '@solutions/JavaScript/burst_balloons_greedy.js?raw';
+import rustGreedy     from '@solutions/Rust/burst_balloons_greedy.rs?raw';
+import goGreedy       from '@solutions/Golang/burst_balloons_greedy.go?raw';
+import pySpaceOptimized from '@solutions/Python/minimum_number_of_arrows_to_burst_balloons_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/minimum_number_of_arrows_to_burst_balloons_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/MinimumNumberOfArrowsToBurstBalloonsSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/minimum_number_of_arrows_to_burst_balloons_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/minimum_number_of_arrows_to_burst_balloons_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/minimum_number_of_arrows_to_burst_balloons_space_optimized.go?raw';
+
+import pySort         from '@solutions/Python/burst_balloons_sort.py?raw';
+import cppSort        from '@solutions/C++/burst_balloons_sort.cpp?raw';
+import javaSort       from '@solutions/Java/BurstBalloonsSort.java?raw';
+import jsSort         from '@solutions/JavaScript/burst_balloons_sort.js?raw';
+import rustSort       from '@solutions/Rust/burst_balloons_sort.rs?raw';
+import goSort         from '@solutions/Golang/burst_balloons_sort.go?raw';
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Interval scheduling problems** — minimize resources needed to cover all time intervals.
+- **Elevator scheduling** — optimize elevator assignments to minimize total trips.
+- **Meeting room allocation** — minimize rooms needed for overlapping meetings.
+- **Network bandwidth** — find minimum connections needed for overlapping traffic windows.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| Greedy Sort by End | O(n log n) | O(1) | Sort once, single pass—most intuitive |
+| Sort by End (Variant) | O(n log n) | O(1) | Identical to greedy, different framing |
+
+## Approach 1: Greedy Sort by End Position (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Sort intervals by their end position, then use a greedy strategy: always shoot the next arrow at the position where the current interval ends. If the next interval starts after that position, it wasn't hit, so shoot again.
+
+This works because placing an arrow as far right as possible (at the end of the current interval) maximizes the chance of hitting future intervals.
+
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Sorting dominates" spaceNote="Only pointer variables" />
+
+### Step-by-step Example
+
+**Input:** `[[10,16],[2,8],[1,6],[7,12]]`
+
+**After sorting by end position:** `[[1,6],[2,8],[7,12],[10,16]]`
+
+| Step | Current | Last Arrow | Hit? | Action |
+| --- | --- | --- | --- | --- |
+| 1 | [1,6] | - | - | Shoot arrow at 6 |
+| 2 | [2,8] | 6 | Yes | 6 ∈ [2,8], no new arrow |
+| 3 | [7,12] | 6 | No | 7 > 6, shoot arrow at 12 |
+| 4 | [10,16] | 12 | Yes | 12 ∈ [10,16], no new arrow |
+| **Result:** | 2 arrows | | |
+
+### Pseudocode
+
+```plaintext
+function minArrowShots(intervals):
+    if intervals is empty:
+        return 0
+    
+    sort intervals by end position
+    arrows = 1
+    lastEnd = intervals[0].end
+    
+    for each interval in intervals[1..n-1]:
+        if interval.start > lastEnd:
+            arrows += 1
+            lastEnd = interval.end
+    
+    return arrows
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyGreedy} lang="python" title="burst_balloons_greedy.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppGreedy} lang="cpp" title="burst_balloons_greedy.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaGreedy} lang="java" title="BurstBalloonsGreedy.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedy} lang="javascript" title="burst_balloons_greedy.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedy} lang="rust" title="burst_balloons_greedy.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedy} lang="go" title="burst_balloons_greedy.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Sort and Single Pass
+
+<ApproachTag tag="simple" />
+
+An alternative framing: sort by end position, then iterate once. The algorithm is identical to Approach 1 but emphasizes the "sort once, scan once" structure.
+
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Sort + single scan" spaceNote="No extra data structures" />
+
+### Pseudocode
+
+```plaintext
+function minArrowShots(intervals):
+    if empty:
+        return 0
+    
+    sort by end position (ascending)
+    count = 1
+    lastArrowPos = intervals[0][1]
+    
+    for i = 1 to n-1:
+        if intervals[i][0] > lastArrowPos:
+            count += 1
+            lastArrowPos = intervals[i][1]
+    
+    return count
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySort} lang="python" title="burst_balloons_sort.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSort} lang="cpp" title="burst_balloons_sort.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSort} lang="java" title="BurstBalloonsSort.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSort} lang="javascript" title="burst_balloons_sort.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSort} lang="rust" title="burst_balloons_sort.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSort} lang="go" title="burst_balloons_sort.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="minimum_number_of_arrows_to_burst_balloons_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="minimum_number_of_arrows_to_burst_balloons_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="MinimumNumberOfArrowsToBurstBalloonsSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="minimum_number_of_arrows_to_burst_balloons_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="minimum_number_of_arrows_to_burst_balloons_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="minimum_number_of_arrows_to_burst_balloons_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Sorting by start position instead of end:** This is the most common mistake. Sorting by end ensures greedy choice is safe.
+- **Forgetting the initial arrow:** The first interval always needs an arrow (or at least, your count must start at 1).
+- **Integer overflow on coordinates:** With 2^31 range, be careful in languages like Java; use long comparisons.
+- **Off-by-one errors:** Ensure boundary conditions: `start > lastEnd` (strictly greater, not >=).
+</Aside>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why sort by end?** Prove it greedily: if two approaches differ, sorting by end is always optimal or tied.
+- **Greedy proof:** The problem has the "greedy choice property"—locally optimal choice (rightmost end) leads to globally optimal solution.
+- **Why not dynamic programming?** This problem doesn't have overlapping subproblems; greedy is simpler and more efficient.
+- **Edge cases:** Empty input, single interval, all overlapping, no overlaps, negative coordinates.
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

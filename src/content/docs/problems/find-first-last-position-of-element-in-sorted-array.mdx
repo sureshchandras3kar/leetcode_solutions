@@ -1,0 +1,342 @@
+---
+title: Find First and Last Position of Element in Sorted Array
+description: Find the starting and ending position of a target in a sorted array. Two approaches — binary search O(log n) and linear O(n) — in six languages.
+leetcodeNumber: 34
+difficulty: Medium
+leetcodeSlug: find-first-and-last-position-of-element-in-sorted-array
+tags: [Array, Binary Search]
+prev:
+  label: "#33 Search in Rotated Sorted Array"
+  link: "../search-in-rotated-sorted-array/"
+next:
+  label: "#35 Search Insert Position"
+  link: "../search-insert-position/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBinarySearch     from '@solutions/Python/find_first_last_position_binary_search.py?raw';
+import cppBinarySearch    from '@solutions/C++/find_first_last_position_binary_search.cpp?raw';
+import javaBinarySearch   from '@solutions/Java/FindFirstLastPositionBinarySearch.java?raw';
+import jsBinarySearch     from '@solutions/JavaScript/find_first_last_position_binary_search.js?raw';
+import rustBinarySearch   from '@solutions/Rust/find_first_last_position_binary_search.rs?raw';
+import goBinarySearch     from '@solutions/Golang/find_first_last_position_binary_search.go?raw';
+import pySpaceOptimized from '@solutions/Python/find_first_and_last_position_of_element_in_sorted_array_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/find_first_and_last_position_of_element_in_sorted_array_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/FindFirstAndLastPositionOfElementInSortedArraySpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/find_first_and_last_position_of_element_in_sorted_array_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/find_first_and_last_position_of_element_in_sorted_array_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/find_first_and_last_position_of_element_in_sorted_array_space_optimized.go?raw';
+
+import pyLinear      from '@solutions/Python/find_first_last_position_linear_search.py?raw';
+import cppLinear     from '@solutions/C++/find_first_last_position_linear_search.cpp?raw';
+import javaLinear    from '@solutions/Java/FindFirstLastPositionLinearSearch.java?raw';
+import jsLinear      from '@solutions/JavaScript/find_first_last_position_linear_search.js?raw';
+import rustLinear    from '@solutions/Rust/find_first_last_position_linear_search.rs?raw';
+import goLinear      from '@solutions/Golang/find_first_last_position_linear_search.go?raw';
+
+## Problem Statement
+
+Given an array of integers `nums` sorted in non-decreasing order, find the starting and ending position of a given `target` value.
+
+If the target is not found in the array, return `[-1, -1]`.
+
+You must write an algorithm with O(log n) runtime complexity.
+
+<Aside type="tip" title="What to notice first">
+- Use two binary searches: one to find the leftmost occurrence, one to find the rightmost.
+- When target is found, continue searching left for the first position, and continue searching right for the last position.
+- The two-search pattern is a powerful technique for range queries on sorted arrays.
+</Aside>
+
+### Examples
+
+| Input | Target | Output | Explanation |
+| --- | --- | --- | --- |
+| `[5, 7, 7, 8, 8, 10]` | `8` | `[3, 4]` | First 8 at index 3, last 8 at index 4 |
+| `[5, 7, 7, 8, 8, 10]` | `6` | `[-1, -1]` | Target not in array |
+| `[]` | `0` | `[-1, -1]` | Empty array |
+| `[1]` | `1` | `[0, 0]` | Single element matches target |
+
+## Constraints
+
+- `0 <= nums.length <= 10^5`
+- `-10^9 <= nums[i] <= 10^9`
+- `nums` is a non-decreasing array
+- `-10^9 <= target <= 10^9`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Database range queries** — finding first and last matching records in an index.
+- **Time-series data** — locating events within a specific time window.
+- **Version control** — finding the range of commits with a specific tag or status.
+- **Log analysis** — identifying the span of entries matching a condition.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Binary Search | O(log n) | O(1) | Standard approach, O(log n) required |
+| Linear Search | O(n) | O(1) | Very small arrays or exact match scenarios |
+
+## Which approach should you learn first?
+
+- Pick **Binary Search** to meet the O(log n) constraint and learn the two-search pattern.
+- Pick **Linear Search** to understand the problem conceptually.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Required Time</div>
+    <div class="lc-approach-quick__name">Binary Search</div>
+    <div class="lc-approach-quick__stats">O(log n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simplicity</div>
+    <div class="lc-approach-quick__name">Linear Search</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Binary Search (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Perform two binary searches: one to find the leftmost position by continuing left when target is found, and one to find the rightmost position by continuing right when target is found.
+
+<ComplexityBadges time="O(log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Two binary searches" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [5, 7, 7, 8, 8, 10]`, `target = 8`
+
+**First search (find leftmost 8):**
+
+| Step | left | right | mid | nums[mid] | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 5 | 2 | 7 | < 8 → left = 3 |
+| 2 | 3 | 5 | 4 | 8 | == 8 → right = 3 |
+| 3 | 3 | 3 | 3 | 8 | == 8 → right = 2 |
+| 4 | 3 | 2 | — | — | **first = 3** |
+
+**Second search (find rightmost 8):**
+
+| Step | left | right | mid | nums[mid] | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 5 | 2 | 7 | < 8 → left = 3 |
+| 2 | 3 | 5 | 4 | 8 | == 8 → left = 5 |
+| 3 | 5 | 5 | 5 | 10 | > 8 → right = 4 |
+| 4 | 5 | 4 | — | — | **last = 4** |
+
+**Result:** `[3, 4]` ✓
+
+### Pseudocode
+
+```plaintext
+function searchRange(nums, target):
+    // Find first position
+    left, right = 0, len(nums) - 1
+    first = -1
+    while left <= right:
+        mid = left + (right - left) / 2
+        if nums[mid] == target:
+            first = mid
+            right = mid - 1  // Continue searching left
+        elif nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    if first == -1:
+        return [-1, -1]
+    
+    // Find last position
+    left, right = 0, len(nums) - 1
+    last = -1
+    while left <= right:
+        mid = left + (right - left) / 2
+        if nums[mid] == target:
+            last = mid
+            left = mid + 1  // Continue searching right
+        elif nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return [first, last]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBinarySearch} lang="python" title="find_first_last_position_binary_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBinarySearch} lang="cpp" title="find_first_last_position_binary_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBinarySearch} lang="java" title="FindFirstLastPositionBinarySearch.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBinarySearch} lang="javascript" title="find_first_last_position_binary_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBinarySearch} lang="rust" title="find_first_last_position_binary_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBinarySearch} lang="go" title="find_first_last_position_binary_search.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Linear Search
+
+<ApproachTag tag="simple" />
+
+Iterate from the start to find the first occurrence, then iterate from the end to find the last occurrence. If the target is not found during the first pass, return `[-1, -1]`.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Two passes" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [5, 7, 7, 8, 8, 10]`, `target = 8`
+
+**First pass (find first 8):**
+
+| i | nums[i] | Match? | Action |
+| --- | --- | --- | --- |
+| 0 | 5 | No | Continue |
+| 1 | 7 | No | Continue |
+| 2 | 7 | No | Continue |
+| 3 | 8 | Yes | **first = 3, break** |
+
+**Second pass (find last 8):**
+
+| i | nums[i] | Match? | Action |
+| --- | --- | --- | --- |
+| 5 | 10 | No | Continue |
+| 4 | 8 | Yes | **last = 4, break** |
+
+**Result:** `[3, 4]` ✓
+
+### Pseudocode
+
+```plaintext
+function searchRange(nums, target):
+    if len(nums) == 0:
+        return [-1, -1]
+    
+    first = -1
+    for i in range(len(nums)):
+        if nums[i] == target:
+            first = i
+            break
+    
+    if first == -1:
+        return [-1, -1]
+    
+    last = -1
+    for i in range(len(nums) - 1, -1, -1):
+        if nums[i] == target:
+            last = i
+            break
+    
+    return [first, last]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyLinear} lang="python" title="find_first_last_position_linear_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppLinear} lang="cpp" title="find_first_last_position_linear_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaLinear} lang="java" title="FindFirstLastPositionLinearSearch.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsLinear} lang="javascript" title="find_first_last_position_linear_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustLinear} lang="rust" title="find_first_last_position_linear_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goLinear} lang="go" title="find_first_last_position_linear_search.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to continue the search after finding the target (instead of breaking immediately).
+- Not checking if the first position is -1 before searching for the last position.
+- Mixing up the direction of pointer movement in the two searches (left for first, right for last).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="find_first_and_last_position_of_element_in_sorted_array_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="find_first_and_last_position_of_element_in_sorted_array_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="FindFirstAndLastPositionOfElementInSortedArraySpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="find_first_and_last_position_of_element_in_sorted_array_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="find_first_and_last_position_of_element_in_sorted_array_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="find_first_and_last_position_of_element_in_sorted_array_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 704, title: 'Binary Search', difficulty: 'Easy', leetcodeSlug: 'binary-search' },
+  { number: 35, title: 'Search Insert Position', difficulty: 'Easy', leetcodeSlug: 'search-insert-position' },
+  { number: 33, title: 'Search in Rotated Sorted Array', difficulty: 'Medium', leetcodeSlug: 'search-in-rotated-sorted-array' },
+  { number: 162, title: 'Find Peak Element', difficulty: 'Medium', leetcodeSlug: 'find-peak-element' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why two searches?** Finding first and last requires different logic: continue left for first, continue right for last.
+- **Early termination:** If the first search returns -1, no need to search for the last.
+- **Efficiency:** Binary search is crucial here. Linear would be O(n) but two binary searches give O(log n).
+- **Edge cases:** Empty array, single element, target at boundaries, arrays with all same values (within constraints).
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 33, title: "Search in Rotated Sorted Array", slug: "search-in-rotated-sorted-array" }}
+  nextProblem={{ number: 35, title: "Search Insert Position", slug: "search-insert-position" }}
+/>

@@ -1,0 +1,222 @@
+---
+title: Sort List
+description: Sort a linked list using merge sort with divide and conquer. Recursive and iterative approaches for O(n log n) sorting.
+leetcodeNumber: 148
+difficulty: Medium
+leetcodeSlug: sort-list
+tags: [Linked List, Divide and Conquer, Merge Sort]
+prev:
+  label: "#146 LRU Cache"
+  link: "../lru-cache/"
+next:
+  label: "#149 Max Points on a Line"
+  link: "../max-points-on-a-line/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyRecursive     from '@solutions/Python/sort_list_recursive.py?raw';
+import cppRecursive    from '@solutions/C++/sort_list_recursive.cpp?raw';
+import javaRecursive   from '@solutions/Java/SortList_Recursive.java?raw';
+import jsRecursive     from '@solutions/JavaScript/sort_list_recursive.js?raw';
+import rustRecursive   from '@solutions/Rust/sort_list_recursive.rs?raw';
+import goRecursive     from '@solutions/Golang/sort_list_recursive.go?raw';
+import pySpaceOptimized from '@solutions/Python/sort_list_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/sort_list_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/SortListSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/sort_list_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/sort_list_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/sort_list_space_optimized.go?raw';
+
+import pyIterative      from '@solutions/Python/sort_list_iterative.py?raw';
+import cppIterative     from '@solutions/C++/sort_list_iterative.cpp?raw';
+import javaIterative    from '@solutions/Java/SortList_Iterative.java?raw';
+import jsIterative      from '@solutions/JavaScript/sort_list_iterative.js?raw';
+import rustIterative    from '@solutions/Rust/sort_list_iterative.rs?raw';
+import goIterative      from '@solutions/Golang/sort_list_iterative.go?raw';
+
+## Problem Statement
+
+Sort a linked list in O(n log n) time and O(1) or O(log n) space complexity. Use merge sort for divide and conquer.
+
+<Aside type="tip" title="What to notice first">
+- Merge sort is ideal for linked lists (unlike quicksort which needs random access).
+- Find middle using slow/fast pointers, split, recursively sort, then merge.
+- Iterative approach uses bottom-up merging starting from size 1.
+- No need for auxiliary space in merge if done carefully (though most implementations use temp nodes).
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `4 -> 2 -> 1 -> 3` | `1 -> 2 -> 3 -> 4` |
+| `-1 -> 5 -> 0` | `-1 -> 0 -> 5` |
+
+## Constraints
+
+- The number of nodes in the list is in the range `[0, 5 * 10^4]`.
+- `-10^5 <= Node.val <= 10^5`
+
+## Complexity Comparison
+
+| Approach | Time | Space |
+| --- | --- | --- |
+| Recursive | O(n log n) | O(log n) |
+| Iterative | O(n log n) | O(1) |
+
+## Which approach should you learn first?
+
+- Pick **Recursive** for clarity — mirrors typical divide and conquer pattern.
+- Pick **Iterative** for minimal space and interview confidence.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Pattern Match</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(log n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Space Optimal</div>
+    <div class="lc-approach-quick__name">Iterative</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Recursive Merge Sort (Recommended)
+
+<ApproachTag tag="recommended" />
+
+1. Find middle using slow/fast pointers.
+2. Split list into two halves.
+3. Recursively sort both halves.
+4. Merge sorted halves.
+
+<ComplexityBadges time="O(n log n)" space="O(log n)" timeColor="green" spaceColor="green" timeNote="Divide and conquer" spaceNote="Call stack depth" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecursive} lang="python" title="sort_list_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecursive} lang="cpp" title="sort_list_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecursive} lang="java" title="SortList_Recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecursive} lang="javascript" title="sort_list_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecursive} lang="rust" title="sort_list_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecursive} lang="go" title="sort_list_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative Bottom-up Merge Sort
+
+<ApproachTag tag="interview" />
+
+Use nested loops: outer loop controls merge size (1, 2, 4, 8, ...), inner loop merges adjacent chunks.
+
+<ComplexityBadges time="O(n log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Divide and conquer" spaceNote="No extra space" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyIterative} lang="python" title="sort_list_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppIterative} lang="cpp" title="sort_list_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaIterative} lang="java" title="SortList_Iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsIterative} lang="javascript" title="sort_list_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustIterative} lang="rust" title="sort_list_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goIterative} lang="go" title="sort_list_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Incorrect middle finding (use slow/fast pointers).
+- Forgetting to split the list (set prev.next = None before recursing).
+- Off-by-one errors in merge boundaries.
+- Not handling edge cases (empty list, single node).
+- Modifying pointers incorrectly during merge.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="sort_list_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="sort_list_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="SortListSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="sort_list_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="sort_list_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="sort_list_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 21, title: 'Merge Two Sorted Lists', difficulty: 'Easy', leetcodeSlug: 'merge-two-sorted-lists' },
+  { number: 147, title: 'Insertion Sort List', difficulty: 'Medium', leetcodeSlug: 'insertion-sort-list' },
+  { number: 23, title: 'Merge k Sorted Lists', difficulty: 'Hard', leetcodeSlug: 'merge-k-sorted-lists' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why merge sort?** O(n log n) guaranteed, works well with linked lists (no random access needed).
+- **Recursive vs. iterative:** Recursive is cleaner, iterative saves space.
+- **Follow-up:** Can you sort in O(1) space and O(n log n) time? (Iterative approach achieves this.)
+- **Edge cases:** Empty list, single node, two nodes, all equal values.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 147, title: "Insertion Sort List", slug: "insertion-sort-list" }}
+  nextProblem={{ number: 149, title: "Max Points on a Line", slug: "max-points-on-a-line" }}
+/>

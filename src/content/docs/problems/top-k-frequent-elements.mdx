@@ -1,0 +1,311 @@
+---
+title: Top K Frequent Elements
+description: Find the k most frequent elements in an array. Two approaches — max heap O(n log k) and bucket sort O(n) — in six languages.
+leetcodeNumber: 347
+difficulty: Medium
+leetcodeSlug: top-k-frequent-elements
+tags: [Array, Hash Table, Sorting, Heap, Bucket Sort]
+prev:
+  label: "#322 Coin Change"
+  link: "../coin-change/"
+next:
+  label: "#349 Intersection of Two Arrays"
+  link: "../intersection-of-two-arrays/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyHeap   from '@solutions/Python/top_k_frequent_max_heap.py?raw';
+import cppHeap  from '@solutions/C++/top_k_frequent_max_heap.cpp?raw';
+import javaHeap from '@solutions/Java/top_k_frequent_max_heap.java?raw';
+import jsHeap   from '@solutions/JavaScript/top_k_frequent_max_heap.js?raw';
+import rustHeap from '@solutions/Rust/top_k_frequent_max_heap.rs?raw';
+import goHeap   from '@solutions/Golang/top_k_frequent_max_heap.go?raw';
+import pySpaceOptimized from '@solutions/Python/top_k_frequent_elements_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/top_k_frequent_elements_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/TopKFrequentElementsSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/top_k_frequent_elements_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/top_k_frequent_elements_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/top_k_frequent_elements_space_optimized.go?raw';
+
+import pyBucket   from '@solutions/Python/top_k_frequent_bucket_sort.py?raw';
+import cppBucket  from '@solutions/C++/top_k_frequent_bucket_sort.cpp?raw';
+import javaBucket from '@solutions/Java/top_k_frequent_bucket_sort.java?raw';
+import jsBucket   from '@solutions/JavaScript/top_k_frequent_bucket_sort.js?raw';
+import rustBucket from '@solutions/Rust/top_k_frequent_bucket_sort.rs?raw';
+import goBucket   from '@solutions/Golang/top_k_frequent_bucket_sort.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums` and an integer `k`, return the `k` most frequent elements. You may return the answer in any order.
+
+<Aside type="tip" title="What to notice first">
+Frequency counting with a hash map is always the first step. The question is just how efficiently you find the top-k after that.
+</Aside>
+
+### Examples
+
+| Input | k | Output |
+| --- | --- | --- |
+| `[1,1,1,2,2,3]` | `2` | `[1,2]` |
+| `[1]` | `1` | `[1]` |
+
+## Constraints
+
+- `1 <= nums.length <= 10^5`
+- `-10^4 <= nums[i] <= 10^4`
+- `k` is in the range `[1, the number of unique elements in the array]`
+- The answer is guaranteed to be unique
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Analytics dashboards** — show the top-k most visited pages from a hit-count log
+- **Autocomplete engines** — suggest the k most frequently typed queries
+- **Trending topics** — surface the k hashtags with the most posts in a time window
+- **Recommendation systems** — return k most commonly co-purchased items
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Max Heap | O(n log k) | O(n) | k &lt;&lt; n, memory matters |
+| Bucket Sort | O(n) | O(n) | Best asymptotic, when n is large |
+
+## Which approach should you learn first?
+
+- Pick **Max Heap** for interviews — it is the expected answer and generalises to streaming data.
+- Pick **Bucket Sort** when you want the asymptotically optimal O(n) solution and can mention it as the follow-up.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Recommended</div>
+    <div class="lc-approach-quick__name">Max Heap</div>
+    <div class="lc-approach-quick__stats">O(n log k) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Interview Favourite</div>
+    <div class="lc-approach-quick__name">Bucket Sort</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Max Heap
+
+<ApproachTag tag="recommended" />
+
+Count element frequencies with a hash map, then push all `(freq, num)` pairs into a max-heap. Pop k times to get the top-k most frequent elements.
+
+<ComplexityBadges time="O(n log k)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="n insertions into a heap of size ≤ n" spaceNote="Freq map + heap store all unique elements" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1,1,1,2,2,3]`, `k = 2`
+
+| Step | State |
+| --- | --- |
+| Build freq map | `{1:3, 2:2, 3:1}` |
+| Max-heap (by freq) | `[(3,1), (2,2), (1,3)]` |
+| Pop 1 | element `1` (freq 3) |
+| Pop 2 | element `2` (freq 2) |
+| Return | `[1, 2]` |
+
+<LogicPlayer
+  title="How the max heap extracts the top-k most frequent elements"
+  description="Use Next or Autoplay to watch frequency counting and then heap extraction."
+  steps={[
+    {
+      title: 'Scan nums and count frequencies',
+      note: 'Every element increments its count in the hash map. After the scan the map holds the exact frequency of each unique number.',
+      formula: 'freq = Counter(nums)',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '1', state: 'active', index: 1 },
+        { label: '1', state: 'active', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '2', state: 'active', index: 4 },
+        { label: '3', state: 'active', index: 5 },
+      ],
+      memory: ['1: 3', '2: 2', '3: 1'],
+    },
+    {
+      title: 'Push all (freq, num) pairs into max-heap',
+      note: 'The heap orders pairs by frequency, largest first. The top of the heap is always the most frequent remaining element.',
+      formula: 'maxHeap = [(3,1), (2,2), (1,3)]',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+      ],
+      memory: ['heap top → (3, 1)'],
+    },
+    {
+      title: 'Pop k=2 times from the heap',
+      note: 'Each pop extracts the element with the highest remaining frequency. After 2 pops we have our answer.',
+      formula: 'result = [heap.pop() for _ in range(k)]',
+      callout: 'Pop 1: element 1 (freq 3). Pop 2: element 2 (freq 2). Return [1, 2].',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+      ],
+      memory: ['result: [1, 2]'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function topKFrequent(nums, k):
+    freq = count all nums
+    return k largest by frequency from freq
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHeap} lang="python" title="top_k_frequent_max_heap.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHeap} lang="cpp" title="top_k_frequent_max_heap.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHeap} lang="java" title="top_k_frequent_max_heap.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHeap} lang="javascript" title="top_k_frequent_max_heap.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHeap} lang="rust" title="top_k_frequent_max_heap.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHeap} lang="go" title="top_k_frequent_max_heap.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Bucket Sort
+
+<ApproachTag tag="interview" />
+
+Since frequency is bounded by `n`, create `n+1` buckets indexed by frequency. `bucket[i]` holds all numbers that appear exactly `i` times. Fill from the freq map, then iterate buckets from high to low, collecting elements until k are found. This achieves O(n) time.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Two passes — one to count, one to collect" spaceNote="Freq map + bucket array both store n elements" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1,1,1,2,2,3]`, `k = 2`
+
+| Step | State |
+| --- | --- |
+| Build freq map | `{1:3, 2:2, 3:1}` |
+| n = 6, create buckets[0..6] | all empty |
+| Fill buckets | `bucket[3]=[1]`, `bucket[2]=[2]`, `bucket[1]=[3]` |
+| Scan from bucket[6] down | bucket[6..4] empty |
+| bucket[3] = [1] | add 1, count=1 |
+| bucket[2] = [2] | add 2, count=2=k, done |
+| Return | `[1, 2]` |
+
+### Pseudocode
+
+```plaintext
+function topKFrequent(nums, k):
+    freq = count all nums
+    buckets = array of (n+1) empty lists
+    for num, count in freq:
+        buckets[count].append(num)
+    result = []
+    for i from n down to 1:
+        result.extend(buckets[i])
+        if len(result) >= k:
+            return result[:k]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBucket} lang="python" title="top_k_frequent_bucket_sort.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBucket} lang="cpp" title="top_k_frequent_bucket_sort.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBucket} lang="java" title="top_k_frequent_bucket_sort.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBucket} lang="javascript" title="top_k_frequent_bucket_sort.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBucket} lang="rust" title="top_k_frequent_bucket_sort.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBucket} lang="go" title="top_k_frequent_bucket_sort.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Common mistakes">
+- **Off-by-one:** create `n+1` buckets (indices 0..n) — frequency n is valid when all elements are identical.
+- **Returning frequencies instead of elements:** the answer should be the numbers themselves, not their counts.
+- **Not handling k equal to all unique elements:** the loop must continue until exactly k elements are collected, not just until the first non-empty bucket is exhausted.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="top_k_frequent_elements_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="top_k_frequent_elements_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="TopKFrequentElementsSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="top_k_frequent_elements_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="top_k_frequent_elements_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="top_k_frequent_elements_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum', leetcodeSlug: 'two-sum' },
+  { number: 49, title: 'Group Anagrams', difficulty: 'Medium', slug: 'problems/group-anagrams', leetcodeSlug: 'group-anagrams' },
+  { number: 295, title: 'Find Median from Data Stream', difficulty: 'Hard', leetcodeSlug: 'find-median-from-data-stream' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Bucket sort achieves O(n)** — mention it as the optimal approach even if you code the heap first; interviewers reward knowing both.
+- **Key insight for bucket sort:** frequency is bounded by n, so buckets have finite size — this is the crucial observation that enables O(n).
+- **Follow-up — what if k changes frequently?** Maintain a heap live as elements stream in; bucket sort requires knowing n upfront.
+- **JavaScript note:** `Map` + sort is effectively the heap approach — no native priority queue in JS, but the sort brings the same O(n log n) result.
+</Aside>

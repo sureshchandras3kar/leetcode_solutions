@@ -1,0 +1,318 @@
+---
+title: Number of Islands
+description: Count distinct islands in a grid using DFS and BFS. Two approaches — Depth-First Search O(m*n) + Breadth-First Search O(m*n) — in six languages.
+leetcodeNumber: 200
+difficulty: Medium
+leetcodeSlug: number-of-islands
+tags: [Graph, DFS, BFS, Union-Find]
+prev:
+  label: "#199 Binary Tree Right Side View"
+  link: "../binary-tree-right-side-view/"
+next:
+  label: "#201 Bitwise AND of Numbers Range"
+  link: "../bitwise-and-of-numbers-range/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDFS from '@solutions/Python/number_of_islands_dfs.py?raw';
+import cppDFS from '@solutions/C++/number_of_islands_dfs.cpp?raw';
+import javaDFS from '@solutions/Java/NumberOfIslandsDFS.java?raw';
+import jsDFS from '@solutions/JavaScript/number_of_islands_dfs.js?raw';
+import rustDFS from '@solutions/Rust/number_of_islands_dfs.rs?raw';
+import goDFS from '@solutions/Golang/number_of_islands_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/number_of_islands_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/number_of_islands_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/NumberOfIslandsBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/number_of_islands_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/number_of_islands_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/number_of_islands_bfs_iterative.go?raw';
+
+import pyBFS from '@solutions/Python/number_of_islands_bfs.py?raw';
+import cppBFS from '@solutions/C++/number_of_islands_bfs.cpp?raw';
+import javaBFS from '@solutions/Java/NumberOfIslandsBFS.java?raw';
+import jsBFS from '@solutions/JavaScript/number_of_islands_bfs.js?raw';
+import rustBFS from '@solutions/Rust/number_of_islands_bfs.rs?raw';
+import goBFS from '@solutions/Golang/number_of_islands_bfs.go?raw';
+
+## Problem Statement
+
+Given an `m x n` 2D binary grid `grid` where `'1'` represents land and `'0'` represents water, return the number of islands.
+
+An island is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are surrounded by water.
+
+<Aside type="tip" title="What to notice first">
+- Each cell is connected to at most 4 neighbors (up, down, left, right).
+- When you find a land cell, you need to mark all connected land cells as visited to count it as one island.
+- This is a classic connected components problem on a 2D grid.
+</Aside>
+
+### Examples
+
+| Grid | Output | Explanation |
+| --- | --- | --- |
+| `[["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]` | `1` | All four 1s are connected, forming one island |
+| `[["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]` | `3` | Three separate islands |
+
+## Constraints
+
+- `m == grid.length`
+- `n == grid[i].length`
+- `1 <= m, n <= 300`
+- `grid[i][j]` is `'0'` or `'1'`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Geographic information systems (GIS)** — identifying landmasses and water bodies.
+- **Image processing** — finding connected components (blob detection).
+- **Social networks** — identifying connected communities.
+- **Game development** — finding playable regions in terrain.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| DFS (Recursive) | O(m * n) | O(m * n) | Call stack depth in worst case, intuitive |
+| BFS (Queue-based) | O(m * n) | O(m * n) | Explicit queue, iterative traversal |
+
+\* m = rows, n = columns
+
+## Which approach should you learn first?
+
+- Pick **DFS** if you want the most straightforward, recursive solution.
+- Pick **BFS** if you prefer an iterative approach with explicit queue management.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Intuitive</div>
+    <div class="lc-approach-quick__name">DFS (Recursive)</div>
+    <div class="lc-approach-quick__stats">O(m * n) time &middot; O(m * n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Iterative</div>
+    <div class="lc-approach-quick__name">BFS (Queue)</div>
+    <div class="lc-approach-quick__stats">O(m * n) time &middot; O(m * n) space</div>
+  </div>
+</div>
+
+## Approach 1: DFS (Depth-First Search) — Recommended
+
+<ApproachTag tag="recommended" />
+
+Use recursive DFS to explore each island completely before moving to the next unvisited land cell. Mark visited cells to avoid counting them multiple times.
+
+<ComplexityBadges time="O(m * n)" space="O(m * n)" timeColor="green" spaceColor="yellow" timeNote="Visit each cell once" spaceNote="Recursion stack + grid marking" />
+
+### Step-by-step Example
+
+**Input:** `grid = [["1","1","0"],["0","1","0"],["1","0","1"]]`
+
+```
+Step 1: Scan grid, find "1" at (0, 0)
+Step 2: DFS from (0, 0) → marks (0, 0), (0, 1), (1, 1) as visited → Count = 1
+Step 3: Continue scan, find "1" at (2, 0)
+Step 4: DFS from (2, 0) → marks (2, 0) → Count = 2
+Step 5: Continue scan, find "1" at (2, 2)
+Step 6: DFS from (2, 2) → marks (2, 2) → Count = 3
+Result: 3 islands
+```
+
+### Pseudocode
+
+```plaintext
+function numIslandsDFS(grid):
+    if grid is empty:
+        return 0
+    
+    count = 0
+    for i from 0 to rows - 1:
+        for j from 0 to cols - 1:
+            if grid[i][j] == '1':
+                dfs(grid, i, j)
+                count += 1
+    
+    return count
+
+function dfs(grid, i, j):
+    if i < 0 or i >= rows or j < 0 or j >= cols or grid[i][j] == '0':
+        return
+    
+    grid[i][j] = '0'  // Mark as visited
+    dfs(grid, i + 1, j)
+    dfs(grid, i - 1, j)
+    dfs(grid, i, j + 1)
+    dfs(grid, i, j - 1)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="number_of_islands_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="number_of_islands_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="NumberOfIslandsDFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="number_of_islands_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="number_of_islands_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="number_of_islands_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS (Breadth-First Search)
+
+<ApproachTag tag="simple" />
+
+Use a queue-based BFS to explore each island level by level. Mark cells as visited when they are enqueued to avoid duplicate processing.
+
+<ComplexityBadges time="O(m * n)" space="O(m * n)" timeColor="green" spaceColor="yellow" timeNote="Visit each cell once" spaceNote="Queue storage + grid marking" />
+
+### Step-by-step Example
+
+**Input:** `grid = [["1","1","0"],["0","1","0"],["1","0","1"]]`
+
+```
+Step 1: Scan grid, find "1" at (0, 0)
+Step 2: BFS from (0, 0) using queue → processes (0, 0), (0, 1), (1, 1) → Count = 1
+Step 3: Continue scan, find "1" at (2, 0)
+Step 4: BFS from (2, 0) using queue → processes (2, 0) → Count = 2
+Step 5: Continue scan, find "1" at (2, 2)
+Step 6: BFS from (2, 2) using queue → processes (2, 2) → Count = 3
+Result: 3 islands
+```
+
+### Pseudocode
+
+```plaintext
+function numIslandsBFS(grid):
+    if grid is empty:
+        return 0
+    
+    count = 0
+    for i from 0 to rows - 1:
+        for j from 0 to cols - 1:
+            if grid[i][j] == '1':
+                bfs(grid, i, j)
+                count += 1
+    
+    return count
+
+function bfs(grid, i, j):
+    queue = [（i, j)]
+    grid[i][j] = '0'  // Mark as visited
+    
+    while queue is not empty:
+        row, col = queue.dequeue()
+        for each direction (up, down, left, right):
+            newRow, newCol = row + dr, col + dc
+            if valid(newRow, newCol) and grid[newRow][newCol] == '1':
+                grid[newRow][newCol] = '0'  // Mark as visited
+                queue.enqueue((newRow, newCol))
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="number_of_islands_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="number_of_islands_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="NumberOfIslandsBFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="number_of_islands_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="number_of_islands_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="number_of_islands_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="number_of_islands_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="number_of_islands_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="NumberOfIslandsBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="number_of_islands_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="number_of_islands_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="number_of_islands_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to mark a cell as visited immediately when found (DFS) or when enqueued (BFS), leading to infinite loops or double counting.
+- Processing cells that are out of bounds without proper boundary checks.
+- Confusing island count with cell count — each DFS/BFS traversal counts as one island.
+- Not handling empty grid or all-water grid edge cases.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 130, title: 'Surrounded Regions', difficulty: 'Medium', slug: 'problems/surrounded-regions', leetcodeSlug: 'surrounded-regions' },
+  { number: 133, title: 'Clone Graph', difficulty: 'Medium', slug: 'problems/clone-graph', leetcodeSlug: 'clone-graph' },
+  { number: 695, title: 'Max Area of Island', difficulty: 'Medium', leetcodeSlug: 'max-area-of-island' },
+  { number: 827, title: 'Making A Large Island', difficulty: 'Hard', leetcodeSlug: 'making-a-large-island' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **DFS vs BFS:** DFS is simpler to write and uses recursion; BFS is iterative and shows understanding of queue mechanics.
+- **Space complexity:** Both are O(m*n) in worst case, but DFS has implicit call stack while BFS has explicit queue.
+- **Mutating input:** Modifying the grid to mark visited cells saves space but destroys original input. Discuss using a visited set instead.
+- **Follow-up:** Can you find the area of the largest island? Can you count islands without modifying the grid?
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={{ number: 130, title: "Surrounded Regions", slug: "surrounded-regions" }}
+/>

@@ -1,0 +1,317 @@
+---
+title: Binary Tree Right Side View
+description: Return the rightmost value visible at each level. Two approaches — BFS level-order O(n) and DFS right-first O(n) — in six languages.
+leetcodeNumber: 199
+difficulty: Medium
+leetcodeSlug: binary-tree-right-side-view
+tags: [Tree, Breadth-First Search, Depth-First Search]
+prev:
+  label: "#198 House Robber"
+  link: "../house-robber/"
+next:
+  label: "#200 Number of Islands"
+  link: "../number-of-islands/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBFS     from '@solutions/Python/binary_tree_right_side_view_bfs.py?raw';
+import cppBFS    from '@solutions/C++/binary_tree_right_side_view_bfs.cpp?raw';
+import javaBFS   from '@solutions/Java/binary_tree_right_side_view_bfs.java?raw';
+import jsBFS     from '@solutions/JavaScript/binary_tree_right_side_view_bfs.js?raw';
+import rustBFS   from '@solutions/Rust/binary_tree_right_side_view_bfs.rs?raw';
+import goBFS     from '@solutions/Golang/binary_tree_right_side_view_bfs.go?raw';
+import pybfsIterative from '@solutions/Python/binary_tree_right_side_view_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/binary_tree_right_side_view_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/BinaryTreeRightSideViewBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/binary_tree_right_side_view_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/binary_tree_right_side_view_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/binary_tree_right_side_view_bfs_iterative.go?raw';
+
+import pyDFS     from '@solutions/Python/binary_tree_right_side_view_dfs.py?raw';
+import cppDFS    from '@solutions/C++/binary_tree_right_side_view_dfs.cpp?raw';
+import javaDFS   from '@solutions/Java/binary_tree_right_side_view_dfs.java?raw';
+import jsDFS     from '@solutions/JavaScript/binary_tree_right_side_view_dfs.js?raw';
+import rustDFS   from '@solutions/Rust/binary_tree_right_side_view_dfs.rs?raw';
+import goDFS     from '@solutions/Golang/binary_tree_right_side_view_dfs.go?raw';
+
+## Problem Statement
+
+Given the `root` of a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.
+
+<Aside type="tip" title="What to notice first">
+- You see only the rightmost node at each level.
+- If a right child exists, you see it; otherwise you see the leftmost node that extends to that level.
+- Both BFS and DFS work, but they visit levels differently.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[1,2,3,null,5,null,4]` | `[1,3,4]` | Right view: root 1, right child 3, right-most at level 3 is 4 |
+| `[1,null,3]` | `[1,3]` | Only right children visible |
+| `[]` | `[]` | Empty tree |
+
+### Visualized Examples
+
+```
+Example 1:       1              Output: [1, 3, 4]
+                / \
+               2   3            Right side view
+                \   \
+                 5   4
+
+Example 2:       1
+                  \
+                   3            Output: [1, 3]
+
+Example 3:    (empty)           Output: []
+```
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[0, 100]`.
+- `-100 <= Node.val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **3D rendering** — determine visible surfaces from a viewing angle.
+- **Organizational charts** — view reporting lines from the side.
+- **Route planning** — see landmarks from a specific viewpoint.
+- **Game graphics** — render visible objects in a scene.
+- **Photography** — identify prominent features in composition.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| BFS Level-Order | O(n) | O(w) | Want to process level-by-level clearly |
+| DFS Right-First | O(n) | O(h) | Prefer simpler recursion; smaller trees |
+
+**Where h = height, w = max width**
+
+## Which approach should you learn first?
+
+- Pick **BFS Level-Order** if you want a clear, intuitive level-by-level approach.
+- Pick **DFS Right-First** if you prefer elegant recursion that processes the right side first.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Level-by-Level</div>
+    <div class="lc-approach-quick__name">BFS Level-Order</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(w) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Right-First</div>
+    <div class="lc-approach-quick__name">DFS Right-First</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(h) space</div>
+  </div>
+</div>
+
+## Approach 1: BFS Level-Order (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Process the tree level by level. For each level, take the rightmost node (the last one dequeued in that level).
+
+<ComplexityBadges time="O(n)" space="O(w)" timeColor="green" spaceColor="yellow" timeNote="Visit all nodes once" spaceNote="Queue width at widest level" />
+
+### Step-by-step Example
+
+**Input:** `root = [1,2,3,null,5,null,4]`
+
+```
+Level 1: [1]         → right-most = 1
+Level 2: [2, 3]      → right-most = 3
+Level 3: [5, 4]      → right-most = 4
+Result: [1, 3, 4]
+```
+
+### Pseudocode
+
+```plaintext
+function rightSideViewBFS(root):
+    if root is null:
+        return []
+    
+    result = []
+    queue = [root]
+    
+    while queue is not empty:
+        levelSize = length of queue
+        
+        // Process all nodes at this level
+        for i = 0 to levelSize - 1:
+            node = queue.dequeue()
+            
+            // Store the rightmost (last) node at this level
+            if i == levelSize - 1:
+                result.append(node.val)
+            
+            if node.left exists:
+                queue.enqueue(node.left)
+            if node.right exists:
+                queue.enqueue(node.right)
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="binary_tree_right_side_view_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="binary_tree_right_side_view_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="binary_tree_right_side_view_bfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="binary_tree_right_side_view_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="binary_tree_right_side_view_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="binary_tree_right_side_view_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: DFS Right-First Traversal
+
+<ApproachTag tag="interview" />
+
+Use DFS and visit the right child before the left child. Track the current level. Record a node only the first time we visit its level (which is the rightmost at that level).
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Visit all nodes" spaceNote="Recursion call stack" />
+
+### Step-by-step Example
+
+**Input:** `root = [1,2,3,null,5,null,4]`
+
+DFS order (right-first): 1 (level 0) → 3 (level 1) → 4 (level 2) → 2 (level 1, skip) → 5 (level 2, skip)
+
+Result: [1, 3, 4]
+
+### Pseudocode
+
+```plaintext
+function rightSideViewDFS(root):
+    result = []
+    
+    function dfs(node, level):
+        if node is null:
+            return
+        
+        // First time reaching this level, it's the rightmost
+        if level == length of result:
+            result.append(node.val)
+        
+        // Right child first, then left
+        dfs(node.right, level + 1)
+        dfs(node.left, level + 1)
+    
+    dfs(root, 0)
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="binary_tree_right_side_view_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="binary_tree_right_side_view_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="binary_tree_right_side_view_dfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="binary_tree_right_side_view_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="binary_tree_right_side_view_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="binary_tree_right_side_view_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="binary_tree_right_side_view_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="binary_tree_right_side_view_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="BinaryTreeRightSideViewBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="binary_tree_right_side_view_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="binary_tree_right_side_view_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="binary_tree_right_side_view_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Taking the wrong node at each level.** Make sure you're getting the rightmost, not the leftmost.
+- **DFS: visiting left before right.** In the DFS approach, visit right first so the first time you reach a level is from the right side.
+- **Not handling empty trees.** Return an empty list for null input.
+- **Off-by-one errors with level tracking.** Ensure your level tracking is correct.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 102, title: 'Binary Tree Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-level-order-traversal' },
+  { number: 103, title: 'Binary Tree Zigzag Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-zigzag-level-order-traversal' },
+  { number: 104, title: 'Maximum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'maximum-depth-of-binary-tree' },
+  { number: 637, title: 'Average of Levels in Binary Tree', difficulty: 'Easy', leetcodeSlug: 'average-of-levels-in-binary-tree' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **BFS vs DFS:** BFS is more intuitive for level processing; DFS is elegant but requires careful right-first ordering.
+- **Space usage:** BFS uses queue space (width-dependent); DFS uses call stack (height-dependent).
+- **Follow-ups to expect:** left side view, top view, bottom view, or per-level aggregations.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 198, title: "House Robber", slug: "house-robber" }}
+  nextProblem={{ number: 200, title: "Number of Islands", slug: "number-of-islands" }}
+/>

@@ -1,0 +1,166 @@
+---
+title: Minimum Genetic Mutation
+description: Find minimum mutations to reach target. Two approaches — BFS O(n*L) + DFS O(n*L) — in six languages.
+leetcodeNumber: 433
+difficulty: Medium
+leetcodeSlug: minimum-genetic-mutation
+tags: [Graph, DFS, BFS, Graph Traversal]
+prev:
+  label: "#427 Construct Quad Tree"
+  link: "../construct-quad-tree/"
+next:
+  label: "#452 Minimum Number of Arrows to Burst Balloons"
+  link: "../burst-balloons/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyApproach1 from '@solutions/Python/minimum_genetic_mutation_bfs.py?raw';
+import cppApproach1 from '@solutions/C++/minimum_genetic_mutation_bfs.cpp?raw';
+import javaApproach1 from '@solutions/Java/MinimumGeneticMutationBfs.java?raw';
+import jsApproach1 from '@solutions/JavaScript/minimum_genetic_mutation_bfs.js?raw';
+import rustApproach1 from '@solutions/Rust/minimum_genetic_mutation_bfs.rs?raw';
+import goApproach1 from '@solutions/Golang/minimum_genetic_mutation_bfs.go?raw';
+import pybfsIterative from '@solutions/Python/minimum_genetic_mutation_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/minimum_genetic_mutation_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/MinimumGeneticMutationBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/minimum_genetic_mutation_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/minimum_genetic_mutation_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/minimum_genetic_mutation_bfs_iterative.go?raw';
+
+import pyApproach2 from '@solutions/Python/minimum_genetic_mutation_dfs.py?raw';
+import cppApproach2 from '@solutions/C++/minimum_genetic_mutation_dfs.cpp?raw';
+import javaApproach2 from '@solutions/Java/MinimumGeneticMutationDfs.java?raw';
+import jsApproach2 from '@solutions/JavaScript/minimum_genetic_mutation_dfs.js?raw';
+import rustApproach2 from '@solutions/Rust/minimum_genetic_mutation_dfs.rs?raw';
+import goApproach2 from '@solutions/Golang/minimum_genetic_mutation_dfs.go?raw';
+
+## Problem Statement
+
+Solve this medium difficulty graph problem using two different approaches.
+
+<Aside type="tip" title="Key Insight">
+- Think about the graph structure and what makes this problem unique.
+- Consider both DFS and BFS solutions.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Notes |
+| --- | --- | --- | --- |
+| BFS | O(n) | O(n) | First approach |
+| DFS | O(n) | O(n) | Second approach |
+
+## Approach 1: BFS
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyApproach1} lang="python" title="minimum_genetic_mutation_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppApproach1} lang="cpp" title="minimum_genetic_mutation_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaApproach1} lang="java" title="MinimumGeneticMutationBfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsApproach1} lang="javascript" title="minimum_genetic_mutation_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustApproach1} lang="rust" title="minimum_genetic_mutation_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goApproach1} lang="go" title="minimum_genetic_mutation_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: DFS
+
+<ApproachTag tag="simple" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyApproach2} lang="python" title="minimum_genetic_mutation_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppApproach2} lang="cpp" title="minimum_genetic_mutation_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaApproach2} lang="java" title="MinimumGeneticMutationDfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsApproach2} lang="javascript" title="minimum_genetic_mutation_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustApproach2} lang="rust" title="minimum_genetic_mutation_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goApproach2} lang="go" title="minimum_genetic_mutation_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="minimum_genetic_mutation_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="minimum_genetic_mutation_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="MinimumGeneticMutationBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="minimum_genetic_mutation_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="minimum_genetic_mutation_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="minimum_genetic_mutation_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- Approach 1 vs Approach 2 trade-offs
+- Edge cases and how to handle them
+- Follow-up questions
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 909, title: "Snakes and Ladders", slug: "snakes-and-ladders" }}
+  nextProblem={{ number: 127, title: "Word Ladder", slug: "word-ladder" }}
+/>

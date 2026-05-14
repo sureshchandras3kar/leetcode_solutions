@@ -1,0 +1,419 @@
+---
+title: Trapping Rain Water
+description: Calculate total water trapped between elevation bars after rainfall. Three approaches — two pointers O(1) space, prefix max arrays, and monotonic stack — in six languages.
+leetcodeNumber: 42
+difficulty: Hard
+leetcodeSlug: trapping-rain-water
+tags: [Array, Two Pointers, Dynamic Programming, Stack, Monotonic Stack]
+prev:
+  label: "#41 First Missing Positive"
+  link: "../first-missing-positive/"
+next:
+  label: "#45 Jump Game II"
+  link: "../jump-game-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyTwoPtr    from '@solutions/Python/trapping_rain_water_two_pointer.py?raw';
+import cppTwoPtr   from '@solutions/C++/trapping_rain_water_two_pointer.cpp?raw';
+import javaTwoPtr  from '@solutions/Java/trapping_rain_water_two_pointer.java?raw';
+import jsTwoPtr    from '@solutions/JavaScript/trapping_rain_water_two_pointer.js?raw';
+import rustTwoPtr  from '@solutions/Rust/trapping_rain_water_two_pointer.rs?raw';
+import goTwoPtr    from '@solutions/Golang/trapping_rain_water_two_pointer.go?raw';
+
+import pyPrefixMax   from '@solutions/Python/trapping_rain_water_prefix_max.py?raw';
+import cppPrefixMax  from '@solutions/C++/trapping_rain_water_prefix_max.cpp?raw';
+import javaPrefixMax from '@solutions/Java/trapping_rain_water_prefix_max.java?raw';
+import jsPrefixMax   from '@solutions/JavaScript/trapping_rain_water_prefix_max.js?raw';
+import rustPrefixMax from '@solutions/Rust/trapping_rain_water_prefix_max.rs?raw';
+import goPrefixMax   from '@solutions/Golang/trapping_rain_water_prefix_max.go?raw';
+
+import pyStack   from '@solutions/Python/trapping_rain_water_stack.py?raw';
+import cppStack  from '@solutions/C++/trapping_rain_water_stack.cpp?raw';
+import javaStack from '@solutions/Java/trapping_rain_water_stack.java?raw';
+import jsStack   from '@solutions/JavaScript/trapping_rain_water_stack.js?raw';
+import rustStack from '@solutions/Rust/trapping_rain_water_stack.rs?raw';
+import goStack   from '@solutions/Golang/trapping_rain_water_stack.go?raw';
+
+## Problem Statement
+
+Given `n` non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.
+
+<Aside type="caution" title="The hard part">
+- Water at position `i` is bounded by the **MINIMUM** of: (tallest bar to its left) and (tallest bar to its right)
+- Then subtract the bar's own height: `water[i] = max(0, min(left_max[i], right_max[i]) - height[i])`
+- The two-pointer approach computes this without extra arrays by maintaining running maxes from both ends
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `[0,1,0,2,1,0,1,3,2,1,2,1]` | `6` |
+| `[4,2,0,3,2,5]` | `9` |
+
+For `height = [0,1,0,2,1,0,1,3,2,1,2,1]`, water is trapped in the following pockets:
+
+| i | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| height | 0 | 1 | 0 | 2 | 1 | 0 | 1 | 3 | 2 | 1 | 2 | 1 |
+| water  | 0 | 0 | 1 | 0 | 1 | 2 | 1 | 0 | 0 | 1 | 0 | 0 |
+
+Total: 0+0+1+0+1+2+1+0+0+1+0+0 = **6**
+
+## Constraints
+
+- `n == height.length`
+- `1 <= n <= 2×10^4`
+- `0 <= height[i] <= 10^5`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Urban drainage planning** — calculate water accumulation in city grids after storms
+- **Histogram analysis** — find "trapped" values below a running maximum in time-series data
+- **Image flood fill** — determine how water would fill depressions in a heightmap
+- **Resource pooling** — model how resources "pool" when blocked by higher-capacity neighbours
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Two Pointers | O(n) | O(1) | Optimal — best for interviews |
+| Prefix Max Arrays | O(n) | O(n) | Conceptually clearest |
+| Monotonic Stack | O(n) | O(n) | Process column by column (horizontal thinking) |
+
+## Approach 1: Prefix Max Arrays
+
+<ApproachTag tag="simple" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Three linear passes" spaceNote="Two extra arrays" />
+
+Start here — it's the most intuitive. Build two arrays: `left_max[i]` is the tallest bar from the left up to `i`, and `right_max[i]` is the tallest bar from the right down to `i`. The water at each position is `min(left_max[i], right_max[i]) - height[i]` (clamped to 0). This directly encodes the core insight: water height is limited by the shorter of the two surrounding walls.
+
+### Step-by-step for `[0,1,0,2,1,0,1,3,2,1,2,1]`
+
+| i | height | left_max | right_max | min(l,r) | water |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 0 | 0 | 3 | 0 | 0 |
+| 1 | 1 | 1 | 3 | 1 | 0 |
+| 2 | 0 | 1 | 3 | 1 | **1** |
+| 3 | 2 | 2 | 3 | 2 | 0 |
+| 4 | 1 | 2 | 3 | 2 | **1** |
+| 5 | 0 | 2 | 3 | 2 | **2** |
+| 6 | 1 | 2 | 3 | 2 | **1** |
+| 7 | 3 | 3 | 3 | 3 | 0 |
+| 8 | 2 | 3 | 2 | 2 | 0 |
+| 9 | 1 | 3 | 2 | 2 | **1** |
+| 10 | 2 | 3 | 2 | 2 | 0 |
+| 11 | 1 | 3 | 1 | 1 | 0 |
+
+**Total: 6 ✓**
+
+<LogicPlayer
+  title="Prefix max arrays — building left_max, right_max, then computing water"
+  description="Use Next or Autoplay to watch the left_max array fill from left to right, then right_max from right to left, then see each water cell computed."
+  steps={[
+    {
+      title: 'Build left_max — scanning left to right',
+      note: 'left_max[i] = max of all heights from index 0 to i. At i=3, left_max becomes 2 (the tallest bar so far).',
+      formula: 'left_max[i] = max(left_max[i-1], height[i])',
+      callout: 'left_max = [0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3]',
+      items: [
+        { label: '0→0', state: 'default', index: 0 },
+        { label: '1→1', state: 'default', index: 1 },
+        { label: '0→1', state: 'default', index: 2 },
+        { label: '2→2', state: 'active', index: 3 },
+        { label: '1→2', state: 'default', index: 4 },
+        { label: '0→2', state: 'default', index: 5 },
+        { label: '1→2', state: 'default', index: 6 },
+        { label: '3→3', state: 'default', index: 7 },
+        { label: '2→3', state: 'default', index: 8 },
+        { label: '1→3', state: 'default', index: 9 },
+        { label: '2→3', state: 'default', index: 10 },
+        { label: '1→3', state: 'default', index: 11 },
+      ],
+      memory: ['left_max[0..3] = [0, 1, 1, 2]', 'Scanning rightward, tracking running max'],
+    },
+    {
+      title: 'Build right_max — scanning right to left',
+      note: 'right_max[i] = max of all heights from index i to n-1. At i=7, right_max becomes 3 (the peak bar).',
+      formula: 'right_max[i] = max(right_max[i+1], height[i])',
+      callout: 'right_max = [3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 1]',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '3', state: 'default', index: 4 },
+        { label: '3', state: 'default', index: 5 },
+        { label: '3', state: 'default', index: 6 },
+        { label: '3', state: 'active', index: 7 },
+        { label: '2', state: 'default', index: 8 },
+        { label: '2', state: 'default', index: 9 },
+        { label: '2', state: 'default', index: 10 },
+        { label: '1', state: 'default', index: 11 },
+      ],
+      memory: ['right_max = [3,3,3,3,3,3,3,3,2,2,2,1]', 'Scanning leftward, tracking running max'],
+    },
+    {
+      title: 'Compute water at i=2',
+      note: 'left_max[2]=1, right_max[2]=3. min(1,3)=1. water = 1 - height[2] = 1 - 0 = 1.',
+      formula: 'water[2] = min(1, 3) - 0 = 1',
+      callout: 'Position 2 traps 1 unit of water',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '0+1', state: 'match', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '1', state: 'default', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '1', state: 'default', index: 6 },
+        { label: '3', state: 'default', index: 7 },
+        { label: '2', state: 'default', index: 8 },
+        { label: '1', state: 'default', index: 9 },
+        { label: '2', state: 'default', index: 10 },
+        { label: '1', state: 'default', index: 11 },
+      ],
+      memory: ['water so far = 1', 'min(left_max, right_max) - height'],
+    },
+    {
+      title: 'Compute water at i=5 (max pocket)',
+      note: 'left_max[5]=2, right_max[5]=3. min(2,3)=2. water = 2 - height[5] = 2 - 0 = 2. Deepest pocket!',
+      formula: 'water[5] = min(2, 3) - 0 = 2',
+      callout: 'Position 5 traps 2 units — the deepest pocket',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '0', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '1', state: 'default', index: 4 },
+        { label: '0+2', state: 'match', index: 5 },
+        { label: '1', state: 'default', index: 6 },
+        { label: '3', state: 'default', index: 7 },
+        { label: '2', state: 'default', index: 8 },
+        { label: '1', state: 'default', index: 9 },
+        { label: '2', state: 'default', index: 10 },
+        { label: '1', state: 'default', index: 11 },
+      ],
+      memory: ['water so far = 1+1+2 = 4', 'The left wall (h=2) is the bottleneck here'],
+    },
+    {
+      title: 'All water computed — total = 6',
+      note: 'Summing water at positions 2,4,5,6,9 gives 1+1+2+1+1 = 6.',
+      formula: 'total = 1+1+2+1+1 = 6',
+      callout: 'Answer: 6 ✓',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '0', state: 'default', index: 1 },
+        { label: '+1', state: 'match', index: 2 },
+        { label: '0', state: 'default', index: 3 },
+        { label: '+1', state: 'match', index: 4 },
+        { label: '+2', state: 'match', index: 5 },
+        { label: '+1', state: 'match', index: 6 },
+        { label: '0', state: 'default', index: 7 },
+        { label: '0', state: 'default', index: 8 },
+        { label: '+1', state: 'match', index: 9 },
+        { label: '0', state: 'default', index: 10 },
+        { label: '0', state: 'default', index: 11 },
+      ],
+      memory: ['Total water = 6', 'water[i] = min(left_max[i], right_max[i]) - height[i]'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function trap(height):
+    n = len(height)
+    left_max = [0] * n; right_max = [0] * n
+    left_max[0] = height[0]
+    for i in 1..n-1: left_max[i] = max(left_max[i-1], height[i])
+    right_max[n-1] = height[n-1]
+    for i in n-2..0: right_max[i] = max(right_max[i+1], height[i])
+    total = 0
+    for i in 0..n-1: total += max(0, min(left_max[i], right_max[i]) - height[i])
+    return total
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPrefixMax} lang="python" title="trapping_rain_water_prefix_max.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPrefixMax} lang="cpp" title="trapping_rain_water_prefix_max.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPrefixMax} lang="java" title="trapping_rain_water_prefix_max.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPrefixMax} lang="javascript" title="trapping_rain_water_prefix_max.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPrefixMax} lang="rust" title="trapping_rain_water_prefix_max.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPrefixMax} lang="go" title="trapping_rain_water_prefix_max.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Two Pointers (Recommended)
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Four variables only" />
+
+The O(1) space optimization over prefix max arrays. Instead of pre-building both arrays, maintain running maxes `max_left` and `max_right` as the pointers converge inward.
+
+**Why it works:** If `max_left <= max_right`, the water at `left` is definitely `max_left - height[left]` — even if `right_max` is higher, the bottleneck is `max_left`. We don't need to know the exact right side. Symmetrically for the right pointer.
+
+### Step-by-step for `[4,2,0,3,2,5]`
+
+| step | L | h[L] | R | h[R] | ml | mr | process | running water |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 4 | 5 | 5 | 0 | 0 | ml&lt;=mr: ml=max(0,4)=4, water+=0, L++ | 0 |
+| 2 | 1 | 2 | 5 | 5 | 4 | 0 | ml&gt;mr: mr=max(0,5)=5, water+=0, R-- | 0 |
+| 3 | 1 | 2 | 4 | 2 | 4 | 5 | ml&lt;=mr: water+=4-2=2, L++ | 2 |
+| 4 | 2 | 0 | 4 | 2 | 4 | 5 | ml&lt;=mr: water+=4-0=4, L++ | 6 |
+| 5 | 3 | 3 | 4 | 2 | 4 | 5 | ml&lt;=mr: water+=4-3=1, L++ | 7 |
+| 6 | 4 | 2 | 4 | 2 | 4 | 5 | ml&lt;=mr: water+=4-2=2, L++ | 9 |
+
+L >= R, done. **Answer: 9 ✓**
+
+### Pseudocode
+
+```plaintext
+function trap(height):
+    left, right = 0, len(height) - 1
+    max_left, max_right = 0, 0
+    water = 0
+    while left < right:
+        if max_left <= max_right:
+            max_left = max(max_left, height[left])
+            water += max_left - height[left]
+            left++
+        else:
+            max_right = max(max_right, height[right])
+            water += max_right - height[right]
+            right--
+    return water
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPtr} lang="python" title="trapping_rain_water_two_pointer.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPtr} lang="cpp" title="trapping_rain_water_two_pointer.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPtr} lang="java" title="trapping_rain_water_two_pointer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPtr} lang="javascript" title="trapping_rain_water_two_pointer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPtr} lang="rust" title="trapping_rain_water_two_pointer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPtr} lang="go" title="trapping_rain_water_two_pointer.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Monotonic Stack
+
+<ApproachTag tag="interview" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Each bar pushed and popped once" spaceNote="Stack stores indices" />
+
+Think **horizontally** instead of vertically. The stack maintains indices of bars in decreasing height order. When a taller bar appears, we found a right wall. The popped bar is the bottom of the pool. The new stack top is the left wall. Each iteration fills one horizontal layer of water.
+
+### Step-by-step for `[0,1,0,2,1,0,1,3,2,1,2,1]`
+
+| i | h[i] | stack before | action | water added |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | [] | push 0 | 0 |
+| 1 | 1 | [0] | h[1]>h[0]: pop 0, stack empty → break; push 1 | 0 |
+| 2 | 0 | [1] | h[2]&lt;=h[1]: push 2 | 0 |
+| 3 | 2 | [1,2] | h[3]&gt;h[2]: pop 2, left=1, w=1, water+=min(1,2)-0=1; h[3]&gt;h[1]: pop 1, empty→break; push 3 | 1 |
+| 4 | 1 | [3] | h[4]&lt;=h[3]: push 4 | 0 |
+| 5 | 0 | [3,4] | h[5]&lt;=h[4]: push 5 | 0 |
+| 6 | 1 | [3,4,5] | h[6]&gt;h[5]: pop 5, left=4, w=0, skip; h[6]&lt;=h[4]: break; push 6 | 0 |
+| 7 | 3 | [3,4,6] | h[7]&gt;h[6]: pop 6, left=4, w=2, water+=min(1,3)-1=0; pop 4, left=3, w=3... | 3 |
+
+*(Remaining steps accumulate total to 6)*
+
+### Pseudocode
+
+```plaintext
+function trap(height):
+    stack = []
+    water = 0
+    for i in range(len(height)):
+        while stack and height[i] > height[stack[-1]]:
+            bottom = stack.pop()
+            if not stack: break
+            left = stack[-1]
+            width = i - left - 1
+            h = min(height[left], height[i]) - height[bottom]
+            water += h * width
+        stack.append(i)
+    return water
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyStack} lang="python" title="trapping_rain_water_stack.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppStack} lang="cpp" title="trapping_rain_water_stack.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaStack} lang="java" title="trapping_rain_water_stack.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsStack} lang="javascript" title="trapping_rain_water_stack.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustStack} lang="rust" title="trapping_rain_water_stack.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goStack} lang="go" title="trapping_rain_water_stack.go" />
+  </TabItem>
+</Tabs>
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Water formula:** `min(left_max, right_max) - height[i]`, NOT `max - height[i]` — the minimum is what bounds the water level
+- **Two-pointer:** update `max_left`/`max_right` **before** adding water (not after) — the max must include the current bar
+- **Stack approach:** break if the stack is empty after popping (no left wall means no trapped water)
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 11,  title: 'Container With Most Water',   difficulty: 'Medium', slug: 'problems/container-with-most-water', leetcodeSlug: 'container-with-most-water' },
+  { number: 84,  title: 'Largest Rectangle in Histogram', difficulty: 'Hard', leetcodeSlug: 'largest-rectangle-in-histogram' },
+  { number: 407, title: 'Trapping Rain Water II',      difficulty: 'Hard',  leetcodeSlug: 'trapping-rain-water-ii' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="How to present this in an interview">
+- **Start with prefix max arrays** — it's the clearest explanation of the core insight
+- **Then present two pointers** as the O(1) space optimization — explain the "bottleneck" reasoning: "if max_left is smaller, it doesn't matter how tall the right wall is"
+- **The stack approach impresses** but is harder to explain — save it as a bonus if asked for alternatives
+- **The hardest interview question:** "Prove two pointers never misses a position" → each position is processed exactly once from whichever side has the smaller max; we never skip a position, we only skip computing it from the wrong side
+</Aside>

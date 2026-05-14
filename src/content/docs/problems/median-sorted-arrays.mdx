@@ -1,0 +1,42 @@
+---
+title: Median of Two Sorted Arrays
+description: Find median of two sorted arrays. Two approaches — binary search O(log(min(m,n))) and two-pointer O(m+n) — in six languages.
+leetcodeNumber: 4
+difficulty: Hard
+leetcodeSlug: median-of-two-sorted-arrays
+tags: ['Array', 'Binary Search', 'Divide and Conquer']
+prev:
+  label: "#3 Longest Substring Without Repeating Characters"
+  link: "../longest-substring-without-repeating-characters/"
+next:
+  label: "#5 Longest Palindromic Substring"
+  link: "../longest-palindromic-substring/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+## Problem Statement
+
+Problem #4 - Median of Two Sorted Arrays
+
+Difficulty: Hard
+
+## Approaches
+
+### Binary Search
+
+- Time Complexity: O(log(min(m,n)))
+- Space Complexity: O(1)
+- Binary search on the shorter array to find the partition point.
+
+### Two-Pointer Merge
+
+- Time Complexity: O(m+n)
+- Space Complexity: O(1)
+- Merge both arrays and find the median.
+

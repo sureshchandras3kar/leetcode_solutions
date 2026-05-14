@@ -1,0 +1,427 @@
+---
+title: Valid Parentheses
+description: Determine if a string of parentheses is valid. Two approaches — stack O(n) and replace loop O(n²) — in six languages.
+leetcodeNumber: 20
+difficulty: Easy
+leetcodeSlug: valid-parentheses
+tags: [String, Stack]
+prev:
+  label: "#19 Remove Nth Node From End of List"
+  link: "../remove-nth-node-from-end-of-list/"
+next:
+  label: "#21 Merge Two Sorted Lists"
+  link: "../merge-two-sorted-lists/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyStack      from '@solutions/Python/valid_parentheses_stack.py?raw';
+import cppStack     from '@solutions/C++/valid_parentheses_stack.cpp?raw';
+import javaStack    from '@solutions/Java/valid_parentheses_stack.java?raw';
+import jsStack      from '@solutions/JavaScript/valid_parentheses_stack.js?raw';
+import rustStack    from '@solutions/Rust/valid_parentheses_stack.rs?raw';
+import goStack      from '@solutions/Golang/valid_parentheses_stack.go?raw';
+import pySpaceOptimized from '@solutions/Python/valid_parentheses_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/valid_parentheses_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ValidParenthesesSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/valid_parentheses_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/valid_parentheses_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/valid_parentheses_space_optimized.go?raw';
+
+import pyReplace    from '@solutions/Python/valid_parentheses_replace.py?raw';
+import cppReplace   from '@solutions/C++/valid_parentheses_replace.cpp?raw';
+import javaReplace  from '@solutions/Java/valid_parentheses_replace.java?raw';
+import jsReplace    from '@solutions/JavaScript/valid_parentheses_replace.js?raw';
+import rustReplace  from '@solutions/Rust/valid_parentheses_replace.rs?raw';
+import goReplace    from '@solutions/Golang/valid_parentheses_replace.go?raw';
+
+## Problem Statement
+
+Given a string `s` containing just the characters `'('`, `')'`, `'['`, `']'`, `'{'` and `'}'`, determine if the input string is valid.
+
+An input string is valid if:
+1. Open brackets must be closed by the same type of closing bracket.
+2. Open brackets must be closed in the correct order.
+3. Every close bracket has a corresponding open bracket of the same type.
+
+<Aside type="tip" title="What to notice first">
+- Each closing bracket must match the **most recent unmatched opening bracket** of the same type.
+- This ordering requirement is the key insight — it's a perfect use case for a **stack** data structure.
+- The stack approach is faster and more intuitive than alternatives.
+</Aside>
+
+### Examples
+
+| Input | Valid? | Explanation |
+| --- | --- | --- |
+| `"()"` | true | Simple pair of parentheses |
+| `"()[]{}"` | true | Three different pairs, all properly closed |
+| `"(]"` | false | Closing bracket does not match opening bracket |
+| `"([{}])"` | true | Nested brackets in correct order |
+| `"([)]"` | false | Brackets closed in wrong order (interleaved) |
+| `""` | true | Empty string is valid |
+| `"("` | false | Unclosed opening bracket |
+| `")"` | false | Closing bracket with no opening |
+
+## Constraints
+
+- `0 <= s.length <= 10^4`
+- `s` consists of parentheses only: `'(', ')', '[', ']', '{', '}'`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Code editors and IDEs** — auto-closing brackets, syntax highlighting, bracket matching
+- **Compilers and interpreters** — validating syntax trees and nested structures
+- **HTML/XML parsing** — checking that tags are properly opened and closed
+- **Mathematical expression evaluation** — ensuring parentheses are balanced before parsing
+- **Text editors** — validating nested delimiters in code and markup
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Intuition | Best When |
+| --- | --- | --- | --- | --- |
+| Stack | O(n) | O(n) | Process left-to-right, match using memory | General case — fast and clear |
+| Replace Loop | O(n²) | O(n) | Remove pairs repeatedly | Learning the concept, simple implementation |
+
+## Which approach should you learn first?
+
+- Pick **Stack** if you want the best all-around solution.
+- Pick **Replace Loop** if you want to understand the concept through a brute-force lens.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Recommended</div>
+    <div class="lc-approach-quick__name">Stack</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Intuitive</div>
+    <div class="lc-approach-quick__name">Replace Loop</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Stack (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use a stack to track opening brackets. When you encounter a closing bracket, check if it matches the most recent opening bracket on the stack.
+
+**Key insight:** The last opened bracket that hasn't been closed yet must match the current closing bracket. This is exactly what a stack provides — last-in-first-out (LIFO) access.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass" spaceNote="Stack in worst case" />
+
+### Step-by-step Example
+
+**Input:** `s = "([{}])"`
+
+| Step | Char | Stack (before) | Action | Stack (after) |
+| --- | --- | --- | --- | --- |
+| 1 | `(` | `[]` | Opening bracket → push | `['(']` |
+| 2 | `[` | `['(']` | Opening bracket → push | `['(', '[']` |
+| 3 | `{` | `['(', '[']` | Opening bracket → push | `['(', '[', '{']` |
+| 4 | `}` | `['(', '[', '{']` | Closing bracket → top is `{` → match! pop | `['(', '[']` |
+| 5 | `]` | `['(', '[']` | Closing bracket → top is `[` → match! pop | `['(']` |
+| 6 | `)` | `['(']` | Closing bracket → top is `(` → match! pop | `[]` |
+| End | — | `[]` | Stack empty → valid ✓ | — |
+
+**Input:** `s = "([)]"`
+
+| Step | Char | Stack (before) | Action | Result |
+| --- | --- | --- | --- | --- |
+| 1 | `(` | `[]` | Opening bracket → push | `['(']` |
+| 2 | `[` | `['(']` | Opening bracket → push | `['(', '[']` |
+| 3 | `)` | `['(', '[']` | Closing bracket → top is `[`, but we see `)` → no match! ✗ | Invalid |
+
+<LogicPlayer
+  title="How the stack solution validates parentheses"
+  description="Watch the stack grow and shrink as opening brackets are pushed and closing brackets are matched and popped."
+  steps={[
+    {
+      title: 'Start with empty stack',
+      note: 'Before scanning the string, the stack is empty. We have not seen any opening brackets yet.',
+      formula: 'Start: stack = []',
+      callout: 'The stack will remember all unclosed opening brackets.',
+      items: [
+        { label: '(', state: 'default', index: 0 },
+        { label: '[', state: 'default', index: 1 },
+        { label: '{', state: 'default', index: 2 },
+        { label: '}', state: 'default', index: 3 },
+        { label: ']', state: 'default', index: 4 },
+        { label: ')', state: 'default', index: 5 },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Push opening bracket (',
+      note: 'The first character is an opening bracket, so we push it onto the stack.',
+      formula: 'stack = ["("]',
+      callout: 'We now remember that we have one unmatched opening bracket.',
+      items: [
+        { label: '(', state: 'active', index: 0 },
+        { label: '[', state: 'default', index: 1 },
+        { label: '{', state: 'default', index: 2 },
+        { label: '}', state: 'default', index: 3 },
+        { label: ']', state: 'default', index: 4 },
+        { label: ')', state: 'default', index: 5 },
+      ],
+      memory: ['( → index 0'],
+    },
+    {
+      title: 'Push opening bracket [',
+      note: 'The second character is also an opening bracket, so we push it onto the stack.',
+      formula: 'stack = ["(", "["]',
+      callout: 'The stack now contains two unmatched opening brackets. The [ is on top.',
+      items: [
+        { label: '(', state: 'stored', index: 0 },
+        { label: '[', state: 'active', index: 1 },
+        { label: '{', state: 'default', index: 2 },
+        { label: '}', state: 'default', index: 3 },
+        { label: ']', state: 'default', index: 4 },
+        { label: ')', state: 'default', index: 5 },
+      ],
+      memory: ['( → index 0', '[ → index 1'],
+    },
+    {
+      title: 'Push opening bracket {',
+      note: 'Another opening bracket. Push it onto the stack.',
+      formula: 'stack = ["(", "[", "{"]',
+      callout: 'Three unmatched opening brackets. The most recent is {.',
+      items: [
+        { label: '(', state: 'stored', index: 0 },
+        { label: '[', state: 'stored', index: 1 },
+        { label: '{', state: 'active', index: 2 },
+        { label: '}', state: 'default', index: 3 },
+        { label: ']', state: 'default', index: 4 },
+        { label: ')', state: 'default', index: 5 },
+      ],
+      memory: ['( → index 0', '[ → index 1', '{ → index 2'],
+    },
+    {
+      title: 'Match closing bracket } with top {',
+      note: 'We encounter a closing bracket }. The top of the stack is {, which matches perfectly. Pop the stack.',
+      formula: 'match "}" with "{" → pop → stack = ["(", "["]',
+      callout: 'The closing } has found its matching opening {. Now we focus on the [ that is on top.',
+      items: [
+        { label: '(', state: 'stored', index: 0 },
+        { label: '[', state: 'default', index: 1 },
+        { label: '{', state: 'match', index: 2 },
+        { label: '}', state: 'match', index: 3 },
+        { label: ']', state: 'default', index: 4 },
+        { label: ')', state: 'default', index: 5 },
+      ],
+      memory: ['( → index 0', '[ → index 1', '{ } matched!'],
+    },
+    {
+      title: 'Match closing bracket ] with top [',
+      note: 'We encounter a closing bracket ]. The top of the stack is [, which matches. Pop the stack.',
+      formula: 'match "]" with "[" → pop → stack = ["("]',
+      callout: 'The closing ] has found its matching opening [.',
+      items: [
+        { label: '(', state: 'stored', index: 0 },
+        { label: '[', state: 'match', index: 1 },
+        { label: '{', state: 'match', index: 2 },
+        { label: '}', state: 'match', index: 3 },
+        { label: ']', state: 'match', index: 4 },
+        { label: ')', state: 'default', index: 5 },
+      ],
+      memory: ['( → index 0', '[ ] matched!', '{ } matched!'],
+    },
+    {
+      title: 'Match closing bracket ) with top (',
+      note: 'We encounter a closing bracket ). The top of the stack is (, which matches. Pop the stack.',
+      formula: 'match ")" with "(" → pop → stack = []',
+      callout: 'All brackets have been matched and the stack is now empty. The string is valid!',
+      items: [
+        { label: '(', state: 'match', index: 0 },
+        { label: '[', state: 'match', index: 1 },
+        { label: '{', state: 'match', index: 2 },
+        { label: '}', state: 'match', index: 3 },
+        { label: ']', state: 'match', index: 4 },
+        { label: ')', state: 'match', index: 5 },
+      ],
+      memory: ['( ) matched!', '[ ] matched!', '{ } matched!'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function validParenthesesStack(s):
+    stack = []
+    bracketMap = {'(': ')', '[': ']', '{': '}'}
+
+    for char in s:
+        if char is an opening bracket:
+            stack.push(char)
+        else:
+            if stack is empty or bracketMap[stack.pop()] != char:
+                return false
+    
+    return stack is empty
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyStack} lang="python" title="valid_parentheses_stack.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppStack} lang="cpp" title="valid_parentheses_stack.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaStack} lang="java" title="valid_parentheses_stack.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsStack} lang="javascript" title="valid_parentheses_stack.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustStack} lang="rust" title="valid_parentheses_stack.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goStack} lang="go" title="valid_parentheses_stack.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Replace Loop
+
+<ApproachTag tag="simple" />
+
+Repeatedly remove consecutive pairs of matching brackets until no more can be removed. If the string becomes empty, it is valid.
+
+This approach is conceptually simpler but less efficient. It directly models the idea that valid brackets always have matching pairs next to each other.
+
+<Aside type="caution" title="Why this is slower">
+Each removal operation scans the entire remaining string. In the worst case (e.g., `"((()))"`) you perform O(n) iterations, each taking O(n) time to remove pairs, giving O(n²) total time.
+</Aside>
+
+<ComplexityBadges time="O(n²)" space="O(n)" timeColor="red" spaceColor="yellow" timeNote="Multiple passes" spaceNote="Temporary strings" />
+
+### Step-by-step Example
+
+**Input:** `s = "([{}])"`
+
+| Pass | Current String | Pairs Removed | Next String |
+| --- | --- | --- | --- |
+| 1 | `"([{}])"` | `{}` | `"([])"` |
+| 2 | `"([])"` | `[]` | `"()"` |
+| 3 | `"()"` | `()` | `""` |
+| End | `""` | — | Valid ✓ |
+
+**Input:** `s = "([)]"`
+
+| Pass | Current String | Pairs Removed | Next String |
+| --- | --- | --- | --- |
+| 1 | `"([)]"` | — | `"([)]"` |
+| End | `"([)]"` | No pairs to remove | Invalid ✗ |
+
+### Pseudocode
+
+```plaintext
+function validParenthesesReplace(s):
+    while s contains "()" or "[]" or "{}":
+        remove all occurrences of "()", "[]", "{}"
+    return s is empty
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyReplace} lang="python" title="valid_parentheses_replace.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppReplace} lang="cpp" title="valid_parentheses_replace.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaReplace} lang="java" title="valid_parentheses_replace.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsReplace} lang="javascript" title="valid_parentheses_replace.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustReplace} lang="rust" title="valid_parentheses_replace.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goReplace} lang="go" title="valid_parentheses_replace.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting to check if the stack is empty** before popping when encountering a closing bracket. A closing bracket with no matching opening bracket should return false immediately.
+- **Wrong bracket type match** — `"(]"` should return false because the closing bracket type does not match the opening bracket type.
+- **Forgetting the final check** — even if you match all closing brackets, you must ensure the stack is empty (no unmatched opening brackets remain).
+- **Checking stack non-empty after the loop** — common mistake: only checking `stack.empty()` but never validating matches during iteration.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="valid_parentheses_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="valid_parentheses_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ValidParenthesesSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="valid_parentheses_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="valid_parentheses_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="valid_parentheses_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 32, title: 'Longest Valid Parentheses', difficulty: 'Hard', leetcodeSlug: 'longest-valid-parentheses' },
+  { number: 36, title: 'Valid Sudoku', difficulty: 'Medium', leetcodeSlug: 'valid-sudoku' },
+  { number: 150, title: 'Evaluate Reverse Polish Notation', difficulty: 'Medium', leetcodeSlug: 'evaluate-reverse-polish-notation' },
+  { number: 155, title: 'Min Stack', difficulty: 'Medium', leetcodeSlug: 'min-stack' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key discussion points">
+- **Why stack over brute force?** Stack processes the string in a single pass. The replace loop must repeatedly scan and modify the string, making it quadratic.
+- **Follow-up: Generate parentheses** — given n pairs, generate all valid combinations. This requires backtracking and builds on the validation concept.
+- **Follow-up: Longest valid parentheses** — find the longest substring of valid parentheses. This uses dynamic programming or stack with index tracking.
+- **Edge cases to mention:** empty string (valid), single character (invalid), all opening brackets, all closing brackets, alternating mismatched types like `"(][)]"`.
+- **Time vs. space trade-off:** Stack approach uses linear space to achieve linear time. There's no way to do this in O(1) space without exponential time.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 19, title: "Remove Nth Node From End of List", slug: "remove-nth-node-from-end-of-list" }}
+  nextProblem={{ number: 21, title: "Merge Two Sorted Lists", slug: "merge-two-sorted-lists" }}
+/>

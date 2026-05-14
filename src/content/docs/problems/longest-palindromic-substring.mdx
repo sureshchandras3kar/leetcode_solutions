@@ -1,0 +1,177 @@
+---
+title: Longest Palindromic Substring
+description: Find the longest palindromic substring in a string.
+leetcodeNumber: 5
+difficulty: Medium
+leetcodeSlug: longest-palindromic-substring
+tags: [String, Dynamic Programming]
+prev:
+  label: "#4 Median of Two Sorted Arrays"
+  link: "../median-sorted-arrays/"
+next:
+  label: "#9 Palindrome Number"
+  link: "../palindrome-number/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pythona from '@solutions/Python/longest-palindromic-substring_expand_around_center.py?raw';
+import c++a from '@solutions/C++/longest-palindromic-substring_expand_around_center.cpp?raw';
+import javaa from '@solutions/Java/longest-palindromic-substring_expand_around_center.java?raw';
+import javascripta from '@solutions/JavaScript/longest-palindromic-substring_expand_around_center.js?raw';
+import rusta from '@solutions/Rust/longest-palindromic-substring_expand_around_center.rs?raw';
+import goa from '@solutions/Golang/longest-palindromic-substring_expand_around_center.go?raw';
+import pythonb from '@solutions/Python/longest-palindromic-substring_dp_table.py?raw';
+import c++b from '@solutions/C++/longest-palindromic-substring_dp_table.cpp?raw';
+import javab from '@solutions/Java/longest-palindromic-substring_dp_table.java?raw';
+import javascriptb from '@solutions/JavaScript/longest-palindromic-substring_dp_table.js?raw';
+import rustb from '@solutions/Rust/longest-palindromic-substring_dp_table.rs?raw';
+import gob from '@solutions/Golang/longest-palindromic-substring_dp_table.go?raw';
+import pythonc from '@solutions/Python/longest-palindromic-substring_manacher's_algorithm.py?raw';
+import c++c from '@solutions/C++/longest-palindromic-substring_manacher's_algorithm.cpp?raw';
+import javac from '@solutions/Java/longest-palindromic-substring_manacher's_algorithm.java?raw';
+import javascriptc from '@solutions/JavaScript/longest-palindromic-substring_manacher's_algorithm.js?raw';
+import rustc from '@solutions/Rust/longest-palindromic-substring_manacher's_algorithm.rs?raw';
+import goc from '@solutions/Golang/longest-palindromic-substring_manacher's_algorithm.go?raw';
+
+## Problem Statement
+
+Find the longest palindromic substring in a string.
+
+<Aside type="tip" title="Key Insight">
+This problem requires dynamic programming or hash-based techniques to solve efficiently. Start by understanding the recurrence relation or the hash structure needed.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation here |
+| Example 2 | Result 2 | Explanation here |
+
+## Constraints
+
+- Constraints go here
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best For |
+| --- | --- | --- | --- |
+| Expand Around Center | DP Table | Manacher's Algorithm | TBD | TBD | TBD |
+
+## Approach 1: Expand Around Center
+
+<ApproachTag tag="recommended" />
+
+Detailed explanation of approach 1.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" />
+
+### Pseudocode
+
+```plaintext
+function solution():
+    // Pseudocode here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pya}} lang="python" title="longest-palindromic-substring_approach1.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppa}} lang="cpp" title="longest-palindromic-substring_approach1.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaa}} lang="java" title="longest-palindromic-substring_approach1.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsa}} lang="javascript" title="longest-palindromic-substring_approach1.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rusta}} lang="rust" title="longest-palindromic-substring_approach1.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goa}} lang="go" title="longest-palindromic-substring_approach1.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: DP Table
+
+<ApproachTag tag="interview" />
+
+Detailed explanation of approach 2.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="yellow" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyb}} lang="python" title="longest-palindromic-substring_approach2.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppb}} lang="cpp" title="longest-palindromic-substring_approach2.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javab}} lang="java" title="longest-palindromic-substring_approach2.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsb}} lang="javascript" title="longest-palindromic-substring_approach2.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustb}} lang="rust" title="longest-palindromic-substring_approach2.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{gob}} lang="go" title="longest-palindromic-substring_approach2.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Manacher's Algorithm
+
+<ApproachTag tag="simple" />
+
+Detailed explanation of approach 3.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="red" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyc}} lang="python" title="longest-palindromic-substring_approach3.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppc}} lang="cpp" title="longest-palindromic-substring_approach3.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javac}} lang="java" title="longest-palindromic-substring_approach3.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsc}} lang="javascript" title="longest-palindromic-substring_approach3.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustc}} lang="rust" title="longest-palindromic-substring_approach3.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goc}} lang="go" title="longest-palindromic-substring_approach3.go" />
+  </TabItem>
+</Tabs>
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs">
+- Discuss time/space trade-offs
+- Mention edge cases
+- Explain optimization steps
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

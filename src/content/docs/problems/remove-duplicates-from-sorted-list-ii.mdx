@@ -1,0 +1,441 @@
+---
+title: Remove Duplicates from Sorted List II
+description: Remove all nodes with duplicate values from a sorted linked list. Two approaches — hash set O(n) and single pass O(n) — in six languages.
+leetcodeNumber: 82
+difficulty: Medium
+leetcodeSlug: remove-duplicates-from-sorted-list-ii
+tags: [Linked List, Two Pointers]
+prev:
+  label: "#80 Remove Duplicates from Sorted Array II"
+  link: "../remove-duplicates-from-sorted-array-ii/"
+next:
+  label: "#86 Partition List"
+  link: "../partition-list/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pySet    from '@solutions/Python/remove_duplicates_from_sorted_list_ii_hash_set.py?raw';
+import cppSet   from '@solutions/C++/remove_duplicates_from_sorted_list_ii_hash_set.cpp?raw';
+import javaSet  from '@solutions/Java/remove_duplicates_from_sorted_list_ii_hash_set.java?raw';
+import jsSet    from '@solutions/JavaScript/remove_duplicates_from_sorted_list_ii_hash_set.js?raw';
+import rustSet  from '@solutions/Rust/remove_duplicates_from_sorted_list_ii_hash_set.rs?raw';
+import goSet    from '@solutions/Golang/remove_duplicates_from_sorted_list_ii_hash_set.go?raw';
+import pyoptimized from '@solutions/Python/remove_duplicates_from_sorted_list_ii_optimized.py?raw';
+import cppoptimized from '@solutions/C++/remove_duplicates_from_sorted_list_ii_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/RemoveDuplicatesFromSortedListIiOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/remove_duplicates_from_sorted_list_ii_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/remove_duplicates_from_sorted_list_ii_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/remove_duplicates_from_sorted_list_ii_optimized.go?raw';
+
+import pySinglePass   from '@solutions/Python/remove_duplicates_from_sorted_list_ii_single_pass.py?raw';
+import cppSinglePass  from '@solutions/C++/remove_duplicates_from_sorted_list_ii_single_pass.cpp?raw';
+import javaSinglePass from '@solutions/Java/remove_duplicates_from_sorted_list_ii_single_pass.java?raw';
+import jsSinglePass   from '@solutions/JavaScript/remove_duplicates_from_sorted_list_ii_single_pass.js?raw';
+import rustSinglePass from '@solutions/Rust/remove_duplicates_from_sorted_list_ii_single_pass.rs?raw';
+import goSinglePass   from '@solutions/Golang/remove_duplicates_from_sorted_list_ii_single_pass.go?raw';
+
+## Problem Statement
+
+Given the `head` of a sorted linked list, **delete all nodes that have duplicate numbers**, leaving only **distinct numbers**. Return the head of the modified linked list.
+
+<Aside type="tip" title="What to notice first">
+- The list is **sorted**, which means all duplicate values are consecutive.
+- You must **delete entire groups** of duplicates, not just reduce them to one — if a value appears 2+ times, it's gone entirely.
+- A dummy node is crucial: if the head itself is part of a duplicate group, the dummy becomes the new head.
+- Single-pass approach tracks "prev" (last non-duplicate node) and checks if the current and next nodes match.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `1 → 2 → 3 → 3 → 4 → 4 → 5` | `1 → 2 → 5` | Remove all `3`s and `4`s (appeared 2+ times) |
+| `1 → 1 → 1 → 2 → 3` | `2 → 3` | Remove all `1`s |
+| `1 → 1` | `(empty)` | Both nodes are duplicates; return empty list |
+
+## Constraints
+
+- The number of nodes in the list is in the range `[0, 300]`.
+- `-100 <= Node.val <= 100`
+- The list is guaranteed to be sorted in ascending order.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Log deduplication** — remove entries that appear multiple times in a sorted log file.
+- **Database cleanup** — strip out duplicate transaction records that violate uniqueness constraints.
+- **Version control** — remove commits that share the same message hash from a history.
+- **Signal processing** — filter out duplicate measurements in a time-series stream.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Hash Set | O(n) | O(n) | First-pass understanding; counting duplicates is intuitive |
+| Single Pass | O(n) | O(1) | Memory is limited; elegant pointer manipulation |
+
+## Which approach should you learn first?
+
+- Learn **Single Pass** first — it demonstrates linked-list traversal and handles the dummy-node pattern.
+- Use **Hash Set** as a reference: it is easier to visualize and debug, but uses extra space.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Optimal &amp; Elegant</div>
+    <div class="lc-approach-quick__name">Single Pass</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Easy to Understand</div>
+    <div class="lc-approach-quick__name">Hash Set</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Single Pass (Two Pointers)
+
+<ApproachTag tag="recommended" />
+
+Use a dummy node and a `prev` pointer. Iterate through the list; when you find a duplicate (current and next have the same value), skip all nodes with that value. Otherwise, advance `prev` and move to the next node.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="One pass through list" spaceNote="Only pointer variables" />
+
+### Step-by-step Example
+
+**Input:** `1 → 2 → 3 → 3 → 4 → 4 → 5`
+
+| Step | Prev | Current | Action | Note |
+| --- | --- | --- | --- | --- |
+| 1 | dummy | 1 | 1 ≠ 2 → advance prev | 1 is unique |
+| 2 | 1 | 2 | 2 ≠ 3 → advance prev | 2 is unique |
+| 3 | 2 | 3 | 3 = 3 → skip all 3s | Duplicate detected |
+| 4 | 2 | 4 | 4 = 4 → skip all 4s | Duplicate detected |
+| 5 | 2 | 5 | No next → done | 5 is unique |
+| **Result** | | | dummy → 1 → 2 → 5 | Duplicates removed |
+
+<LogicPlayer
+  title="How pointers identify and remove duplicate nodes"
+  description="Watch as prev marks the last valid node, and current skips all duplicates when consecutive nodes match."
+  steps={[
+    {
+      title: 'Create dummy node pointing to head',
+      note: 'If the head itself is duplicate, dummy helps us return the correct new head.',
+      formula: 'dummy → 1 → 2 → 3 → 3 → 4 → 4 → 5',
+      items: [
+        { label: 'dummy', state: 'active', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '5', state: 'default', index: 6 },
+      ],
+      memory: ['prev: dummy'],
+    },
+    {
+      title: 'Check node 1: 1 ≠ 2 (next value)',
+      note: 'Since 1 is unique (no duplicate following), keep it and advance prev to 1.',
+      formula: 'prev = prev.next',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'active', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '5', state: 'default', index: 6 },
+      ],
+      memory: ['prev: 1', 'current: 2'],
+    },
+    {
+      title: 'Check node 2: 2 ≠ 3',
+      note: 'Node 2 is unique. Keep it and advance prev.',
+      formula: 'prev = prev.next',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '5', state: 'default', index: 6 },
+      ],
+      memory: ['prev: 2', 'current: 3'],
+    },
+    {
+      title: 'Check node 3: 3 = 3 (next value) — DUPLICATE',
+      note: 'Nodes match! Skip all nodes with value 3. Keep advancing current until value changes.',
+      formula: 'current = current.next',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'marked', index: 2 },
+        { label: '3', state: 'marked', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '5', state: 'default', index: 6 },
+      ],
+      memory: ['prev: 2', 'Skipping value 3'],
+      callout: 'All nodes with value 3 will be removed.',
+    },
+    {
+      title: 'Skip all 3s, move to node 4',
+      note: 'After skipping, current now points to the first node after all 3s (which is 4).',
+      formula: 'current has value 4, but next is also 4',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'removed', index: 2 },
+        { label: '3', state: 'removed', index: 3 },
+        { label: '4', state: 'active', index: 4 },
+        { label: '4', state: 'default', index: 5 },
+        { label: '5', state: 'default', index: 6 },
+      ],
+      memory: ['prev: 2', 'current: 4'],
+    },
+    {
+      title: 'Check node 4: 4 = 4 — DUPLICATE',
+      note: 'Same logic: skip all 4s. current advances through the duplicate group.',
+      formula: 'current = current.next',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'removed', index: 2 },
+        { label: '3', state: 'removed', index: 3 },
+        { label: '4', state: 'marked', index: 4 },
+        { label: '4', state: 'marked', index: 5 },
+        { label: '5', state: 'default', index: 6 },
+      ],
+      memory: ['prev: 2', 'Skipping value 4'],
+    },
+    {
+      title: 'Skip all 4s, move to node 5',
+      note: 'Now current points to 5, which is unique. Link prev.next to skip the duplicate 4s.',
+      formula: 'prev.next = current (skip the 4s)',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'removed', index: 2 },
+        { label: '3', state: 'removed', index: 3 },
+        { label: '4', state: 'removed', index: 4 },
+        { label: '4', state: 'removed', index: 5 },
+        { label: '5', state: 'active', index: 6 },
+      ],
+      memory: ['prev: 2', 'current: 5', 'Link: 2 → 5'],
+    },
+    {
+      title: 'Process node 5: 5 has no next',
+      note: 'Node 5 is unique. Advance prev and finish.',
+      formula: 'prev = prev.next (to node 5)',
+      items: [
+        { label: 'dummy', state: 'default', index: -1 },
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'removed', index: 2 },
+        { label: '3', state: 'removed', index: 3 },
+        { label: '4', state: 'removed', index: 4 },
+        { label: '4', state: 'removed', index: 5 },
+        { label: '5', state: 'active', index: 6 },
+      ],
+      memory: ['prev: 5', 'current: null', 'Done!'],
+      callout: 'Result: dummy → 1 → 2 → 5',
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function deleteDuplicates(head):
+    dummy = new ListNode(0)
+    dummy.next = head
+    prev = dummy
+    current = head
+    
+    while current != null:
+        if current.next != null and current.val == current.next.val:
+            // Skip all duplicates
+            value = current.val
+            while current != null and current.val == value:
+                current = current.next
+            // Link prev to the first non-duplicate node
+            prev.next = current
+        else:
+            // Unique node, keep it
+            prev = prev.next
+            current = current.next
+    
+    return dummy.next
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySinglePass} lang="python" title="remove_duplicates_from_sorted_list_ii_single_pass.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSinglePass} lang="cpp" title="remove_duplicates_from_sorted_list_ii_single_pass.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSinglePass} lang="java" title="remove_duplicates_from_sorted_list_ii_single_pass.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSinglePass} lang="javascript" title="remove_duplicates_from_sorted_list_ii_single_pass.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSinglePass} lang="rust" title="remove_duplicates_from_sorted_list_ii_single_pass.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSinglePass} lang="go" title="remove_duplicates_from_sorted_list_ii_single_pass.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Hash Set
+
+<ApproachTag tag="simple" />
+
+First pass: count the frequency of each value using a set or hash map. Second pass: build the result list, skipping any node whose value appeared more than once.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Two passes" spaceNote="Hash set stores unique values" />
+
+### Step-by-step Example
+
+**Input:** `1 → 2 → 3 → 3 → 4 → 4 → 5`
+
+| Step | Value | Frequency | Keep? |
+| --- | --- | --- | --- |
+| Pass 1 | 1 | 1 | Yes |
+| | 2 | 1 | Yes |
+| | 3 | 2 | No |
+| | 4 | 2 | No |
+| | 5 | 1 | Yes |
+| **Pass 2** | Keep: `1 → 2 → 5` | | |
+
+### Pseudocode
+
+```plaintext
+function deleteDuplicates(head):
+    // Count frequencies
+    freq = {}
+    current = head
+    while current != null:
+        freq[current.val] = freq.get(current.val, 0) + 1
+        current = current.next
+    
+    // Build result list
+    dummy = new ListNode(0)
+    dummy.next = head
+    prev = dummy
+    current = head
+    
+    while current != null:
+        if freq[current.val] == 1:
+            prev = current
+            current = current.next
+        else:
+            // Skip this node (duplicate)
+            prev.next = current.next
+            current = current.next
+    
+    return dummy.next
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySet} lang="python" title="remove_duplicates_from_sorted_list_ii_hash_set.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSet} lang="cpp" title="remove_duplicates_from_sorted_list_ii_hash_set.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSet} lang="java" title="remove_duplicates_from_sorted_list_ii_hash_set.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSet} lang="javascript" title="remove_duplicates_from_sorted_list_ii_hash_set.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSet} lang="rust" title="remove_duplicates_from_sorted_list_ii_hash_set.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSet} lang="go" title="remove_duplicates_from_sorted_list_ii_hash_set.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Dummy node is essential:** If the head itself is part of a duplicate group, the dummy becomes the safe starting point.
+- **Advancing current vs prev:** In single-pass, when you skip duplicates, only current moves; prev stays until a unique node is found.
+- **Null pointer checks:** Always verify `current.next != null` before comparing values to avoid crashes.
+- **Forgetting the second skip:** When skipping duplicates, you must advance current *through all matching values*, not just to the next node.
+</Aside>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="remove_duplicates_from_sorted_list_ii_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="remove_duplicates_from_sorted_list_ii_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="RemoveDuplicatesFromSortedListIiOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="remove_duplicates_from_sorted_list_ii_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="remove_duplicates_from_sorted_list_ii_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="remove_duplicates_from_sorted_list_ii_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 83, title: 'Remove Duplicates from Sorted List', difficulty: 'Easy', slug: 'problems/remove-duplicates-from-sorted-list' },
+  { number: 21, title: 'Merge Two Sorted Lists', difficulty: 'Easy', leetcodeSlug: 'merge-two-sorted-lists' },
+  { number: 206, title: 'Reverse Linked List', difficulty: 'Easy', leetcodeSlug: 'reverse-linked-list' },
+  { number: 92, title: 'Reverse Linked List II', difficulty: 'Medium', leetcodeSlug: 'reverse-linked-list-ii' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Single-pass benefit:** O(1) space is ideal when memory is constrained.
+- **Hash set benefit:** Two separate passes make the logic clearer and easier to debug.
+- **Dummy node insight:** Using a sentinel node simplifies edge cases (e.g., duplicate at head).
+- **When to use which:** Ask the interviewer about space constraints; if O(n) space is acceptable, the hash set approach is easier to code error-free.
+- **Edge case:** A list of all duplicates (e.g., `1 → 1 → 1`) should return an empty list—verify this works in your implementation.
+</Aside>

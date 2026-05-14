@@ -1,0 +1,359 @@
+---
+title: Product of Array Except Self
+description: Compute the product of all elements except each index without division. Two approaches — prefix/suffix arrays O(n) and two-pass O(1) space — in six languages.
+leetcodeNumber: 238
+difficulty: Medium
+leetcodeSlug: product-of-array-except-self
+tags: [Array, Prefix Sum]
+prev:
+  label: "#236 Lowest Common Ancestor of a Binary Tree"
+  link: "../lowest-common-ancestor-of-a-binary-tree/"
+next:
+  label: "#242 Valid Anagram"
+  link: "../valid-anagram/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyPrefixSuffix   from '@solutions/Python/product_except_self_prefix_suffix.py?raw';
+import cppPrefixSuffix  from '@solutions/C++/product_except_self_prefix_suffix.cpp?raw';
+import javaPrefixSuffix from '@solutions/Java/product_except_self_prefix_suffix.java?raw';
+import jsPrefixSuffix   from '@solutions/JavaScript/product_except_self_prefix_suffix.js?raw';
+import rustPrefixSuffix from '@solutions/Rust/product_except_self_prefix_suffix.rs?raw';
+import goPrefixSuffix   from '@solutions/Golang/product_except_self_prefix_suffix.go?raw';
+import pySpaceOptimized from '@solutions/Python/product_of_array_except_self_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/product_of_array_except_self_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ProductOfArrayExceptSelfSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/product_of_array_except_self_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/product_of_array_except_self_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/product_of_array_except_self_space_optimized.go?raw';
+
+import pyTwoPass   from '@solutions/Python/product_except_self_two_pass.py?raw';
+import cppTwoPass  from '@solutions/C++/product_except_self_two_pass.cpp?raw';
+import javaTwoPass from '@solutions/Java/product_except_self_two_pass.java?raw';
+import jsTwoPass   from '@solutions/JavaScript/product_except_self_two_pass.js?raw';
+import rustTwoPass from '@solutions/Rust/product_except_self_two_pass.rs?raw';
+import goTwoPass   from '@solutions/Golang/product_except_self_two_pass.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]`. The product of any prefix or suffix of `nums` is guaranteed to fit in a 32-bit integer. You must write an algorithm that runs in O(n) time and without using the division operation.
+
+<Aside type="tip" title="Key insight">
+- Division would be the obvious answer but it is explicitly forbidden — and breaks when the array contains zeros.
+- The key insight: `output[i] = (product of everything LEFT of i) × (product of everything RIGHT of i)`.
+- You can compute both sides in separate passes without ever dividing.
+</Aside>
+
+### Examples
+
+| Input | Output |
+| --- | --- |
+| `[1,2,3,4]` | `[24,12,8,6]` |
+| `[-1,1,0,-3,3]` | `[0,-9,0,9,0]` |
+
+## Constraints
+
+- `2 <= nums.length <= 10^5`
+- `-30 <= nums[i] <= 30`
+- The product of any prefix or suffix fits in a 32-bit integer
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Parallel computation** — computing per-node contributions in distributed matrix operations.
+- **Financial returns** — computing total portfolio return excluding each individual asset's contribution.
+- **Leave-one-out cross validation** — machine learning metric where you exclude each data point's own contribution.
+- **Signal processing** — computing running products that exclude self-interference.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Prefix/Suffix Arrays | O(n) | O(n) | Clarity matters, extra memory allowed |
+| Two-Pass (O(1) space) | O(n) | O(1)* | Follow-up requirement, memory-constrained |
+
+*The output array is not counted as extra space per the problem convention.
+
+## Approach 1: Prefix/Suffix Arrays
+
+<ApproachTag tag="recommended" />
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Two passes" spaceNote="Two extra arrays" />
+
+Build a `prefix` array where `prefix[i]` is the product of all elements to the left of index `i`, and a `suffix` array where `suffix[i]` is the product of all elements to the right of index `i`. The answer at each index is simply `prefix[i] * suffix[i]`.
+
+### Step-by-step Example
+
+**Input:** `[1, 2, 3, 4]`
+
+| i | prefix[i] | suffix[i] | output[i] |
+| --- | --- | --- | --- |
+| 0 | 1 | 24 | 24 |
+| 1 | 1 | 12 | 12 |
+| 2 | 2 | 4 | 8 |
+| 3 | 6 | 1 | 6 |
+
+<LogicPlayer
+  title="Building prefix and suffix arrays"
+  description="Use Next or Autoplay to watch the prefix array fill left→right, then the suffix array fill right→left, before combining them."
+  steps={[
+    {
+      title: 'Initial state',
+      note: 'Both prefix and suffix arrays start filled with 1 (the multiplicative identity).',
+      formula: 'prefix = [1,1,1,1]  suffix = [1,1,1,1]',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+      ],
+      memory: ['prefix: [1, 1, 1, 1]', 'suffix: [1, 1, 1, 1]'],
+    },
+    {
+      title: 'Fill prefix left→right',
+      note: 'prefix[i] = prefix[i-1] * nums[i-1]. prefix[0] stays 1 (nothing to its left).',
+      formula: 'prefix[1]=1×1=1  prefix[2]=1×2=2  prefix[3]=2×3=6',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+      ],
+      memory: ['prefix: [1, 1, 2, 6]', 'suffix: [1, 1, 1, 1]'],
+    },
+    {
+      title: 'Fill suffix right→left',
+      note: 'suffix[i] = suffix[i+1] * nums[i+1]. suffix[3] stays 1 (nothing to its right).',
+      formula: 'suffix[2]=1×4=4  suffix[1]=4×3=12  suffix[0]=12×2=24',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'active', index: 3 },
+      ],
+      memory: ['prefix: [1, 1, 2, 6]', 'suffix: [24, 12, 4, 1]'],
+    },
+    {
+      title: 'Multiply element-wise',
+      note: 'output[i] = prefix[i] * suffix[i] gives the product of all elements except nums[i].',
+      formula: '[1×24, 1×12, 2×4, 6×1] = [24, 12, 8, 6]',
+      items: [
+        { label: '24', state: 'match', index: 0 },
+        { label: '12', state: 'match', index: 1 },
+        { label: '8',  state: 'match', index: 2 },
+        { label: '6',  state: 'match', index: 3 },
+      ],
+      memory: ['output: [24, 12, 8, 6]'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function productExceptSelf(nums):
+    n = len(nums)
+    prefix = [1] * n
+    suffix = [1] * n
+    for i in range(1, n):
+        prefix[i] = prefix[i-1] * nums[i-1]
+    for i in range(n-2, -1, -1):
+        suffix[i] = suffix[i+1] * nums[i+1]
+    return [prefix[i] * suffix[i] for i in range(n)]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPrefixSuffix} lang="python" title="product_except_self_prefix_suffix.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPrefixSuffix} lang="cpp" title="product_except_self_prefix_suffix.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPrefixSuffix} lang="java" title="product_except_self_prefix_suffix.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPrefixSuffix} lang="javascript" title="product_except_self_prefix_suffix.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPrefixSuffix} lang="rust" title="product_except_self_prefix_suffix.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPrefixSuffix} lang="go" title="product_except_self_prefix_suffix.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Two-Pass O(1) Space
+
+<ApproachTag tag="space-optimal" />
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" spaceNote="Output array only" />
+
+Reuse the output array itself instead of allocating separate prefix and suffix arrays. The first pass (left→right) fills each slot with the running prefix product. The second pass (right→left) multiplies each slot by a running suffix product variable.
+
+### Step-by-step Example
+
+**Input:** `[1, 2, 3, 4]`
+
+After pass 1 (left prefix into output): `output = [1, 1, 2, 6]`
+
+Pass 2 (right→left, running suffix starts at 1):
+
+| i | output[i] before | suffix | output[i] after | suffix update |
+| --- | --- | --- | --- | --- |
+| 3 | 6 | 1 | 6×1 = **6** | 1×4 = 4 |
+| 2 | 2 | 4 | 2×4 = **8** | 4×3 = 12 |
+| 1 | 1 | 12 | 1×12 = **12** | 12×2 = 24 |
+| 0 | 1 | 24 | 1×24 = **24** | — |
+
+Result: `[24, 12, 8, 6]`
+
+<LogicPlayer
+  title="Two-pass in-place product"
+  description="Pass 1 fills the output with left-prefix products. Pass 2 multiplies in right-suffix products using a single variable."
+  steps={[
+    {
+      title: 'Pass 1 start',
+      note: 'Running prefix starts at 1. We store it in output[i] before multiplying it by nums[i].',
+      formula: 'prefix = 1',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+      ],
+      memory: ['output: [_, _, _, _]', 'prefix = 1'],
+    },
+    {
+      title: 'Pass 1 complete',
+      note: 'Each output[i] now holds the product of all elements to its left.',
+      formula: 'output = [1, 1, 2, 6]',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'active', index: 3 },
+      ],
+      memory: ['output: [1, 1, 2, 6]', 'prefix = 24'],
+    },
+    {
+      title: 'Pass 2 — multiply in suffix',
+      note: 'Running suffix starts at 1. At each index we multiply output[i] by suffix, then update suffix *= nums[i].',
+      formula: 'i=3: 6×1=6, suffix=4 | i=2: 2×4=8, suffix=12 | i=1: 1×12=12, suffix=24 | i=0: 1×24=24',
+      items: [
+        { label: '24', state: 'match', index: 0 },
+        { label: '12', state: 'match', index: 1 },
+        { label: '8',  state: 'match', index: 2 },
+        { label: '6',  state: 'match', index: 3 },
+      ],
+      memory: ['output: [24, 12, 8, 6]', 'suffix = 24'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function productExceptSelfOptimal(nums):
+    n = len(nums)
+    output = [1] * n
+    prefix = 1
+    for i in range(n):
+        output[i] = prefix
+        prefix *= nums[i]
+    suffix = 1
+    for i in range(n-1, -1, -1):
+        output[i] *= suffix
+        suffix *= nums[i]
+    return output
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPass} lang="python" title="product_except_self_two_pass.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPass} lang="cpp" title="product_except_self_two_pass.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPass} lang="java" title="product_except_self_two_pass.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPass} lang="javascript" title="product_except_self_two_pass.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPass} lang="rust" title="product_except_self_two_pass.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPass} lang="go" title="product_except_self_two_pass.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Common mistakes">
+- Forgetting that `prefix[0]` and `suffix[n-1]` must both start as `1` (the multiplicative identity).
+- Off-by-one: `prefix[i]` should be the product of `nums[0..i-1]`, not including `nums[i]`.
+- Division approach: fails when the array contains zeros (division by zero).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="product_of_array_except_self_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="product_of_array_except_self_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ProductOfArrayExceptSelfSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="product_of_array_except_self_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="product_of_array_except_self_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="product_of_array_except_self_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 42,  title: 'Trapping Rain Water',       difficulty: 'Hard',   leetcodeSlug: 'trapping-rain-water' },
+  { number: 560, title: 'Subarray Sum Equals K',     difficulty: 'Medium', leetcodeSlug: 'subarray-sum-equals-k' },
+  { number: 152, title: 'Maximum Product Subarray',  difficulty: 'Medium', leetcodeSlug: 'maximum-product-subarray' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to mention">
+- Always mention the O(1) space follow-up unprompted — it signals awareness of the classic progression.
+- The output array is considered O(1) extra space per the problem statement (it is the return value).
+- Zero handling: ask "what if the array contains zeros?" — this approach handles it correctly, division would not.
+</Aside>

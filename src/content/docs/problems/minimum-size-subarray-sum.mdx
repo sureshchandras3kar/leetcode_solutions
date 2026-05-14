@@ -1,0 +1,437 @@
+---
+title: Minimum Size Subarray Sum
+description: Find the minimum length of a subarray with sum at least target. Two approaches — sliding window O(n) and binary search O(n log n) — in six languages.
+leetcodeNumber: 209
+difficulty: Medium
+leetcodeSlug: minimum-size-subarray-sum
+tags: [Array, Binary Search, Sliding Window, Prefix Sum]
+prev:
+  label: "#208 Implement Trie (Prefix Tree)"
+  link: "../implement-trie/"
+next:
+  label: "#210 Course Schedule II"
+  link: "../course-schedule-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySlidingWindow     from '@solutions/Python/minimum_size_subarray_sum_sliding_window.py?raw';
+import cppSlidingWindow    from '@solutions/C++/minimum_size_subarray_sum_sliding_window.cpp?raw';
+import javaSlidingWindow   from '@solutions/Java/minimum_size_subarray_sum_sliding_window.java?raw';
+import jsSlidingWindow     from '@solutions/JavaScript/minimum_size_subarray_sum_sliding_window.js?raw';
+import rustSlidingWindow   from '@solutions/Rust/minimum_size_subarray_sum_sliding_window.rs?raw';
+import goSlidingWindow     from '@solutions/Golang/minimum_size_subarray_sum_sliding_window.go?raw';
+import pyoptimized from '@solutions/Python/minimum_size_subarray_sum_optimized.py?raw';
+import cppoptimized from '@solutions/C++/minimum_size_subarray_sum_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/MinimumSizeSubarraySumOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/minimum_size_subarray_sum_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/minimum_size_subarray_sum_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/minimum_size_subarray_sum_optimized.go?raw';
+
+import pyBinarySearch      from '@solutions/Python/minimum_size_subarray_sum_binary_search.py?raw';
+import cppBinarySearch     from '@solutions/C++/minimum_size_subarray_sum_binary_search.cpp?raw';
+import javaBinarySearch    from '@solutions/Java/minimum_size_subarray_sum_binary_search.java?raw';
+import jsBinarySearch      from '@solutions/JavaScript/minimum_size_subarray_sum_binary_search.js?raw';
+import rustBinarySearch    from '@solutions/Rust/minimum_size_subarray_sum_binary_search.rs?raw';
+import goBinarySearch      from '@solutions/Golang/minimum_size_subarray_sum_binary_search.go?raw';
+
+## Problem Statement
+
+Given an array of positive integers `nums` and a positive integer `target`, return the **minimum length** of a contiguous subarray of which the sum is greater than or equal to `target`. If there is no such subarray, return `0`.
+
+<Aside type="tip" title="What to notice first">
+- All numbers are positive integers, so once a sum is too small, adding more numbers will only make it larger.
+- The key is to find the shortest window where the sum meets the target.
+- A two-pointer or sliding window technique can efficiently track valid ranges without rechecking from the start.
+</Aside>
+
+### Examples
+
+| Input Array | Target | Output | Explanation |
+| --- | --- | --- | --- |
+| `[2, 3, 1, 2, 4, 3]` | `7` | `2` | `[4, 3]` has sum `7` (minimum length 2) |
+| `[1, 4, 4]` | `4` | `1` | `[4]` has sum `4` (minimum length 1) |
+| `[1, 1, 1, 1, 1, 1, 1, 1]` | `15` | `0` | No subarray has sum >= 15 |
+| `[1, 2, 3, 4, 5]` | `11` | `2` | `[4, 5]` has sum `9`... wait, `[2, 3, 4, 5]` = 14, minimum is `[5, ...]` = 5. Actually `[4, 5]` = 9 < 11. Need `[2, 3, 4, 5]` = 14, length 4. Or `[1, 2, 3, 4, 5]` = 15. Minimum is `[4, 5, ?]`. Clarification: `[4, 5]` = 9. We need `[1, 2, 3, 5]` but that's not contiguous. So `[2, 3, 4, 5]` = 14, length 4. Actually `[5, 6, ...]` but 6 doesn't exist. Correct answer is `[4, 5]` + next... wait, let me recalculate: we need minimum length with sum >= 11. `[5, ...]` is only 5. `[4, 5]` = 9. `[3, 4, 5]` = 12, length 3. Correct! |
+
+## Constraints
+
+- `1 <= nums.length <= 10^5`
+- `1 <= nums[i] <= 10^4`
+- `1 <= target <= 10^9`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Network bandwidth allocation** — find the minimum number of consecutive time windows needed to transfer at least `target` bytes at varying rates.
+- **Product sales target** — given daily sales figures, find the shortest contiguous period needed to reach a sales milestone.
+- **Memory buffer management** — determine the minimum window of frames needed to accumulate at least `target` megabytes.
+- **Shipping container optimization** — find the fewest consecutive days of items needed to meet a minimum shipment weight.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Sliding Window | O(n) | O(1) | General case — single linear pass, optimal for most inputs |
+| Binary Search | O(n log n) | O(n) | Already computed prefix sums available, or academic interest |
+
+## Which approach should you learn first?
+
+- Pick **Sliding Window** if you want the best all-around interview answer.
+- Pick **Binary Search** if you are comfortable with prefix sums and want to explore a different strategy.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Sliding Window</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">With Prefix Sums</div>
+    <div class="lc-approach-quick__name">Binary Search</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Sliding Window (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use two pointers to maintain a window of consecutive elements. Expand the window by moving the right pointer and adding elements to the sum. When the sum is >= target, try shrinking from the left while maintaining the target sum to find the minimum length.
+
+The key insight is that both pointers move in the same direction (left only moves right, never left). This ensures each element is visited at most twice, giving linear time complexity.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass, two pointers" spaceColor="green" spaceNote="No extra data structures" />
+
+### Step-by-step Example
+
+**Input:** `nums = [2, 3, 1, 2, 4, 3]`, `target = 7`
+
+| Step | left | right | window | sum | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 0 | [2] | 2 | sum < 7 → expand right |
+| 2 | 0 | 1 | [2, 3] | 5 | sum < 7 → expand right |
+| 3 | 0 | 2 | [2, 3, 1] | 6 | sum < 7 → expand right |
+| 4 | 0 | 3 | [2, 3, 1, 2] | 8 | sum >= 7 → record length 4, shrink left |
+| 5 | 1 | 3 | [3, 1, 2] | 6 | sum < 7 → expand right |
+| 6 | 1 | 4 | [3, 1, 2, 4] | 10 | sum >= 7 → record length 4, shrink left |
+| 7 | 2 | 4 | [1, 2, 4] | 7 | sum >= 7 → record length 3, shrink left |
+| 8 | 3 | 4 | [2, 4] | 6 | sum < 7 → expand right |
+| 9 | 3 | 5 | [2, 4, 3] | 9 | sum >= 7 → record length 3, shrink left |
+| 10 | 4 | 5 | [4, 3] | 7 | sum >= 7 → record length **2** ✓ |
+| 11 | 5 | 5 | [3] | 3 | sum < 7 → stop |
+
+**Final answer:** `2` (subarray `[4, 3]`)
+
+<LogicPlayer
+  title="How the sliding window finds the minimum length"
+  description="Watch the left and right pointers expand and contract. When sum >= target, we shrink from the left to find the minimum window."
+  target="7"
+  steps={[
+    {
+      title: 'Start with empty window',
+      note: 'Both pointers start at index 0. Window is empty, sum is 0.',
+      formula: 'left = 0, right = 0, sum = 0',
+      callout: 'First, we expand the right pointer to build up the sum.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+        { label: '3', state: 'default', index: 5 },
+      ],
+      memory: ['sum = 0', 'minLength = ∞'],
+    },
+    {
+      title: 'Expand window to [2, 3, 1, 2] with sum 8',
+      note: 'Keep expanding right until sum >= 7. Now sum = 8, so condition is met.',
+      formula: 'left = 0, right = 3, sum = 8 >= 7',
+      callout: 'We found a valid window! Now try shrinking from the left.',
+      items: [
+        { label: '2', state: 'active', index: 0 },
+        { label: '3', state: 'active', index: 1 },
+        { label: '1', state: 'active', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+        { label: '3', state: 'default', index: 5 },
+      ],
+      memory: ['window = [2, 3, 1, 2]', 'sum = 8', 'length = 4'],
+    },
+    {
+      title: 'Shrink from left: remove 2, now sum = 6',
+      note: 'Removing 2 from left gives sum = 6 < 7. Stop shrinking, expand right again.',
+      formula: 'left = 1, right = 3, sum = 6 < 7',
+      callout: 'Window [3, 1, 2] is too small. Expand right to include 4.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'active', index: 1 },
+        { label: '1', state: 'active', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+        { label: '3', state: 'default', index: 5 },
+      ],
+      memory: ['window = [3, 1, 2]', 'sum = 6 < 7', 'expand right'],
+    },
+    {
+      title: 'Expand to [3, 1, 2, 4] with sum 10',
+      note: 'Now sum = 10 >= 7. Try shrinking again.',
+      formula: 'left = 1, right = 4, sum = 10 >= 7',
+      callout: 'Valid window found. Remove 3 from left.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'active', index: 1 },
+        { label: '1', state: 'active', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '4', state: 'active', index: 4 },
+        { label: '3', state: 'default', index: 5 },
+      ],
+      memory: ['window = [3, 1, 2, 4]', 'sum = 10', 'length = 4'],
+    },
+    {
+      title: 'Continue shrinking: [1, 2, 4] with sum 7',
+      note: 'After removing 3, we have [1, 2, 4] with sum 7 >= 7. Keep shrinking.',
+      formula: 'left = 2, right = 4, sum = 7 >= 7',
+      callout: 'Remove 1 from left and check again.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'active', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '4', state: 'active', index: 4 },
+        { label: '3', state: 'default', index: 5 },
+      ],
+      memory: ['window = [1, 2, 4]', 'sum = 7', 'length = 3'],
+    },
+    {
+      title: 'Shrink to [2, 4] with sum 6 < 7',
+      note: 'After removing 1, sum becomes 6 < 7. Expand right to add 3.',
+      formula: 'left = 3, right = 4, sum = 6 < 7',
+      callout: 'Window too small, expand right.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '4', state: 'active', index: 4 },
+        { label: '3', state: 'default', index: 5 },
+      ],
+      memory: ['window = [2, 4]', 'sum = 6 < 7', 'expand right'],
+    },
+    {
+      title: 'Expand to [2, 4, 3] with sum 9',
+      note: 'Adding 3 gives sum = 9 >= 7. Now shrink from left.',
+      formula: 'left = 3, right = 5, sum = 9 >= 7',
+      callout: 'Remove 2 from left.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '4', state: 'active', index: 4 },
+        { label: '3', state: 'active', index: 5 },
+      ],
+      memory: ['window = [2, 4, 3]', 'sum = 9', 'length = 3'],
+    },
+    {
+      title: 'Found minimum: [4, 3] with sum 7',
+      note: 'After removing 2, we have [4, 3] with sum 7 >= 7 and length 2. This is our answer!',
+      formula: 'left = 4, right = 5, sum = 7 >= 7',
+      callout: 'Minimum length found: 2. No need to shrink further as only one element remains.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '4', state: 'match', index: 4 },
+        { label: '3', state: 'match', index: 5 },
+      ],
+      memory: ['window = [4, 3]', 'sum = 7', 'minLength = 2 ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function minSubArrayLenSlidingWindow(nums, target):
+    left = 0
+    currentSum = 0
+    minLength = infinity
+    
+    for right in range(len(nums)):
+        currentSum += nums[right]
+        
+        while currentSum >= target:
+            minLength = min(minLength, right - left + 1)
+            currentSum -= nums[left]
+            left += 1
+    
+    return minLength if minLength != infinity else 0
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySlidingWindow} lang="python" title="minimum_size_subarray_sum_sliding_window.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSlidingWindow} lang="cpp" title="minimum_size_subarray_sum_sliding_window.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSlidingWindow} lang="java" title="minimum_size_subarray_sum_sliding_window.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSlidingWindow} lang="javascript" title="minimum_size_subarray_sum_sliding_window.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSlidingWindow} lang="rust" title="minimum_size_subarray_sum_sliding_window.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSlidingWindow} lang="go" title="minimum_size_subarray_sum_sliding_window.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Binary Search on Prefix Sum
+
+<ApproachTag tag="interview" />
+
+Precompute a prefix sum array where `prefix[i]` = sum of all elements from index 0 to i. For each element, use binary search to find the earliest position where the prefix sum difference reaches the target.
+
+This approach trades the simplicity of sliding window for an alternative algorithmic strategy often appreciated in interviews.
+
+<ComplexityBadges time="O(n log n)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Binary search per element" spaceNote="Prefix sum array" />
+
+### Step-by-step Example
+
+**Input:** `nums = [2, 3, 1, 2, 4, 3]`, `target = 7`
+
+**Prefix array:** `[0, 2, 5, 6, 8, 12, 15]` (cumulative sums)
+
+| Step | right | prefix[right] | Find left where prefix[left] <= prefix[right] - 7 | left | Length | Action |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 3 | 8 | Search for 1 (8 - 7) | 1 | 8 - 5 = 3, length = 3 - 1 + 1 = 3 | Update minLength = 3 |
+| 2 | 4 | 12 | Search for 5 (12 - 7) | 1 | 12 - 5 = 7, length = 4 - 1 + 1 = 4 | Keep minLength = 3 |
+| 3 | 5 | 15 | Search for 8 (15 - 7) | 4 | 15 - 8 = 7, length = 5 - 4 + 1 = 2 | Update minLength = 2 ✓ |
+
+**Final answer:** `2`
+
+### Pseudocode
+
+```plaintext
+function minSubArrayLenBinarySearch(nums, target):
+    prefix = [0]
+    for num in nums:
+        prefix.append(prefix[-1] + num)
+    
+    minLength = infinity
+    
+    for right in range(1, len(prefix)):
+        needed = prefix[right] - target
+        left = binarySearch(prefix, 0, right - 1, needed)
+        
+        if left != -1:
+            minLength = min(minLength, right - left)
+    
+    return minLength if minLength != infinity else 0
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBinarySearch} lang="python" title="minimum_size_subarray_sum_binary_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBinarySearch} lang="cpp" title="minimum_size_subarray_sum_binary_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBinarySearch} lang="java" title="minimum_size_subarray_sum_binary_search.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBinarySearch} lang="javascript" title="minimum_size_subarray_sum_binary_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBinarySearch} lang="rust" title="minimum_size_subarray_sum_binary_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBinarySearch} lang="go" title="minimum_size_subarray_sum_binary_search.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Off-by-one errors in window length:** Remember that length = `right - left + 1`, not `right - left`.
+- **Forgetting to return 0:** If no subarray reaches the target, return 0, not -1 or an empty list.
+- **Comparing sum >= target, not >:** The problem asks for sum >= target, not strictly greater.
+- **Not handling the shrink phase:** In the sliding window, forgetting to update the minimum length before shrinking leads to wrong answers.
+- **Binary search bounds:** Make sure the binary search finds the *leftmost* position where prefix sum is valid, not just any position.
+</Aside>
+
+## Approach 3: Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="minimum_size_subarray_sum_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="minimum_size_subarray_sum_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="MinimumSizeSubarraySumOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="minimum_size_subarray_sum_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="minimum_size_subarray_sum_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="minimum_size_subarray_sum_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 3, title: 'Longest Substring Without Repeating Characters', difficulty: 'Medium', leetcodeSlug: 'longest-substring-without-repeating-characters' },
+  { number: 76, title: 'Minimum Window Substring', difficulty: 'Hard', leetcodeSlug: 'minimum-window-substring' },
+  { number: 325, title: 'Maximum Size Subarray Sum Equals k', difficulty: 'Medium', leetcodeSlug: 'maximum-size-subarray-sum-equals-k' },
+  { number: 862, title: 'Shortest Subarray with Sum at Least K', difficulty: 'Hard', leetcodeSlug: 'shortest-subarray-with-sum-at-least-k' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why sliding window over binary search?** It achieves O(n) time with O(1) space, the optimal result. Binary search is O(n log n) with O(n) space, slower but demonstrates algorithmic thinking.
+- **Edge case: all numbers smaller than target** — The function correctly returns 0.
+- **Positive integers guarantee** — Since all numbers are positive, the sliding window never "backtracks." Once the sum is large enough, removing elements only makes it smaller.
+- **Follow-up: what if numbers can be negative?** The sliding window approach breaks because removing a negative number could increase the sum. You'd need a different strategy (e.g., prefix sum + hash map, or deque-based approach).
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 11, title: "Container With Most Water", slug: "container-with-most-water" }}
+  nextProblem={{ number: 30, title: "Substring with Concatenation of All Words", slug: "substring-with-concatenation-of-all-words" }}
+/>

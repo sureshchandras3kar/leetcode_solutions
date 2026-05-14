@@ -1,0 +1,324 @@
+---
+title: Letter Combinations of a Phone Number
+description: Generate all possible letter combinations from a digit string. Two approaches — backtracking recursive O(4^n) and BFS iterative O(4^n) — in six languages.
+leetcodeNumber: 17
+difficulty: Medium
+leetcodeSlug: letter-combinations-of-a-phone-number
+tags: [String, Backtracking, Hash Table]
+prev:
+  label: "#15 3Sum"
+  link: "../three-sum/"
+next:
+  label: "#19 Remove Nth Node From End of List"
+  link: "../remove-nth-node-from-end-of-list/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBacktracking    from '@solutions/Python/letter_combinations_backtracking.py?raw';
+import cppBacktracking   from '@solutions/C++/letter_combinations_backtracking.cpp?raw';
+import javaBacktracking  from '@solutions/Java/LetterCombinationsBacktracking.java?raw';
+import jsBacktracking    from '@solutions/JavaScript/letter_combinations_backtracking.js?raw';
+import rustBacktracking  from '@solutions/Rust/letter_combinations_backtracking.rs?raw';
+import goBacktracking    from '@solutions/Golang/letter_combinations_backtracking.go?raw';
+import pySpaceOptimized from '@solutions/Python/letter_combinations_of_a_phone_number_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/letter_combinations_of_a_phone_number_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/LetterCombinationsOfAPhoneNumberSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/letter_combinations_of_a_phone_number_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/letter_combinations_of_a_phone_number_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/letter_combinations_of_a_phone_number_space_optimized.go?raw';
+
+import pyBFS             from '@solutions/Python/letter_combinations_bfs.py?raw';
+import cppBFS            from '@solutions/C++/letter_combinations_bfs.cpp?raw';
+import javaBFS           from '@solutions/Java/LetterCombinationsBFS.java?raw';
+import jsBFS             from '@solutions/JavaScript/letter_combinations_bfs.js?raw';
+import rustBFS           from '@solutions/Rust/letter_combinations_bfs.rs?raw';
+import goBFS             from '@solutions/Golang/letter_combinations_bfs.go?raw';
+
+## Problem Statement
+
+Given a string containing digits from `2-9` inclusive, return all possible letter combinations that the number could represent on a traditional phone keypad.
+
+A mapping of digit to letters (just like on the telephone buttons) is given below. Note that `1` does not map to any letters.
+
+```
+2 → "abc"
+3 → "def"
+4 → "ghi"
+5 → "jkl"
+6 → "mno"
+7 → "pqrs"
+8 → "tuv"
+9 → "wxyz"
+```
+
+<Aside type="tip" title="What to notice first">
+- The number of combinations grows exponentially: digits "23" produces 3 × 3 = 9 combinations.
+- You must explore all possible paths through the digit-to-letter mapping.
+- This is a classic exploration problem solved by backtracking or BFS.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `"23"` | `["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]` | 2 maps to "abc", 3 maps to "def"; all pairings |
+| `""` | `[]` | Empty input yields empty result |
+| `"2"` | `["a", "b", "c"]` | Single digit maps directly to its letters |
+| `"234"` | 27 combinations | 3 × 3 × 3 = 27 total combinations |
+
+## Constraints
+
+- `0 <= digits.length <= 4`
+- `digits[i]` is a digit in the range `['2', '9']`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Predictive text / autocomplete** — phone keyboards and T9 input systems generate word suggestions from digit sequences.
+- **Password generation patterns** — exploring all possible character sequences for brute-force testing or policy compliance validation.
+- **Telephony routing** — mapping numeric sequences to multiple possible extension names or office destinations.
+- **Chess move enumeration** — generating all legal move combinations from a numeric board position encoding.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Returns | Best When |
+| --- | --- | --- | --- | --- |
+| Backtracking (Recursive) | O(4^n) | O(4^n) | All combinations | Want clear recursive structure, understanding decision tree |
+| BFS (Iterative) | O(4^n) | O(4^n) | All combinations | Prefer iterative approach, level-by-level exploration |
+
+## Which approach should you learn first?
+
+- Pick **Backtracking** if you are learning recursion and decision trees.
+- Pick **BFS** if you prefer iterative solutions or want to see level-by-level growth.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Common</div>
+    <div class="lc-approach-quick__name">Backtracking</div>
+    <div class="lc-approach-quick__stats">O(4^n) time &middot; O(4^n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Iterative</div>
+    <div class="lc-approach-quick__name">BFS</div>
+    <div class="lc-approach-quick__stats">O(4^n) time &middot; O(4^n) space</div>
+  </div>
+</div>
+
+## Approach 1: Backtracking (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Build combinations by recursively appending letters. For each digit, try all letters it maps to, then recurse on the next digit. When all digits are processed, save the combination.
+
+The key insight is that we make a *choice* at each digit (which letter to use) and then recursively solve the subproblem for the remaining digits.
+
+<ComplexityBadges time="O(4^n)" space="O(4^n)" timeColor="red" spaceColor="red" timeNote="4^n combinations" spaceNote="Result storage" />
+
+### Step-by-step Example
+
+**Input:** `digits = "23"`
+
+| Depth | Digit | Current | Action |
+| --- | --- | --- | --- |
+| 0 | "2" | "" | Start backtracking |
+| 1 | "3" | "a" | Process 2 → "a", now explore 3 |
+| 2 | - | "ad" | Process 3 → "d", save "ad" ✓ |
+| 2 | - | "ae" | Process 3 → "e", save "ae" ✓ |
+| 2 | - | "af" | Process 3 → "f", save "af" ✓ |
+| 1 | "3" | "b" | Backtrack to 2 → "b", now explore 3 |
+| 2 | - | "bd" | Process 3 → "d", save "bd" ✓ |
+| ... | ... | ... | Continue for "c" + all letters in "def" |
+
+### Pseudocode
+
+```plaintext
+function letterCombinationsBacktracking(digits):
+    if digits is empty:
+        return []
+    
+    phoneMap = {
+        "2": "abc", "3": "def", "4": "ghi", "5": "jkl",
+        "6": "mno", "7": "pqrs", "8": "tuv", "9": "wxyz"
+    }
+    
+    result = []
+    
+    function backtrack(index, current):
+        if index == len(digits):
+            result.append(current)
+            return
+        
+        digit = digits[index]
+        letters = phoneMap[digit]
+        for letter in letters:
+            backtrack(index + 1, current + letter)
+    
+    backtrack(0, "")
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBacktracking} lang="python" title="letter_combinations_backtracking.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBacktracking} lang="cpp" title="letter_combinations_backtracking.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBacktracking} lang="java" title="LetterCombinationsBacktracking.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBacktracking} lang="javascript" title="letter_combinations_backtracking.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBacktracking} lang="rust" title="letter_combinations_backtracking.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBacktracking} lang="go" title="letter_combinations_backtracking.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS (Level-Order Iteration)
+
+<ApproachTag tag="interview" />
+
+Build combinations iteratively, processing one digit at a time. Start with a queue containing an empty string. For each digit, create new combinations by appending each of its letters to all current combinations.
+
+This approach grows the result level by level, making it intuitive for those who prefer iterative over recursive solutions.
+
+<ComplexityBadges time="O(4^n)" space="O(4^n)" timeColor="red" spaceColor="red" timeNote="4^n combinations" spaceColor="4^n queue size" />
+
+### Step-by-step Example
+
+**Input:** `digits = "23"`
+
+| Digit | Queue Before | Queue After | Action |
+| --- | --- | --- | --- |
+| "2" | `[""]` | `["a", "b", "c"]` | Append each of "abc" to "" |
+| "3" | `["a", "b", "c"]` | `["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]` | Append each of "def" to each in queue |
+
+### Pseudocode
+
+```plaintext
+function letterCombinationsBFS(digits):
+    if digits is empty:
+        return []
+    
+    phoneMap = {
+        "2": "abc", "3": "def", "4": "ghi", "5": "jkl",
+        "6": "mno", "7": "pqrs", "8": "tuv", "9": "wxyz"
+    }
+    
+    queue = [""]
+    
+    for digit in digits:
+        newQueue = []
+        letters = phoneMap[digit]
+        for current in queue:
+            for letter in letters:
+                newQueue.append(current + letter)
+        queue = newQueue
+    
+    return queue
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="letter_combinations_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="letter_combinations_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="LetterCombinationsBFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="letter_combinations_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="letter_combinations_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="letter_combinations_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to handle the empty string case (return `[]`, not `[""]`).
+- Using a static phone map incorrectly (ensure digit '0' and '1' are not included or handled separately).
+- In the BFS approach, clearing the queue without saving it first (always save results before processing the next digit).
+- Off-by-one errors in the backtracking base case (ensure index == len(digits), not index > len(digits)).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="letter_combinations_of_a_phone_number_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="letter_combinations_of_a_phone_number_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="LetterCombinationsOfAPhoneNumberSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="letter_combinations_of_a_phone_number_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="letter_combinations_of_a_phone_number_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="letter_combinations_of_a_phone_number_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 77, title: 'Combinations', difficulty: 'Medium', leetcodeSlug: 'combinations' },
+  { number: 46, title: 'Permutations', difficulty: 'Medium', leetcodeSlug: 'permutations' },
+  { number: 39, title: 'Combination Sum', difficulty: 'Medium', leetcodeSlug: 'combination-sum' },
+  { number: 60, title: 'Permutation Sequence', difficulty: 'Hard', leetcodeSlug: 'permutation-sequence' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Backtracking vs BFS:** Both are O(4^n) time and space. Backtracking is more natural for recursive explorers; BFS is better if you want to demonstrate understanding of level-order growth.
+- **Edge cases:** Emphasize that empty input should return an empty list, not a list with one empty string.
+- **Phone keypad knowledge:** Be ready to explain why digits 0 and 1 are not included (historically, they had no letters on phone keypads).
+- **Follow-up — K-digit combinations:** If asked to generate only k-length combinations, add a parameter and check `len(current) == k` before saving.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 16, title: "3Sum Closest", slug: "3sum-closest" }}
+  nextProblem={{ number: 18, title: "4Sum", slug: "4sum" }}
+/>

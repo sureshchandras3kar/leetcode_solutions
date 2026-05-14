@@ -1,0 +1,42 @@
+---
+title: Merge Intervals
+description: Merge overlapping intervals. Two approaches — sort-and-merge O(n log n) and heap O(n log n) — in six languages.
+leetcodeNumber: 56
+difficulty: Medium
+leetcodeSlug: merge-intervals
+tags: ['Array', 'Sorting']
+prev:
+  label: "#55 Jump Game"
+  link: "../jump-game/"
+next:
+  label: "#57 Insert Interval"
+  link: "../insert-interval/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+## Problem Statement
+
+Problem #56 - Merge Intervals
+
+Difficulty: Medium
+
+## Approaches
+
+### Sort and Merge
+
+- Time Complexity: O(n log n)
+- Space Complexity: O(n)
+- Sort intervals by start time, then merge overlapping ones.
+
+### Heap / Priority Queue
+
+- Time Complexity: O(n log n)
+- Space Complexity: O(n)
+- Use a min-heap to track and merge intervals.
+

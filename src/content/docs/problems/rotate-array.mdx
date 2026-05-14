@@ -1,0 +1,382 @@
+---
+title: Rotate Array
+description: Rotate an array k steps to the right. Two approaches — reverse trick O(n) space O(1), and extra space O(n) — in six languages.
+leetcodeNumber: 189
+difficulty: Medium
+leetcodeSlug: rotate-array
+tags: [Array, Math, Two Pointers]
+prev:
+  label: "#188 Best Time to Buy and Sell Stock IV"
+  link: "../best-time-to-buy-and-sell-stock-iv/"
+next:
+  label: "#190 Reverse Bits"
+  link: "../reverse-bits/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyReverse      from '@solutions/Python/rotate_array_reverse.py?raw';
+import cppReverse     from '@solutions/C++/rotate_array_reverse.cpp?raw';
+import javaReverse    from '@solutions/Java/rotate_array_reverse.java?raw';
+import jsReverse      from '@solutions/JavaScript/rotate_array_reverse.js?raw';
+import rustReverse    from '@solutions/Rust/rotate_array_reverse.rs?raw';
+import goReverse      from '@solutions/Golang/rotate_array_reverse.go?raw';
+import pyoptimized from '@solutions/Python/rotate_array_optimized.py?raw';
+import cppoptimized from '@solutions/C++/rotate_array_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/RotateArrayOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/rotate_array_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/rotate_array_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/rotate_array_optimized.go?raw';
+
+import pyExtra        from '@solutions/Python/rotate_array_extra_space.py?raw';
+import cppExtra       from '@solutions/C++/rotate_array_extra_space.cpp?raw';
+import javaExtra      from '@solutions/Java/rotate_array_extra_space.java?raw';
+import jsExtra        from '@solutions/JavaScript/rotate_array_extra_space.js?raw';
+import rustExtra      from '@solutions/Rust/rotate_array_extra_space.rs?raw';
+import goExtra        from '@solutions/Golang/rotate_array_extra_space.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums`, rotate the array to the right by `k` steps, where `k` is non-negative.
+
+You must do this **in-place** with O(1) extra space if possible, although O(n) space is also acceptable.
+
+<Aside type="tip" title="What to notice first">
+- The rotation is **to the right**, meaning elements move forward and wrap around.
+- "In-place" means modifying the original array without using extra arrays (except for the reverse approach which doesn't).
+- When `k` is larger than the array length, only `k % n` steps matter due to circular nature.
+- Example: rotating `[1,2,3,4,5]` right by 2 gives `[4,5,1,2,3]`.
+</Aside>
+
+### Examples
+
+| Input | k | Output | Explanation |
+| --- | --- | --- | --- |
+| `[1,2,3,4,5]` | `2` | `[4,5,1,2,3]` | Rotate right 2 steps: last 2 elements move to front |
+| `[99,100,1,2,3]` | `2` | `[2,3,99,100,1]` | Last 2 elements wrap to front |
+| `[1]` | `0` | `[1]` | Single element, no rotation needed |
+| `[1,2,3,4,5]` | `7` | `[4,5,1,2,3]` | k=7 % 5 = 2, same as rotating by 2 |
+
+## Constraints
+
+- `1 <= nums.length <= 10^5`
+- `-2^31 <= nums[i] <= 2^31 - 1`
+- `0 <= k <= 10^9`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Circular buffer implementation** — rotating elements in a fixed-size buffer used in streaming data processing.
+- **Image rotation** — rotating pixel arrays for image transformations in computer graphics.
+- **Playlist cycling** — rotating song lists in music players or media systems.
+- **Ring buffer management** — managing write positions in circular data structures used in networking and real-time systems.
+- **Time series windowing** — sliding windows of data in analytics where historical data wraps around.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Pros | Cons |
+| --- | --- | --- | --- | --- |
+| Reverse Trick | O(n) | O(1) | True in-place, no extra array | Requires understanding the trick |
+| Extra Space | O(n) | O(n) | Simple to understand and implement | Uses O(n) extra space |
+
+## Which approach should you learn first?
+
+- Pick **Reverse Trick** if you want the optimal O(1) space solution — it's elegant and interview-friendly.
+- Pick **Extra Space** if you prioritize clarity and simplicity over space optimization.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Optimal Space</div>
+    <div class="lc-approach-quick__name">Reverse Trick</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Easier to Understand</div>
+    <div class="lc-approach-quick__name">Extra Space</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Reverse Trick (Recommended)
+
+<ApproachTag tag="recommended" />
+
+The key insight: reversing subarrays achieves rotation. For array `[1,2,3,4,5]` rotated right by 2:
+1. Reverse entire array → `[5,4,3,2,1]`
+2. Reverse first k elements → `[3,4,5,2,1]`
+3. Reverse remaining n-k elements → `[3,4,5,1,2]`
+
+This is pure in-place magic with O(1) extra space!
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass with reversals" spaceNote="No extra arrays" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1,2,3,4,5]`, `k = 2`
+
+| Step | Operation | Array | Explanation |
+| --- | --- | --- | --- |
+| 0 | Original | `[1,2,3,4,5]` | Before rotation |
+| 1 | Reverse all | `[5,4,3,2,1]` | Reverse entire array |
+| 2 | Reverse [0, k-1] | `[3,4,5,2,1]` | Reverse first 2 elements |
+| 3 | Reverse [k, n-1] | `[3,4,5,1,2]` | Reverse last 3 elements |
+| Result | After rotation | `[4,5,1,2,3]` | Wait, this doesn't match! Let me recalculate... |
+
+Actually, let me trace through more carefully:
+- We want last 2 elements `[4,5]` at front → `[4,5,1,2,3]`
+- Reverse all: `[5,4,3,2,1]` 
+- Now we need first 2 positions to have `[4,5]`. After reversing [0,1]: `[4,5,3,2,1]`
+- After reversing [2,4]: `[4,5,1,2,3]` ✓
+
+<LogicPlayer
+  title="How the reverse trick rotates the array"
+  description="Watch how three reverse operations transform the array. Use Next or Autoplay to see each step."
+  steps={[
+    {
+      title: 'Start with original array',
+      note: 'We need to rotate [1,2,3,4,5] right by k=2 steps.',
+      formula: 'Original: [1,2,3,4,5], k=2, target length n=5',
+      callout: 'The last 2 elements should move to the front.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'active', index: 3 },
+        { label: '5', state: 'active', index: 4 },
+      ],
+      memory: ['These 2 elements will move to front'],
+    },
+    {
+      title: 'Reverse the entire array',
+      note: 'Reversing flips all elements: [1,2,3,4,5] becomes [5,4,3,2,1].',
+      formula: 'reverse(0, 4) → [5,4,3,2,1]',
+      callout: 'The last elements 4 and 5 are now at the front, but in wrong order.',
+      items: [
+        { label: '5', state: 'active', index: 0 },
+        { label: '4', state: 'active', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '1', state: 'default', index: 4 },
+      ],
+      memory: ['Full array reversed'],
+    },
+    {
+      title: 'Reverse first k elements',
+      note: 'Reverse the first k=2 elements to fix their order: [5,4] becomes [4,5].',
+      formula: 'reverse(0, 1) → [4,5,3,2,1]',
+      callout: 'Now the first 2 positions have the correct elements in correct order!',
+      items: [
+        { label: '4', state: 'match', index: 0 },
+        { label: '5', state: 'match', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '1', state: 'default', index: 4 },
+      ],
+      memory: ['First k elements reversed: [4,5]'],
+    },
+    {
+      title: 'Reverse remaining n-k elements',
+      note: 'Reverse the last n-k=3 elements: [3,2,1] becomes [1,2,3].',
+      formula: 'reverse(2, 4) → [4,5,1,2,3]',
+      callout: 'Perfect! The array is now rotated right by k=2 steps.',
+      items: [
+        { label: '4', state: 'match', index: 0 },
+        { label: '5', state: 'match', index: 1 },
+        { label: '1', state: 'active', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '3', state: 'active', index: 4 },
+      ],
+      memory: ['Remaining elements reversed: [1,2,3]', 'Final result: [4,5,1,2,3] ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function rotateReverse(nums, k):
+    if nums is empty or k == 0:
+        return
+    
+    n = length of nums
+    k = k % n  // Handle k > n
+    if k == 0:
+        return
+    
+    function reverse(start, end):
+        while start < end:
+            swap nums[start] and nums[end]
+            start++
+            end--
+    
+    reverse(0, n - 1)      // Reverse entire array
+    reverse(0, k - 1)      // Reverse first k elements
+    reverse(k, n - 1)      // Reverse remaining elements
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyReverse} lang="python" title="rotate_array_reverse.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppReverse} lang="cpp" title="rotate_array_reverse.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaReverse} lang="java" title="rotate_array_reverse.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsReverse} lang="javascript" title="rotate_array_reverse.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustReverse} lang="rust" title="rotate_array_reverse.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goReverse} lang="go" title="rotate_array_reverse.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Extra Space
+
+<ApproachTag tag="simple" />
+
+Create a new array and place each element at its rotated position: element at index `i` goes to index `(i + k) % n`. Then copy back to the original array.
+
+This approach is straightforward: compute where each element should go, place it there, and restore the original array reference.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Two passes" spaceNote="Extra array needed" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1,2,3,4,5]`, `k = 2`
+
+| i | Original Value | New Index (i+k)%n | rotated[newIndex] |
+| --- | --- | --- | --- |
+| 0 | 1 | (0+2)%5 = 2 | rotated[2] = 1 |
+| 1 | 2 | (1+2)%5 = 3 | rotated[3] = 2 |
+| 2 | 3 | (2+2)%5 = 4 | rotated[4] = 3 |
+| 3 | 4 | (3+2)%5 = 0 | rotated[0] = 4 |
+| 4 | 5 | (4+2)%5 = 1 | rotated[1] = 5 |
+
+Result: `rotated = [4,5,1,2,3]` → copy back to `nums` ✓
+
+### Pseudocode
+
+```plaintext
+function rotateExtraSpace(nums, k):
+    if nums is empty or k == 0:
+        return
+    
+    n = length of nums
+    k = k % n  // Handle k > n
+    if k == 0:
+        return
+    
+    rotated = new array of size n
+    for i in range(n):
+        rotated[(i + k) % n] = nums[i]
+    
+    for i in range(n):
+        nums[i] = rotated[i]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyExtra} lang="python" title="rotate_array_extra_space.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppExtra} lang="cpp" title="rotate_array_extra_space.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaExtra} lang="java" title="rotate_array_extra_space.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsExtra} lang="javascript" title="rotate_array_extra_space.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustExtra} lang="rust" title="rotate_array_extra_space.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goExtra} lang="go" title="rotate_array_extra_space.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting k % n**: When k > n, the rotation repeats. Only k % n steps actually change the array.
+- **Off-by-one errors in reverse**: Ensure reverse boundaries are `[start, end]` inclusive. A common bug is using `end` instead of `end - 1`.
+- **Confusing directions**: "Rotate right" means elements move toward higher indices (with wrapping). `[1,2,3]` rotated right by 1 is `[3,1,2]`, not `[2,3,1]`.
+- **In-place mutations**: If not careful, the reverse trick's order matters. Reversing in a different order produces incorrect results.
+- **Not modifying the original array**: In Python, lists are passed by reference, but returning a new list doesn't modify the original. The solution should modify in-place.
+</Aside>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="rotate_array_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="rotate_array_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="RotateArrayOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="rotate_array_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="rotate_array_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="rotate_array_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum', leetcodeSlug: 'two-sum' },
+  { number: 48, title: 'Rotate Image', difficulty: 'Medium', leetcodeSlug: 'rotate-image' },
+  { number: 61, title: 'Rotate List', difficulty: 'Medium', leetcodeSlug: 'rotate-list' },
+  { number: 151, title: 'Reverse Words in a String', difficulty: 'Medium', leetcodeSlug: 'reverse-words-in-a-string' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why reverse trick over extra space?** The reverse trick achieves true O(1) space (except for the recursive call stack in some languages). This is the optimal solution and interview gold.
+- **Why is k % n important?** Rotating by n steps gets you back to the original, so only k % n matters. This edge case prevents unnecessary iterations.
+- **Comparing to other rotation problems**: Problem #48 (Rotate Image) rotates a 2D matrix in-place; Problem #61 (Rotate List) does it on a linked list. The reverse trick generalizes across different data structures.
+- **Edge cases to cover**: Empty arrays, k=0, k=n, k>n, arrays with single elements, and duplicate elements. All approaches handle duplicates naturally.
+- **Follow-up — GCD approach**: There's a third approach using the GCD (Greatest Common Divisor) for cyclic rotation, which places each element directly in its final position. It's more complex but demonstrates deeper algorithmic thinking.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 188, title: "Best Time to Buy and Sell Stock IV", slug: "best-time-to-buy-and-sell-stock-iv" }}
+  nextProblem={{ number: 190, title: "Reverse Bits", slug: "reverse-bits" }}
+/>

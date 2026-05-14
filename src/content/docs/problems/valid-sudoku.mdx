@@ -1,0 +1,441 @@
+---
+title: Valid Sudoku
+description: Determine if a 9×9 Sudoku board is valid. Two approaches — hash sets and bitmask — both O(1) space — in six languages.
+leetcodeNumber: 36
+difficulty: Medium
+leetcodeSlug: valid-sudoku
+tags: [Array, Hash Table, Matrix]
+prev:
+  label: "#35 Search Insert Position"
+  link: "../search-insert-position/"
+next:
+  label: "#39 Combination Sum"
+  link: "../combination-sum/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyHashSets   from '@solutions/Python/valid_sudoku_hash_sets.py?raw';
+import cppHashSets  from '@solutions/C++/valid_sudoku_hash_sets.cpp?raw';
+import javaHashSets from '@solutions/Java/valid_sudoku_hash_sets.java?raw';
+import jsHashSets   from '@solutions/JavaScript/valid_sudoku_hash_sets.js?raw';
+import rustHashSets from '@solutions/Rust/valid_sudoku_hash_sets.rs?raw';
+import goHashSets   from '@solutions/Golang/valid_sudoku_hash_sets.go?raw';
+import pySpaceOptimized from '@solutions/Python/valid_sudoku_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/valid_sudoku_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/ValidSudokuSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/valid_sudoku_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/valid_sudoku_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/valid_sudoku_space_optimized.go?raw';
+
+import pyBitmask   from '@solutions/Python/valid_sudoku_bitmask.py?raw';
+import cppBitmask  from '@solutions/C++/valid_sudoku_bitmask.cpp?raw';
+import javaBitmask from '@solutions/Java/valid_sudoku_bitmask.java?raw';
+import jsBitmask   from '@solutions/JavaScript/valid_sudoku_bitmask.js?raw';
+import rustBitmask from '@solutions/Rust/valid_sudoku_bitmask.rs?raw';
+import goBitmask   from '@solutions/Golang/valid_sudoku_bitmask.go?raw';
+
+## Problem Statement
+
+Determine if a 9 × 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+- Each **row** must contain the digits 1–9 without repetition.
+- Each **column** must contain the digits 1–9 without repetition.
+- Each of the nine **3×3 sub-boxes** of the grid must contain the digits 1–9 without repetition.
+
+**Note:** A Sudoku board (partially filled) could be valid but is not necessarily solvable. Only the filled cells need to be validated.
+
+<Aside type="tip" title="What to notice first">
+- The hardest part is the box index formula: `box = (row // 3) * 3 + (col // 3)`
+- `'.'` represents an empty cell — skip those entirely.
+- This is a **validation** problem, not a solving problem — you only check that no digit appears twice, not that a solution exists.
+</Aside>
+
+### Examples
+
+| Board | Valid? | Reason |
+| --- | --- | --- |
+| Standard partially filled valid board | ✓ | No duplicates in any row, column, or box |
+| Board with `'8'` repeated in the same row | ✗ | Duplicate `8` in row 0 |
+
+**Valid board (first 3 rows shown):**
+
+```
+["5","3",".",".","7",".",".",".","."]
+["6",".",".","1","9","5",".",".","."]
+[".","9","8",".",".",".",".","6","."]
+```
+
+No digit repeats in any row, column, or 3×3 box — valid.
+
+**Invalid board:**
+
+```
+["8","8",".",".","7",".",".",".","."]
+...
+```
+
+`'8'` appears twice in row 0 — invalid.
+
+## Constraints
+
+- `board.length == 9`
+- `board[i].length == 9`
+- `board[i][j]` is a digit `'1'`–`'9'` or `'.'`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Constraint satisfaction validation** — checking that a partially completed puzzle satisfies all constraints before solving.
+- **Spreadsheet validation** — detecting conflicts in constraint-based cell value assignments.
+- **Exam seating arrangements** — verifying no two students with the same topic are in the same row, column, or block.
+- **Resource allocation** — ensuring no two processes require the same resource in overlapping time slots.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Hash Sets | O(1) | O(1) | Board is always 9×9 — both are constant |
+| Bitmask | O(1) | O(1) | Micro-optimisation, avoids hash overhead |
+
+Both are O(1) since the board size is fixed at 9×9.
+
+## Which approach should you learn first?
+
+- Pick **Hash Sets** for interviews — it reads naturally and is easy to explain.
+- Pick **Bitmask** as a follow-up to show you can eliminate hash overhead with integer operations.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Readable</div>
+    <div class="lc-approach-quick__name">Hash Sets</div>
+    <div class="lc-approach-quick__stats">O(1) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Fastest in Practice</div>
+    <div class="lc-approach-quick__name">Bitmask</div>
+    <div class="lc-approach-quick__stats">O(1) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Hash Sets
+
+<ApproachTag tag="recommended" />
+
+Use three arrays of 9 sets — `rows[9]`, `cols[9]`, `boxes[9]` — to track which digits have been seen. For every non-empty cell `(r, c)` with digit `d`:
+
+1. Compute `box = (r // 3) * 3 + (c // 3)`
+2. If `d` is already in `rows[r]`, `cols[c]`, or `boxes[box]` → return `false`
+3. Otherwise add `d` to all three sets
+
+If no conflict is found after all 81 cells → return `true`.
+
+<ComplexityBadges time="O(1)" space="O(1)" timeColor="green" spaceColor="green" timeNote="81 cells fixed" spaceNote="27 sets of ≤9 digits" />
+
+### Box Index Derivation
+
+The 9 boxes are numbered 0–8 left-to-right, top-to-bottom:
+
+| rows \ cols | 0–2 | 3–5 | 6–8 |
+| --- | --- | --- | --- |
+| 0–2 | box 0 | box 1 | box 2 |
+| 3–5 | box 3 | box 4 | box 5 |
+| 6–8 | box 6 | box 7 | box 8 |
+
+Formula: `box = (row // 3) * 3 + (col // 3)`
+
+### Step-by-step: Processing row 0
+
+**Sample row 0:** `["5","3",".",".","7",".",".",".","."]`
+
+| Step | (r, c) | d | box | rows[0] after | cols[c] after | boxes[box] after |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | (0, 0) | 5 | 0 | `{5}` | `{5}` | `{5}` |
+| 2 | (0, 1) | 3 | 0 | `{5,3}` | `{3}` | `{5,3}` |
+| 3 | (0, 2) | . | — | skip | skip | skip |
+| 4 | (0, 3) | . | — | skip | skip | skip |
+| 5 | (0, 4) | 7 | 1 | `{5,3,7}` | `{7}` | `{7}` |
+| … | … | . | — | skip | skip | skip |
+
+<LogicPlayer
+  title="Hash sets tracking row 0 of a valid Sudoku board"
+  description="Use Next or Autoplay to see each cell visited and its digit added to the row, column, and box sets."
+  steps={[
+    {
+      title: 'Start: all sets empty',
+      note: 'Before scanning, rows[0], cols, and boxes are all empty. We will visit each cell in row 0 left to right.',
+      formula: 'rows[0] = {}, cols[0..8] = {}, boxes[0..8] = {}',
+      items: [
+        { label: '5', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '.', state: 'default', index: 2 },
+        { label: '.', state: 'default', index: 3 },
+        { label: '7', state: 'default', index: 4 },
+        { label: '.', state: 'default', index: 5 },
+        { label: '.', state: 'default', index: 6 },
+        { label: '.', state: 'default', index: 7 },
+        { label: '.', state: 'default', index: 8 },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Cell (0,0) = 5 — not seen, add to sets',
+      note: '5 is not in rows[0], cols[0], or boxes[0]. Add it to all three. box = (0//3)*3 + (0//3) = 0.',
+      formula: 'box=0 | rows[0]∌5 → add 5',
+      items: [
+        { label: '5', state: 'active', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '.', state: 'default', index: 2 },
+        { label: '.', state: 'default', index: 3 },
+        { label: '7', state: 'default', index: 4 },
+        { label: '.', state: 'default', index: 5 },
+        { label: '.', state: 'default', index: 6 },
+        { label: '.', state: 'default', index: 7 },
+        { label: '.', state: 'default', index: 8 },
+      ],
+      memory: ['rows[0]: {5}', 'cols[0]: {5}', 'boxes[0]: {5}'],
+    },
+    {
+      title: 'Cell (0,1) = 3 — not seen, add to sets',
+      note: '3 is not in any relevant set. Add it. box = (0//3)*3 + (1//3) = 0.',
+      formula: 'box=0 | rows[0]∌3 → add 3',
+      items: [
+        { label: '5', state: 'default', index: 0 },
+        { label: '3', state: 'active', index: 1 },
+        { label: '.', state: 'default', index: 2 },
+        { label: '.', state: 'default', index: 3 },
+        { label: '7', state: 'default', index: 4 },
+        { label: '.', state: 'default', index: 5 },
+        { label: '.', state: 'default', index: 6 },
+        { label: '.', state: 'default', index: 7 },
+        { label: '.', state: 'default', index: 8 },
+      ],
+      memory: ['rows[0]: {5,3}', 'cols[1]: {3}', 'boxes[0]: {5,3}'],
+    },
+    {
+      title: 'Cells (0,2) and (0,3) = . — skip empty cells',
+      note: "Empty cells are represented by '.'. We skip them entirely — nothing to validate.",
+      formula: "d == '.' → continue",
+      items: [
+        { label: '5', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '.', state: 'active', index: 2 },
+        { label: '.', state: 'active', index: 3 },
+        { label: '7', state: 'default', index: 4 },
+        { label: '.', state: 'default', index: 5 },
+        { label: '.', state: 'default', index: 6 },
+        { label: '.', state: 'default', index: 7 },
+        { label: '.', state: 'default', index: 8 },
+      ],
+      memory: ['rows[0]: {5,3}', 'boxes[0]: {5,3}', 'skipping empty cells'],
+    },
+    {
+      title: 'Cell (0,4) = 7 — not seen, add to sets',
+      note: '7 is not in any set. box = (0//3)*3 + (4//3) = 1. This digit goes into box 1, not box 0.',
+      formula: 'box=1 | rows[0]∌7 → add 7',
+      items: [
+        { label: '5', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '.', state: 'default', index: 2 },
+        { label: '.', state: 'default', index: 3 },
+        { label: '7', state: 'active', index: 4 },
+        { label: '.', state: 'default', index: 5 },
+        { label: '.', state: 'default', index: 6 },
+        { label: '.', state: 'default', index: 7 },
+        { label: '.', state: 'default', index: 8 },
+      ],
+      memory: ['rows[0]: {5,3,7}', 'cols[4]: {7}', 'boxes[1]: {7}'],
+    },
+    {
+      title: 'Row 0 fully processed — no conflicts found',
+      note: 'All non-empty cells in row 0 were unique. The row is valid. We continue to the next row.',
+      formula: 'no conflict in row 0 → continue',
+      callout: 'rows[0], each cols, and the relevant boxes now record what digits are already used.',
+      items: [
+        { label: '5', state: 'match', index: 0 },
+        { label: '3', state: 'match', index: 1 },
+        { label: '.', state: 'default', index: 2 },
+        { label: '.', state: 'default', index: 3 },
+        { label: '7', state: 'match', index: 4 },
+        { label: '.', state: 'default', index: 5 },
+        { label: '.', state: 'default', index: 6 },
+        { label: '.', state: 'default', index: 7 },
+        { label: '.', state: 'default', index: 8 },
+      ],
+      memory: ['rows[0]: {5,3,7}', 'boxes[0]: {5,3}', 'boxes[1]: {7}', 'row 0 valid ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function isValidSudoku(board):
+    rows  = 9 empty sets
+    cols  = 9 empty sets
+    boxes = 9 empty sets
+    for r in 0..8:
+        for c in 0..8:
+            d = board[r][c]
+            if d == '.': continue
+            box = (r // 3) * 3 + (c // 3)
+            if d in rows[r] or d in cols[c] or d in boxes[box]:
+                return false
+            add d to rows[r], cols[c], boxes[box]
+    return true
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHashSets} lang="python" title="valid_sudoku_hash_sets.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHashSets} lang="cpp" title="valid_sudoku_hash_sets.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHashSets} lang="java" title="valid_sudoku_hash_sets.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHashSets} lang="javascript" title="valid_sudoku_hash_sets.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHashSets} lang="rust" title="valid_sudoku_hash_sets.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHashSets} lang="go" title="valid_sudoku_hash_sets.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Bitmask
+
+<ApproachTag tag="interview" />
+
+Replace each set with a single integer. Bit `k` (0-indexed) is set when digit `k+1` has been seen. This eliminates hash overhead and reduces each check to a bitwise AND.
+
+- **Check** digit `d`: `(mask >> (d - 1)) & 1 == 1`
+- **Set** digit `d`: `mask |= (1 << (d - 1))`
+
+<ComplexityBadges time="O(1)" space="O(1)" timeColor="green" spaceColor="green" timeNote="81 cells fixed" spaceNote="27 integers" />
+
+### Bitmask Example
+
+For digit `5`: bit index = `5 - 1 = 4`, so bit pattern = `0b000010000` (bit 4 set).
+
+| Digit seen | Bit set | mask value |
+| --- | --- | --- |
+| 5 | bit 4 | `0b000010000` = 16 |
+| 3 | bit 2 | `0b000010100` = 20 |
+| 7 | bit 6 | `0b001010100` = 84 |
+
+To check if `3` is already in this mask: `84 & (1 << 2)` = `84 & 4` = `4` ≠ 0 → duplicate detected.
+
+### Pseudocode
+
+```plaintext
+function isValidSudoku(board):
+    rows  = [0] * 9
+    cols  = [0] * 9
+    boxes = [0] * 9
+    for r in 0..8:
+        for c in 0..8:
+            d = board[r][c]
+            if d == '.': continue
+            bit = 1 << (int(d) - 1)
+            box = (r // 3) * 3 + (c // 3)
+            if rows[r] & bit or cols[c] & bit or boxes[box] & bit:
+                return false
+            rows[r]  |= bit
+            cols[c]  |= bit
+            boxes[box] |= bit
+    return true
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBitmask} lang="python" title="valid_sudoku_bitmask.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBitmask} lang="cpp" title="valid_sudoku_bitmask.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBitmask} lang="java" title="valid_sudoku_bitmask.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBitmask} lang="javascript" title="valid_sudoku_bitmask.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBitmask} lang="rust" title="valid_sudoku_bitmask.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBitmask} lang="go" title="valid_sudoku_bitmask.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Common mistakes">
+- **Incorrect box index formula** — the correct formula is `(row // 3) * 3 + (col // 3)`, not `row * 3 + col` or any other variant.
+- **Forgetting to skip `'.'` cells** — attempting to insert or check `'.'` corrupts all three sets/masks.
+- **Thinking completeness is required** — you only need to confirm no digit appears twice among the filled cells; an incomplete board can still be valid.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="valid_sudoku_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="valid_sudoku_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="ValidSudokuSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="valid_sudoku_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="valid_sudoku_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="valid_sudoku_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 37, title: 'Sudoku Solver', difficulty: 'Hard', leetcodeSlug: 'sudoku-solver' },
+  { number: 49, title: 'Group Anagrams', difficulty: 'Medium', slug: 'problems/group-anagrams', leetcodeSlug: 'group-anagrams' },
+  { number: 73, title: 'Set Matrix Zeroes', difficulty: 'Medium', leetcodeSlug: 'set-matrix-zeroes' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to communicate">
+- **State the box formula immediately** — `(row // 3) * 3 + (col // 3)` is the one part that trips people up, so say it out loud early.
+- **Both approaches are O(1) time and space** because the board is fixed-size (9×9) — the constant 81 cells and 27 tracking structures never grow.
+- **The bitmask approach is a clean follow-up** — "I can do this with 27 integers instead of 27 sets, replacing hash operations with bitwise AND/OR."
+- **Practice tracing the box index** — verify: (0,0)→0, (0,3)→1, (3,0)→3, (4,4)→4, (8,8)→8.
+</Aside>

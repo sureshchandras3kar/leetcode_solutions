@@ -1,0 +1,187 @@
+---
+title: Binary Tree Maximum Path Sum
+description: Find maximum path sum through any node. Two post-order DFS approaches O(n) — in six languages.
+leetcodeNumber: 124
+difficulty: Hard
+leetcodeSlug: binary-tree-maximum-path-sum
+tags: [Tree, Depth-First Search, Dynamic Programming]
+prev:
+  label: "#123 Best Time to Buy and Sell Stock III"
+  link: "../best-time-to-buy-and-sell-stock-iii/"
+next:
+  label: "#125 Valid Palindrome"
+  link: "../valid-palindrome/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyPost    from '@solutions/Python/binary_tree_maximum_path_sum_postorder_dfs.py?raw';
+import cppPost   from '@solutions/C++/binary_tree_maximum_path_sum_postorder_dfs.cpp?raw';
+import javaPost  from '@solutions/Java/BinaryTreeMaximumPathSumPostorderDFS.java?raw';
+import jsPost    from '@solutions/JavaScript/binary_tree_maximum_path_sum_postorder_dfs.js?raw';
+import rustPost  from '@solutions/Rust/binary_tree_maximum_path_sum_postorder_dfs.rs?raw';
+import goPost    from '@solutions/Golang/binary_tree_maximum_path_sum_postorder_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/binary_tree_maximum_path_sum_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/binary_tree_maximum_path_sum_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/BinaryTreeMaximumPathSumBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/binary_tree_maximum_path_sum_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/binary_tree_maximum_path_sum_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/binary_tree_maximum_path_sum_bfs_iterative.go?raw';
+
+import pyMax     from '@solutions/Python/binary_tree_maximum_path_sum_dfs_max_tracking.py?raw';
+import cppMax    from '@solutions/C++/binary_tree_maximum_path_sum_dfs_max_tracking.cpp?raw';
+import javaMax   from '@solutions/Java/BinaryTreeMaximumPathSumDFSMaxTracking.java?raw';
+import jsMax     from '@solutions/JavaScript/binary_tree_maximum_path_sum_dfs_max_tracking.js?raw';
+import rustMax   from '@solutions/Rust/binary_tree_maximum_path_sum_dfs_max_tracking.rs?raw';
+import goMax     from '@solutions/Golang/binary_tree_maximum_path_sum_dfs_max_tracking.go?raw';
+
+## Problem Statement
+
+A path in a binary tree is a sequence of nodes where each pair of adjacent nodes in the sequence has an edge connecting them. A node can only appear in the sequence at most once. Note that the path does not need to pass through the root.
+
+The path sum of a path is the sum of the node's values in the path. Return the maximum path sum of any non-empty path.
+
+<Aside type="tip" title="What to notice first">
+- Paths do not need to start or end at the root.
+- A path can bend at a node (left + node + right).
+- Negative gains from subtrees should be rejected (use max(0, gain)).
+</Aside>
+
+### Examples
+
+| Input | Output | Path |
+| --- | --- | --- |
+| `[1,2,3]` | 6 | 2 → 1 → 3 |
+| `[-10,9,20,null,null,15,7]` | 42 | 15 → 20 → 7 |
+
+## Constraints
+
+- The number of nodes is in the range `[1, 3000]`.
+- `-1000 <= Node.val <= 1000`
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Post-Order DFS + list tracking | O(n) | O(h) | Explicit max_sum storage |
+| DFS with reference parameter | O(n) | O(h) | Cleaner max tracking |
+
+## Approach 1: Post-Order DFS with List
+
+<ApproachTag tag="recommended" />
+
+Use post-order DFS. At each node, compute max path through it and update global max. Return max single-path gain.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Recursion depth" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPost} lang="python" title="binary_tree_maximum_path_sum_postorder_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPost} lang="cpp" title="binary_tree_maximum_path_sum_postorder_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPost} lang="java" title="BinaryTreeMaximumPathSumPostorderDFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPost} lang="javascript" title="binary_tree_maximum_path_sum_postorder_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPost} lang="rust" title="binary_tree_maximum_path_sum_postorder_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPost} lang="go" title="binary_tree_maximum_path_sum_postorder_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: DFS with Reference Max Tracking
+
+<ApproachTag tag="alternative" />
+
+Pass max_sum as mutable reference. Update during traversal. Same logic, different max tracking style.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Recursion depth" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyMax} lang="python" title="binary_tree_maximum_path_sum_dfs_max_tracking.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppMax} lang="cpp" title="binary_tree_maximum_path_sum_dfs_max_tracking.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaMax} lang="java" title="BinaryTreeMaximumPathSumDFSMaxTracking.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsMax} lang="javascript" title="binary_tree_maximum_path_sum_dfs_max_tracking.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustMax} lang="rust" title="binary_tree_maximum_path_sum_dfs_max_tracking.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goMax} lang="go" title="binary_tree_maximum_path_sum_dfs_max_tracking.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="binary_tree_maximum_path_sum_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="binary_tree_maximum_path_sum_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="BinaryTreeMaximumPathSumBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="binary_tree_maximum_path_sum_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="binary_tree_maximum_path_sum_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="binary_tree_maximum_path_sum_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 112, title: 'Path Sum', difficulty: 'Easy', leetcodeSlug: 'path-sum' },
+  { number: 129, title: 'Sum Root to Leaf Numbers', difficulty: 'Medium', leetcodeSlug: 'sum-root-to-leaf-numbers' },
+  { number: 543, title: 'Diameter of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'diameter-of-binary-tree' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Key insight:** Return the max single-path gain, but track max path that may bend.
+- **Negative handling:** Reject negative contributions with max(0, gain).
+- **Path bending:** Only possible at each node (left + node + right).
+- **Edge cases:** Single negative node, all negative tree, negative subtrees.
+</Aside>

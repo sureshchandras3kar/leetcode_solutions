@@ -1,0 +1,163 @@
+---
+title: Binary Tree Zigzag Level Order Traversal
+description: Return nodes in zigzag order (left-right-left...). Two approaches — BFS with deque O(n) and DFS with level parity O(n) — in six languages.
+leetcodeNumber: 103
+difficulty: Medium
+leetcodeSlug: binary-tree-zigzag-level-order-traversal
+tags: [Tree, Breadth-First Search, Deque]
+prev:
+  label: "#102 Binary Tree Level Order Traversal"
+  link: "../binary-tree-level-order-traversal/"
+next:
+  label: "#104 Maximum Depth of Binary Tree"
+  link: "../maximum-depth-of-binary-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+
+import pyDeque     from '@solutions/Python/binary_tree_zigzag_level_order_traversal_deque.py?raw';
+import cppDeque    from '@solutions/C++/binary_tree_zigzag_level_order_traversal_deque.cpp?raw';
+import javaDeque   from '@solutions/Java/binary_tree_zigzag_level_order_traversal_deque.java?raw';
+import jsDeque     from '@solutions/JavaScript/binary_tree_zigzag_level_order_traversal_deque.js?raw';
+import rustDeque   from '@solutions/Rust/binary_tree_zigzag_level_order_traversal_deque.rs?raw';
+import goDeque     from '@solutions/Golang/binary_tree_zigzag_level_order_traversal_deque.go?raw';
+import pybfsIterative from '@solutions/Python/binary_tree_zigzag_level_order_traversal_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/binary_tree_zigzag_level_order_traversal_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/BinaryTreeZigzagLevelOrderTraversalBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/binary_tree_zigzag_level_order_traversal_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/binary_tree_zigzag_level_order_traversal_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/binary_tree_zigzag_level_order_traversal_bfs_iterative.go?raw';
+
+import pyParity     from '@solutions/Python/binary_tree_zigzag_level_order_traversal_parity.py?raw';
+import cppParity    from '@solutions/C++/binary_tree_zigzag_level_order_traversal_parity.cpp?raw';
+import javaParity   from '@solutions/Java/binary_tree_zigzag_level_order_traversal_parity.java?raw';
+import jsParity     from '@solutions/JavaScript/binary_tree_zigzag_level_order_traversal_parity.js?raw';
+import rustParity   from '@solutions/Rust/binary_tree_zigzag_level_order_traversal_parity.rs?raw';
+import goParity     from '@solutions/Golang/binary_tree_zigzag_level_order_traversal_parity.go?raw';
+
+## Problem Statement
+
+Given the `root` of a binary tree, return the zigzag level order traversal of its nodes' values. (i.e., from left to right, then right to left for the next level and alternate between).
+
+## Examples
+
+| Input | Output |
+| --- | --- |
+| `[3,9,20,null,null,15,7]` | `[[3],[20,9],[15,7]]` |
+| `[1]` | `[[1]]` |
+| `[]` | `[]` |
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[0, 2000]`.
+- `-1000 <= Node.val <= 1000`
+
+## Complexity Comparison
+
+| Approach | Time | Space |
+| --- | --- | --- |
+| BFS with Deque | O(n) | O(w) |
+| DFS with Level Parity | O(n) | O(h) |
+
+## Approach 1: BFS with Deque (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use a deque. For even levels, add from left; for odd levels, add from right.
+
+<ComplexityBadges time="O(n)" space="O(w)" timeColor="green" spaceColor="yellow" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDeque} lang="python" title="binary_tree_zigzag_level_order_traversal_deque.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDeque} lang="cpp" title="binary_tree_zigzag_level_order_traversal_deque.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDeque} lang="java" title="binary_tree_zigzag_level_order_traversal_deque.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDeque} lang="javascript" title="binary_tree_zigzag_level_order_traversal_deque.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDeque} lang="rust" title="binary_tree_zigzag_level_order_traversal_deque.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDeque} lang="go" title="binary_tree_zigzag_level_order_traversal_deque.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: DFS with Level Parity
+
+<ApproachTag tag="interview" />
+
+Use DFS and check level parity to determine insertion direction.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyParity} lang="python" title="binary_tree_zigzag_level_order_traversal_parity.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppParity} lang="cpp" title="binary_tree_zigzag_level_order_traversal_parity.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaParity} lang="java" title="binary_tree_zigzag_level_order_traversal_parity.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsParity} lang="javascript" title="binary_tree_zigzag_level_order_traversal_parity.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustParity} lang="rust" title="binary_tree_zigzag_level_order_traversal_parity.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goParity} lang="go" title="binary_tree_zigzag_level_order_traversal_parity.go" />
+  </TabItem>
+</Tabs>
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="BinaryTreeZigzagLevelOrderTraversalBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+

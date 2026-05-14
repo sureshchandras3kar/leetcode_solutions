@@ -1,0 +1,182 @@
+---
+title: Bitwise AND of Numbers Range
+description: Given two integers left and right, return the bitwise AND of all numbers in the range [left, right].
+leetcodeNumber: 201
+difficulty: Medium
+leetcodeSlug: bitwise-and-of-numbers-range
+tags: ["Bit Manipulation"]
+prev:
+  label: "#200 Number of Islands"
+  link: "../number-of-islands/"
+next:
+  label: "#202 Happy Number"
+  link: "../happy-number/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyShift from '@solutions/Python/bitwise_and_of_numbers_range_shift.py?raw';
+import cppShift from '@solutions/C++/bitwise_and_of_numbers_range_shift.cpp?raw';
+import javaShift from '@solutions/Java/bitwise_and_of_numbers_range_shift.java?raw';
+import jsShift from '@solutions/JavaScript/bitwise_and_of_numbers_range_shift.js?raw';
+import rustShift from '@solutions/Rust/bitwise_and_of_numbers_range_shift.rs?raw';
+import goShift from '@solutions/Golang/bitwise_and_of_numbers_range_shift.go?raw';
+
+import pyBriankernighan from '@solutions/Python/bitwise_and_of_numbers_range_brian_kernighan.py?raw';
+import cppBriankernighan from '@solutions/C++/bitwise_and_of_numbers_range_brian_kernighan.cpp?raw';
+import javaBriankernighan from '@solutions/Java/bitwise_and_of_numbers_range_brian_kernighan.java?raw';
+import jsBriankernighan from '@solutions/JavaScript/bitwise_and_of_numbers_range_brian_kernighan.js?raw';
+import rustBriankernighan from '@solutions/Rust/bitwise_and_of_numbers_range_brian_kernighan.rs?raw';
+import goBriankernighan from '@solutions/Golang/bitwise_and_of_numbers_range_brian_kernighan.go?raw';
+
+import pyNaive from '@solutions/Python/bitwise_and_of_numbers_range_naive.py?raw';
+import cppNaive from '@solutions/C++/bitwise_and_of_numbers_range_naive.cpp?raw';
+import javaNaive from '@solutions/Java/bitwise_and_of_numbers_range_naive.java?raw';
+import jsNaive from '@solutions/JavaScript/bitwise_and_of_numbers_range_naive.js?raw';
+import rustNaive from '@solutions/Rust/bitwise_and_of_numbers_range_naive.rs?raw';
+import goNaive from '@solutions/Golang/bitwise_and_of_numbers_range_naive.go?raw';
+
+
+
+## Problem Statement
+
+Given two integers left and right, return the bitwise AND of all numbers in the range [left, right].
+
+You need to solve this problem efficiently.
+
+<Aside type="tip" title="What to notice first">
+- Key insight 1 for Bitwise AND of Numbers Range
+- Key insight 2 for solving this problem
+- Key insight 3 specific to the approach
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation for example 1 |
+| Example 2 | Result 2 | Explanation for example 2 |
+
+## Constraints
+
+- Constraint 1 for Bitwise AND of Numbers Range
+- Constraint 2
+- Constraint 3
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Shift | O(n) | O(1) | When applicable |
+| Brian Kernighan | O(n) | O(1) | When applicable |
+| Naive | O(n) | O(1) | When applicable |
+
+
+## Approach 1: Shift
+
+<ApproachTag tag="recommended" />
+
+This approach provides an efficient solution for bitwise and of numbers range.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyShift}} lang="python" title="bitwise_and_of_numbers_range_shift.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppShift}} lang="cpp" title="bitwise_and_of_numbers_range_shift.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaShift}} lang="java" title="bitwise_and_of_numbers_range_shift.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsShift}} lang="javascript" title="bitwise_and_of_numbers_range_shift.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustShift}} lang="rust" title="bitwise_and_of_numbers_range_shift.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goShift}} lang="go" title="bitwise_and_of_numbers_range_shift.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Brian Kernighan
+
+<ApproachTag tag="interview" />
+
+This approach provides an efficient solution for bitwise and of numbers range.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyBriankernighan}} lang="python" title="bitwise_and_of_numbers_range_brian_kernighan.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppBriankernighan}} lang="cpp" title="bitwise_and_of_numbers_range_brian_kernighan.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaBriankernighan}} lang="java" title="bitwise_and_of_numbers_range_brian_kernighan.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsBriankernighan}} lang="javascript" title="bitwise_and_of_numbers_range_brian_kernighan.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustBriankernighan}} lang="rust" title="bitwise_and_of_numbers_range_brian_kernighan.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goBriankernighan}} lang="go" title="bitwise_and_of_numbers_range_brian_kernighan.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Naive
+
+<ApproachTag tag="simple" />
+
+This approach provides an efficient solution for bitwise and of numbers range.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyNaive}} lang="python" title="bitwise_and_of_numbers_range_naive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppNaive}} lang="cpp" title="bitwise_and_of_numbers_range_naive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaNaive}} lang="java" title="bitwise_and_of_numbers_range_naive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsNaive}} lang="javascript" title="bitwise_and_of_numbers_range_naive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustNaive}} lang="rust" title="bitwise_and_of_numbers_range_naive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goNaive}} lang="go" title="bitwise_and_of_numbers_range_naive.go" />
+  </TabItem>
+</Tabs>
+
+
+
+<RelatedProblems problems={{
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 9, title: 'Palindrome Number', difficulty: 'Easy', leetcodeSlug: 'palindrome-number' },
+}} />
+
+<PrevNextNav
+  prevProblem={ number: 137, title: "Single Number II", slug: "single-number-ii" }
+  nextProblem=undefined
+/>

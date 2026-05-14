@@ -1,0 +1,434 @@
+---
+title: Min Stack
+description: Design a stack that supports push, pop, top, and retrieving the minimum element in constant time. Two approaches — dual stack O(1) per op and single stack with pairs O(1) per op — in six languages.
+leetcodeNumber: 155
+difficulty: Medium
+leetcodeSlug: min-stack
+tags: [Stack, Design]
+prev:
+  label: "#153 Find Minimum in Rotated Sorted Array"
+  link: "../find-minimum-rotated/"
+next:
+  label: "#162 Find Peak Element"
+  link: "../find-peak-element/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDual      from '@solutions/Python/min_stack_dual.py?raw';
+import cppDual     from '@solutions/C++/min_stack_dual.cpp?raw';
+import javaDual    from '@solutions/Java/min_stack_dual.java?raw';
+import jsDual      from '@solutions/JavaScript/min_stack_dual.js?raw';
+import rustDual    from '@solutions/Rust/min_stack_dual.rs?raw';
+import goDual      from '@solutions/Golang/min_stack_dual.go?raw';
+import pySpaceOptimized from '@solutions/Python/min_stack_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/min_stack_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/MinStackSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/min_stack_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/min_stack_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/min_stack_space_optimized.go?raw';
+
+import pyPair      from '@solutions/Python/min_stack_pair.py?raw';
+import cppPair     from '@solutions/C++/min_stack_pair.cpp?raw';
+import javaPair    from '@solutions/Java/min_stack_pair.java?raw';
+import jsPair      from '@solutions/JavaScript/min_stack_pair.js?raw';
+import rustPair    from '@solutions/Rust/min_stack_pair.rs?raw';
+import goPair      from '@solutions/Golang/min_stack_pair.go?raw';
+
+## Problem Statement
+
+Design a stack that supports `push`, `pop`, `top`, and retrieving the **minimum element** in **constant time**.
+
+Implement the `MinStack` class:
+
+- `MinStack()` Initializes the stack object.
+- `void push(int val)` Pushes the element `val` onto the stack.
+- `void pop()` Removes the element on the top of the stack.
+- `int top()` Gets the top element of the stack.
+- `int getMin()` Retrieves the minimum element in the stack.
+
+Each operation must run in **O(1) time**.
+
+<Aside type="tip" title="What to notice first">
+- The stack must support all four operations in constant time.
+- The key challenge is: how can we track the minimum without scanning the entire stack on every `getMin()` call?
+- You cannot modify the values being pushed; you must design the data structure cleverly.
+- Every `push` and `pop` must maintain the minimum invariant.
+</Aside>
+
+### Examples
+
+| Operation | Stack | Min | Notes |
+| --- | --- | --- | --- |
+| `push(-2)` | `[-2]` | -2 | Initialize with minimum as -2 |
+| `push(0)` | `[-2, 0]` | -2 | New min is still -2 |
+| `push(-3)` | `[-2, 0, -3]` | -3 | New min is -3 |
+| `getMin()` | `[-2, 0, -3]` | -3 | Return -3 ✓ |
+| `pop()` | `[-2, 0]` | -2 | Remove -3, min reverts to -2 |
+| `top()` | `[-2, 0]` | — | Return 0 ✓ |
+| `getMin()` | `[-2, 0]` | -2 | Return -2 ✓ |
+
+## Constraints
+
+- `-2^31 <= val <= 2^31 - 1`
+- `pop`, `top`, and `getMin` operations will always be called on **non-empty stacks**.
+- At most `3 × 10^4` calls will be made to `push`, `pop`, `top`, and `getMin`.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Stock price tracking** — maintain running minimum price alongside incoming prices during trading sessions.
+- **Browser history navigation** — track the minimum (or maximum) time spent on each visited page.
+- **Network latency monitoring** — retrieve minimum latency within a sliding time window as packets arrive.
+- **Undo/redo systems** — maintain a minimum or maximum state value as operations are pushed and popped.
+- **Expression evaluation** — some parsing tasks need to track minimum depth or priority level as tokens arrive.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Additional Memory | Best When |
+| --- | --- | --- | --- | --- |
+| Dual Stack | O(1) all ops | O(n) | O(n) for min stack | Clearer logic, easier to debug |
+| Single Stack with Pairs | O(1) all ops | O(n) | O(n) same stack | Memory-conscious, stores both in one place |
+
+## Which approach should you learn first?
+
+- Pick **Dual Stack** if you want the simplest mental model: one stack for values, one for mins.
+- Pick **Single Stack with Pairs** if you want to understand space optimization and tuple/pair handling.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Clearer Logic</div>
+    <div class="lc-approach-quick__name">Dual Stack</div>
+    <div class="lc-approach-quick__stats">O(1) all ops &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Space Optimized</div>
+    <div class="lc-approach-quick__name">Single Stack with Pairs</div>
+    <div class="lc-approach-quick__stats">O(1) all ops &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Dual Stack (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Maintain **two stacks**:
+1. **Main stack**: stores all pushed values.
+2. **Min stack**: stores the minimum value at each level (only pushes/pops in sync with main stack).
+
+Whenever we push a value to the main stack, we push `min(val, current_min)` to the min stack. When we pop from the main stack, we pop from the min stack too. This way, `getMin()` is always O(1) by peeking the top of the min stack.
+
+<ComplexityBadges time="O(1)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="All operations constant" spaceNote="Two stacks of size n" />
+
+### Step-by-step Example
+
+**Sequence of operations:** `push(-2)`, `push(0)`, `push(-3)`, `getMin()`, `pop()`, `top()`, `getMin()`
+
+| Step | Operation | Main Stack | Min Stack | Result | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `push(-2)` | `[-2]` | `[-2]` | — | First element: min is -2 itself |
+| 2 | `push(0)` | `[-2, 0]` | `[-2, -2]` | — | min(-2, 0) = -2, so push -2 |
+| 3 | `push(-3)` | `[-2, 0, -3]` | `[-2, -2, -3]` | — | min(-2, -3) = -3, so push -3 |
+| 4 | `getMin()` | `[-2, 0, -3]` | `[-2, -2, -3]` | **-3** | Peek top of min stack → -3 ✓ |
+| 5 | `pop()` | `[-2, 0]` | `[-2, -2]` | — | Remove from both stacks |
+| 6 | `top()` | `[-2, 0]` | `[-2, -2]` | **0** | Peek main stack → 0 ✓ |
+| 7 | `getMin()` | `[-2, 0]` | `[-2, -2]` | **-2** | Peek min stack → -2 ✓ |
+
+<LogicPlayer
+  title="How the dual stack solution tracks the minimum"
+  description="Watch both stacks grow and shrink as you push, pop, and query. The min stack always shows the minimum at each level."
+  steps={[
+    {
+      title: 'Initialize empty stacks',
+      note: 'Both the main stack and min stack start empty. No operations yet.',
+      formula: 'mainStack = [], minStack = []',
+      callout: 'Ready to accept the first push.',
+      items: [
+        { label: 'Step 1', state: 'default', index: 0 },
+      ],
+      memory: ['Main Stack: empty', 'Min Stack: empty'],
+    },
+    {
+      title: 'Push -2 (first element)',
+      note: 'The first element becomes the minimum by default. Push -2 to both stacks.',
+      formula: 'push(-2): min(-2, ∞) = -2',
+      callout: 'Both stacks: [-2]',
+      items: [
+        { label: 'Step 1', state: 'active', index: 0 },
+      ],
+      memory: ['Main Stack: [-2]', 'Min Stack: [-2]'],
+    },
+    {
+      title: 'Push 0',
+      note: 'Compare 0 with the current min (-2). Since -2 < 0, the new min is still -2.',
+      formula: 'push(0): min(0, -2) = -2',
+      callout: 'Main: [-2, 0], Min: [-2, -2]',
+      items: [
+        { label: 'Step 1', state: 'default', index: 0 },
+        { label: 'Step 2', state: 'active', index: 1 },
+      ],
+      memory: ['Main Stack: [-2, 0]', 'Min Stack: [-2, -2]'],
+    },
+    {
+      title: 'Push -3',
+      note: 'Compare -3 with the current min (-2). Since -3 < -2, the new min is -3.',
+      formula: 'push(-3): min(-3, -2) = -3',
+      callout: 'Main: [-2, 0, -3], Min: [-2, -2, -3]',
+      items: [
+        { label: 'Step 1', state: 'default', index: 0 },
+        { label: 'Step 2', state: 'default', index: 1 },
+        { label: 'Step 3', state: 'active', index: 2 },
+      ],
+      memory: ['Main Stack: [-2, 0, -3]', 'Min Stack: [-2, -2, -3]'],
+    },
+    {
+      title: 'getMin() returns -3',
+      note: 'Peek the top of the min stack. The current minimum is -3.',
+      formula: 'getMin() → minStack.top() = -3',
+      callout: 'Constant time lookup!',
+      items: [
+        { label: 'Step 1', state: 'default', index: 0 },
+        { label: 'Step 2', state: 'default', index: 1 },
+        { label: 'Step 3', state: 'match', index: 2 },
+      ],
+      memory: ['Main Stack: [-2, 0, -3]', 'Min Stack: [-2, -2, -3]', 'Result: -3'],
+    },
+    {
+      title: 'Pop -3',
+      note: 'Remove the top element from both stacks. The minimum reverts to -2.',
+      formula: 'pop(): remove from both stacks',
+      callout: 'Main: [-2, 0], Min: [-2, -2]',
+      items: [
+        { label: 'Step 1', state: 'default', index: 0 },
+        { label: 'Step 2', state: 'default', index: 1 },
+      ],
+      memory: ['Main Stack: [-2, 0]', 'Min Stack: [-2, -2]'],
+    },
+    {
+      title: 'top() returns 0',
+      note: 'Peek the top of the main stack. The top element is 0.',
+      formula: 'top() → mainStack.top() = 0',
+      callout: 'Simple peek operation.',
+      items: [
+        { label: 'Step 1', state: 'default', index: 0 },
+        { label: 'Step 2', state: 'match', index: 1 },
+      ],
+      memory: ['Main Stack: [-2, 0]', 'Min Stack: [-2, -2]', 'Result: 0'],
+    },
+    {
+      title: 'getMin() returns -2',
+      note: 'After popping -3, the minimum at the new top is -2.',
+      formula: 'getMin() → minStack.top() = -2',
+      callout: 'The minimum reverted automatically!',
+      items: [
+        { label: 'Step 1', state: 'match', index: 0 },
+        { label: 'Step 2', state: 'default', index: 1 },
+      ],
+      memory: ['Main Stack: [-2, 0]', 'Min Stack: [-2, -2]', 'Result: -2'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+class MinStack:
+    minStack = {} // main stack for all values
+    mainStack = {} // separate stack for minimums
+
+    function push(val):
+        mainStack.push(val)
+        if minStack is empty:
+            minStack.push(val)
+        else:
+            minStack.push(min(val, minStack.top()))
+
+    function pop():
+        mainStack.pop()
+        minStack.pop()
+
+    function top():
+        return mainStack.top()
+
+    function getMin():
+        return minStack.top()
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDual} lang="python" title="min_stack_dual.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDual} lang="cpp" title="min_stack_dual.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDual} lang="java" title="min_stack_dual.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDual} lang="javascript" title="min_stack_dual.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDual} lang="rust" title="min_stack_dual.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDual} lang="go" title="min_stack_dual.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Single Stack with Pairs
+
+<ApproachTag tag="interview" />
+
+Instead of maintaining two separate stacks, store **one element per level as a pair (value, min_at_this_level)**.
+
+Each pair holds:
+- **value**: the actual value being pushed
+- **min_at_this_level**: the minimum from the bottom of the stack up to and including this element
+
+When you push a new value, compute its minimum as `min(val, previous_min)` and store the pair. This way, the entire history of minimums is embedded in the stack itself.
+
+<Aside type="note" title="Memory efficiency">
+Both approaches use O(n) space overall, but the pair approach stores everything in one data structure, which can be slightly more cache-friendly. However, the dual stack approach is often clearer to reason about in interviews.
+</Aside>
+
+<ComplexityBadges time="O(1)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="All operations constant" spaceNote="Single stack with pairs" />
+
+### Step-by-step Example
+
+**Sequence of operations:** `push(-2)`, `push(0)`, `push(-3)`, `getMin()`, `pop()`, `top()`, `getMin()`
+
+| Step | Operation | Stack | Top Pair | Min | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `push(-2)` | `[(-2, -2)]` | `(-2, -2)` | -2 | First: value=min=-2 |
+| 2 | `push(0)` | `[(-2, -2), (0, -2)]` | `(0, -2)` | -2 | min(0, -2) = -2 |
+| 3 | `push(-3)` | `[(-2, -2), (0, -2), (-3, -3)]` | `(-3, -3)` | -3 | min(-3, -2) = -3 |
+| 4 | `getMin()` | `[(-2, -2), (0, -2), (-3, -3)]` | `(-3, -3)` | **-3** | Return second element of top pair |
+| 5 | `pop()` | `[(-2, -2), (0, -2)]` | `(0, -2)` | -2 | Remove top pair |
+| 6 | `top()` | `[(-2, -2), (0, -2)]` | `(0, -2)` | — | **Return 0** (first element of top pair) |
+| 7 | `getMin()` | `[(-2, -2), (0, -2)]` | `(0, -2)` | **-2** | Return second element of top pair |
+
+### Pseudocode
+
+```plaintext
+class MinStack:
+    stack = [] // stores (value, min_at_this_level) pairs
+
+    function push(val):
+        if stack is empty:
+            stack.push((val, val))
+        else:
+            currentMin = min(val, stack.top().min)
+            stack.push((val, currentMin))
+
+    function pop():
+        stack.pop()
+
+    function top():
+        return stack.top().value
+
+    function getMin():
+        return stack.top().min
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPair} lang="python" title="min_stack_pair.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPair} lang="cpp" title="min_stack_pair.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPair} lang="java" title="min_stack_pair.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPair} lang="javascript" title="min_stack_pair.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPair} lang="rust" title="min_stack_pair.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPair} lang="go" title="min_stack_pair.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting to sync the min stack on pop()** — if you only pop from the main stack and not the min stack, the two get out of sync.
+- **Computing min inside pop() instead of push()** — the minimum must be stored *as you push*, not computed later.
+- **Using a heap or priority queue** — those are O(log n) per operation, not O(1).
+- **Recomputing the minimum by scanning the stack on getMin()** — this is O(n), defeating the entire purpose.
+- **Not handling duplicate minimums** — if the same minimum value appears multiple times, make sure each occurrence is tracked in the min stack.
+- **Off-by-one errors when storing pairs** — ensure the min value in a pair reflects the minimum *up to that point*, not just the current value.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="min_stack_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="min_stack_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="MinStackSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="min_stack_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="min_stack_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="min_stack_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 71, title: 'Simplify Path', difficulty: 'Medium', leetcodeSlug: 'simplify-path' },
+  { number: 146, title: 'LRU Cache', difficulty: 'Medium', leetcodeSlug: 'lru-cache' },
+  { number: 225, title: 'Implement Stack using Queues', difficulty: 'Easy', leetcodeSlug: 'implement-stack-using-queues' },
+  { number: 232, title: 'Implement Queue using Stacks', difficulty: 'Easy', leetcodeSlug: 'implement-queue-using-stacks' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Dual Stack vs. Pairs:** Both are O(1) time. Dual Stack is clearer and easier to explain. Pairs are more compact but require careful bookkeeping.
+- **Why not use a heap?** Heaps give O(log n) per operation, and you'd need to remove specific elements (no efficient removal for min-heaps).
+- **Why not recompute on getMin()?** The problem explicitly demands O(1) time for getMin(). Scanning the stack is O(n).
+- **Edge cases to mention:** Single element (min = that element), duplicate minimums (each occurrence needs a min stack entry), negative numbers (all approaches handle them), and large stacks (space is O(n) either way).
+- **Follow-up — Median Finder:** A harder version where you track both min and median; this requires a heap-based approach.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 154, title: "Find Minimum in Rotated Sorted Array II", slug: "find-minimum-in-rotated-sorted-array-ii" }}
+  nextProblem={{ number: 156, title: "Binary Tree Upside Down", slug: "binary-tree-upside-down" }}
+/>

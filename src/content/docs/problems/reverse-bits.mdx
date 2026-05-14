@@ -1,0 +1,182 @@
+---
+title: Reverse Bits
+description: Reverse the bits of a given 32-bit unsigned integer.
+leetcodeNumber: 190
+difficulty: Easy
+leetcodeSlug: reverse-bits
+tags: ["Bit Manipulation", "Divide and Conquer"]
+prev:
+  label: "#189 Rotate Array"
+  link: "../rotate-array/"
+next:
+  label: "#191 Number of 1 Bits"
+  link: "../number-of-1-bits/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyIterate from '@solutions/Python/reverse_bits_iterate.py?raw';
+import cppIterate from '@solutions/C++/reverse_bits_iterate.cpp?raw';
+import javaIterate from '@solutions/Java/reverse_bits_iterate.java?raw';
+import jsIterate from '@solutions/JavaScript/reverse_bits_iterate.js?raw';
+import rustIterate from '@solutions/Rust/reverse_bits_iterate.rs?raw';
+import goIterate from '@solutions/Golang/reverse_bits_iterate.go?raw';
+
+import pyBitmanipulation from '@solutions/Python/reverse_bits_bit_manipulation.py?raw';
+import cppBitmanipulation from '@solutions/C++/reverse_bits_bit_manipulation.cpp?raw';
+import javaBitmanipulation from '@solutions/Java/reverse_bits_bit_manipulation.java?raw';
+import jsBitmanipulation from '@solutions/JavaScript/reverse_bits_bit_manipulation.js?raw';
+import rustBitmanipulation from '@solutions/Rust/reverse_bits_bit_manipulation.rs?raw';
+import goBitmanipulation from '@solutions/Golang/reverse_bits_bit_manipulation.go?raw';
+
+import pyBytereversal from '@solutions/Python/reverse_bits_byte_reversal.py?raw';
+import cppBytereversal from '@solutions/C++/reverse_bits_byte_reversal.cpp?raw';
+import javaBytereversal from '@solutions/Java/reverse_bits_byte_reversal.java?raw';
+import jsBytereversal from '@solutions/JavaScript/reverse_bits_byte_reversal.js?raw';
+import rustBytereversal from '@solutions/Rust/reverse_bits_byte_reversal.rs?raw';
+import goBytereversal from '@solutions/Golang/reverse_bits_byte_reversal.go?raw';
+
+
+
+## Problem Statement
+
+Reverse the bits of a given 32-bit unsigned integer.
+
+You need to solve this problem efficiently.
+
+<Aside type="tip" title="What to notice first">
+- Key insight 1 for Reverse Bits
+- Key insight 2 for solving this problem
+- Key insight 3 specific to the approach
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation for example 1 |
+| Example 2 | Result 2 | Explanation for example 2 |
+
+## Constraints
+
+- Constraint 1 for Reverse Bits
+- Constraint 2
+- Constraint 3
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Iterate | O(n) | O(1) | When applicable |
+| Bit Manipulation | O(n) | O(1) | When applicable |
+| Byte Reversal | O(n) | O(1) | When applicable |
+
+
+## Approach 1: Iterate
+
+<ApproachTag tag="recommended" />
+
+This approach provides an efficient solution for reverse bits.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyIterate}} lang="python" title="reverse_bits_iterate.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppIterate}} lang="cpp" title="reverse_bits_iterate.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaIterate}} lang="java" title="reverse_bits_iterate.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsIterate}} lang="javascript" title="reverse_bits_iterate.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustIterate}} lang="rust" title="reverse_bits_iterate.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goIterate}} lang="go" title="reverse_bits_iterate.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Bit Manipulation
+
+<ApproachTag tag="interview" />
+
+This approach provides an efficient solution for reverse bits.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyBitmanipulation}} lang="python" title="reverse_bits_bit_manipulation.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppBitmanipulation}} lang="cpp" title="reverse_bits_bit_manipulation.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaBitmanipulation}} lang="java" title="reverse_bits_bit_manipulation.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsBitmanipulation}} lang="javascript" title="reverse_bits_bit_manipulation.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustBitmanipulation}} lang="rust" title="reverse_bits_bit_manipulation.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goBitmanipulation}} lang="go" title="reverse_bits_bit_manipulation.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Byte Reversal
+
+<ApproachTag tag="simple" />
+
+This approach provides an efficient solution for reverse bits.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyBytereversal}} lang="python" title="reverse_bits_byte_reversal.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppBytereversal}} lang="cpp" title="reverse_bits_byte_reversal.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaBytereversal}} lang="java" title="reverse_bits_byte_reversal.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsBytereversal}} lang="javascript" title="reverse_bits_byte_reversal.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustBytereversal}} lang="rust" title="reverse_bits_byte_reversal.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goBytereversal}} lang="go" title="reverse_bits_byte_reversal.go" />
+  </TabItem>
+</Tabs>
+
+
+
+<RelatedProblems problems={{
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 9, title: 'Palindrome Number', difficulty: 'Easy', leetcodeSlug: 'palindrome-number' },
+}} />
+
+<PrevNextNav
+  prevProblem=undefined
+  nextProblem=undefined
+/>

@@ -1,0 +1,182 @@
+---
+title: Pow(x, n)
+description: Implement pow(x, n), which calculates x raised to the power n.
+leetcodeNumber: 50
+difficulty: Medium
+leetcodeSlug: powx-n
+tags: ["Math", "Recursion"]
+prev:
+  label: "#49 Group Anagrams"
+  link: "../group-anagrams/"
+next:
+  label: "#52 N-Queens II"
+  link: "../n-queens-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyFastexponentiation from '@solutions/Python/powx_n_fast_exponentiation.py?raw';
+import cppFastexponentiation from '@solutions/C++/powx_n_fast_exponentiation.cpp?raw';
+import javaFastexponentiation from '@solutions/Java/powx_n_fast_exponentiation.java?raw';
+import jsFastexponentiation from '@solutions/JavaScript/powx_n_fast_exponentiation.js?raw';
+import rustFastexponentiation from '@solutions/Rust/powx_n_fast_exponentiation.rs?raw';
+import goFastexponentiation from '@solutions/Golang/powx_n_fast_exponentiation.go?raw';
+
+import pyIterative from '@solutions/Python/powx_n_iterative.py?raw';
+import cppIterative from '@solutions/C++/powx_n_iterative.cpp?raw';
+import javaIterative from '@solutions/Java/powx_n_iterative.java?raw';
+import jsIterative from '@solutions/JavaScript/powx_n_iterative.js?raw';
+import rustIterative from '@solutions/Rust/powx_n_iterative.rs?raw';
+import goIterative from '@solutions/Golang/powx_n_iterative.go?raw';
+
+import pyRecursive from '@solutions/Python/powx_n_recursive.py?raw';
+import cppRecursive from '@solutions/C++/powx_n_recursive.cpp?raw';
+import javaRecursive from '@solutions/Java/powx_n_recursive.java?raw';
+import jsRecursive from '@solutions/JavaScript/powx_n_recursive.js?raw';
+import rustRecursive from '@solutions/Rust/powx_n_recursive.rs?raw';
+import goRecursive from '@solutions/Golang/powx_n_recursive.go?raw';
+
+
+
+## Problem Statement
+
+Implement pow(x, n), which calculates x raised to the power n.
+
+You need to solve this problem efficiently.
+
+<Aside type="tip" title="What to notice first">
+- Key insight 1 for Pow(x, n)
+- Key insight 2 for solving this problem
+- Key insight 3 specific to the approach
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation for example 1 |
+| Example 2 | Result 2 | Explanation for example 2 |
+
+## Constraints
+
+- Constraint 1 for Pow(x, n)
+- Constraint 2
+- Constraint 3
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Fast Exponentiation | O(n) | O(1) | When applicable |
+| Iterative | O(n) | O(1) | When applicable |
+| Recursive | O(n) | O(1) | When applicable |
+
+
+## Approach 1: Fast Exponentiation
+
+<ApproachTag tag="recommended" />
+
+This approach provides an efficient solution for pow(x, n).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyFastexponentiation}} lang="python" title="powx_n_fast_exponentiation.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppFastexponentiation}} lang="cpp" title="powx_n_fast_exponentiation.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaFastexponentiation}} lang="java" title="powx_n_fast_exponentiation.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsFastexponentiation}} lang="javascript" title="powx_n_fast_exponentiation.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustFastexponentiation}} lang="rust" title="powx_n_fast_exponentiation.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goFastexponentiation}} lang="go" title="powx_n_fast_exponentiation.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Iterative
+
+<ApproachTag tag="interview" />
+
+This approach provides an efficient solution for pow(x, n).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyIterative}} lang="python" title="powx_n_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppIterative}} lang="cpp" title="powx_n_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaIterative}} lang="java" title="powx_n_iterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsIterative}} lang="javascript" title="powx_n_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustIterative}} lang="rust" title="powx_n_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goIterative}} lang="go" title="powx_n_iterative.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Recursive
+
+<ApproachTag tag="simple" />
+
+This approach provides an efficient solution for pow(x, n).
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyRecursive}} lang="python" title="powx_n_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppRecursive}} lang="cpp" title="powx_n_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaRecursive}} lang="java" title="powx_n_recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsRecursive}} lang="javascript" title="powx_n_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustRecursive}} lang="rust" title="powx_n_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goRecursive}} lang="go" title="powx_n_recursive.go" />
+  </TabItem>
+</Tabs>
+
+
+
+<RelatedProblems problems={{
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 9, title: 'Palindrome Number', difficulty: 'Easy', leetcodeSlug: 'palindrome-number' },
+}} />
+
+<PrevNextNav
+  prevProblem=undefined
+  nextProblem=undefined
+/>

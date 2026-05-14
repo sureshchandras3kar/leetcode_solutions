@@ -5,8 +5,12 @@ leetcodeNumber: 215
 difficulty: Medium
 leetcodeSlug: kth-largest-element-in-array
 tags: [Array, Heap, Dynamic Programming]
-prev: false
-next: false
+prev:
+  label: "#212 Word Search II"
+  link: "../word-search-ii/"
+next:
+  label: "#217 Contains Duplicate"
+  link: "../contains-duplicate/"
 ---
 
 import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
@@ -29,15 +33,17 @@ Solve this classic coding interview problem efficiently using multiple approache
 
 ### Examples
 
-| Input | Output | Explanation |
-| --- | --- | --- |
-| `[example1]` | `result1` | Explanation goes here |
-| `[example2]` | `result2` | Explanation goes here |
+| nums | k | Output | Explanation |
+| --- | --- | --- | --- |
+| `[3,2,1,5,6,4]` | 2 | 5 | Sorted: [1,2,3,4,5,6]. 2nd largest = 5 |
+| `[3,2,3,1,2,4,5,5,6]` | 4 | 4 | Sorted: [1,2,2,3,3,4,5,5,6]. 4th largest = 4 |
+| `[1]` | 1 | 1 | Single element |
+| `[7,7,7,7]` | 2 | 7 | All same value |
 
 ## Constraints
 
-- Standard LeetCode constraints
-- Refer to the official problem statement for exact details
+- `1 <= k <= nums.length <= 10^5`
+- `-10^4 <= nums[i] <= 10^4`
 
 ## Real-World Applications
 

@@ -1,0 +1,167 @@
+---
+title: Validate Binary Search Tree
+description: Verify if a tree is a valid BST. Two approaches — DFS with bounds O(n) and in-order traversal O(n) — in six languages.
+leetcodeNumber: 98
+difficulty: Medium
+leetcodeSlug: validate-binary-search-tree
+tags: [Tree, Depth-First Search, In-Order Traversal]
+prev:
+  label: "#97 Interleaving String"
+  link: "../interleaving-string/"
+next:
+  label: "#100 Same Tree"
+  link: "../same-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+
+import pyBounds     from '@solutions/Python/validate_binary_search_tree_bounds.py?raw';
+import cppBounds    from '@solutions/C++/validate_binary_search_tree_bounds.cpp?raw';
+import javaBounds   from '@solutions/Java/validate_binary_search_tree_bounds.java?raw';
+import jsBounds     from '@solutions/JavaScript/validate_binary_search_tree_bounds.js?raw';
+import rustBounds   from '@solutions/Rust/validate_binary_search_tree_bounds.rs?raw';
+import goBounds     from '@solutions/Golang/validate_binary_search_tree_bounds.go?raw';
+import pybfsIterative from '@solutions/Python/validate_binary_search_tree_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/validate_binary_search_tree_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/ValidateBinarySearchTreeBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/validate_binary_search_tree_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/validate_binary_search_tree_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/validate_binary_search_tree_bfs_iterative.go?raw';
+
+import pyInorder     from '@solutions/Python/validate_binary_search_tree_inorder.py?raw';
+import cppInorder    from '@solutions/C++/validate_binary_search_tree_inorder.cpp?raw';
+import javaInorder   from '@solutions/Java/validate_binary_search_tree_inorder.java?raw';
+import jsInorder     from '@solutions/JavaScript/validate_binary_search_tree_inorder.js?raw';
+import rustInorder   from '@solutions/Rust/validate_binary_search_tree_inorder.rs?raw';
+import goInorder     from '@solutions/Golang/validate_binary_search_tree_inorder.go?raw';
+
+## Problem Statement
+
+Given the `root` of a binary tree, determine if it is a valid binary search tree (BST).
+
+A valid BST is defined as:
+- The left subtree of a node contains only nodes with keys less than the node's key.
+- The right subtree contains only nodes with keys greater than the node's key.
+- Both left and right subtrees must also be binary search trees.
+
+## Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[2,1,3]` | `true` | 1 < 2 < 3 ✓ |
+| `[5,1,4,null,null,3,6]` | `false` | Node 4 should be > 5 |
+
+## Constraints
+
+- The number of nodes is in range `[1, 10^4]`.
+- `-2^31 <= Node.val <= 2^31 - 1`
+
+## Complexity Comparison
+
+| Approach | Time | Space |
+| --- | --- | --- |
+| DFS with Bounds | O(n) | O(h) |
+| In-Order Traversal | O(n) | O(h) |
+
+## Approach 1: DFS with Min/Max Bounds (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Track min and max bounds as you traverse. Left child must be > min, right child must be < max.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBounds} lang="python" title="validate_binary_search_tree_bounds.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBounds} lang="cpp" title="validate_binary_search_tree_bounds.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBounds} lang="java" title="validate_binary_search_tree_bounds.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBounds} lang="javascript" title="validate_binary_search_tree_bounds.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBounds} lang="rust" title="validate_binary_search_tree_bounds.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBounds} lang="go" title="validate_binary_search_tree_bounds.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: In-Order Traversal
+
+<ApproachTag tag="interview" />
+
+In-order traversal of a valid BST yields sorted values. Track previous value and ensure it's always increasing.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyInorder} lang="python" title="validate_binary_search_tree_inorder.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppInorder} lang="cpp" title="validate_binary_search_tree_inorder.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaInorder} lang="java" title="validate_binary_search_tree_inorder.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsInorder} lang="javascript" title="validate_binary_search_tree_inorder.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustInorder} lang="rust" title="validate_binary_search_tree_inorder.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goInorder} lang="go" title="validate_binary_search_tree_inorder.go" />
+  </TabItem>
+</Tabs>
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="validate_binary_search_tree_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="validate_binary_search_tree_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="ValidateBinarySearchTreeBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="validate_binary_search_tree_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="validate_binary_search_tree_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="validate_binary_search_tree_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+

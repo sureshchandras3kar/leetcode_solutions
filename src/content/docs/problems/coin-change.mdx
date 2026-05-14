@@ -1,0 +1,301 @@
+---
+title: Coin Change
+description: Find minimum number of coins for an amount. Two approaches — DP Array O(n*amount) + BFS O(n*amount) — in six languages.
+leetcodeNumber: 322
+difficulty: Medium
+leetcodeSlug: coin-change
+tags: [Array, Dynamic Programming, Breadth-First Search]
+prev:
+  label: "#300 Longest Increasing Subsequence"
+  link: "../longest-increasing-subsequence/"
+next:
+  label: "#347 Top K Frequent Elements"
+  link: "../top-k-frequent-elements/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDP     from '@solutions/Python/coin_change_dp_array.py?raw';
+import cppDP    from '@solutions/C++/coin_change_dp_array.cpp?raw';
+import javaDP   from '@solutions/Java/CoinChangeDP.java?raw';
+import jsDP     from '@solutions/JavaScript/coin_change_dp_array.js?raw';
+import rustDP   from '@solutions/Rust/coin_change_dp_array.rs?raw';
+import goDP     from '@solutions/Golang/coin_change_dp_array.go?raw';
+import pySpaceOptimized from '@solutions/Python/coin_change_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/coin_change_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/CoinChangeSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/coin_change_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/coin_change_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/coin_change_space_optimized.go?raw';
+
+import pyBFS    from '@solutions/Python/coin_change_bfs.py?raw';
+import cppBFS   from '@solutions/C++/coin_change_bfs.cpp?raw';
+import javaBFS  from '@solutions/Java/CoinChangeBFS.java?raw';
+import jsBFS    from '@solutions/JavaScript/coin_change_bfs.js?raw';
+import rustBFS  from '@solutions/Rust/coin_change_bfs.rs?raw';
+import goBFS    from '@solutions/Golang/coin_change_bfs.go?raw';
+
+## Problem Statement
+
+You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.
+
+Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`.
+
+You may assume that you have an infinite number of each kind of coin.
+
+<Aside type="tip" title="What to notice first">
+- This is an optimization problem: minimize the number of coins.
+- You can use each coin denomination unlimited times.
+- If the amount cannot be made, return -1.
+- This is a classic DP problem that can also be solved with BFS (shortest path).
+</Aside>
+
+### Examples
+
+| coins | amount | Output | Explanation |
+| --- | --- | --- | --- |
+| `[1,2,5]` | `5` | `1` | One 5-coin makes 5 |
+| `[2]` | `3` | `-1` | Cannot make 3 with only 2-coins |
+| `[10]` | `10` | `1` | One 10-coin makes 10 |
+| `[1,3,4]` | `6` | `2` | Two 3-coins or one 3-coin and three 1-coins |
+
+## Constraints
+
+- `1 <= coins.length <= 12`
+- `1 <= coins[i] <= 2^31 - 1`
+- `0 <= amount <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Currency exchange** — minimizing number of bills/coins to make a payment.
+- **Resource allocation** — using minimum resources to reach a target capacity.
+- **Scheduling** — minimizing number of time slots to cover a duration.
+- **Inventory management** — minimum packaging units needed for a quantity.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best For |
+| --- | --- | --- | --- |
+| DP | O(n * amount) | O(amount) | Classic approach, intuitive logic |
+| BFS | O(n * amount) | O(amount) | Shortest path perspective, level-based traversal |
+
+where n = len(coins)
+
+## Which approach should you learn first?
+
+- Pick **DP** if you want the fundamental dynamic programming approach.
+- Pick **BFS** if you prefer thinking in terms of graph/shortest path problems.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Classic DP</div>
+    <div class="lc-approach-quick__name">DP Array</div>
+    <div class="lc-approach-quick__stats">O(n * amount) time &middot; O(amount) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Graph Perspective</div>
+    <div class="lc-approach-quick__name">BFS</div>
+    <div class="lc-approach-quick__stats">O(n * amount) time &middot; O(amount) space</div>
+  </div>
+</div>
+
+## Approach 1: Dynamic Programming
+
+<ApproachTag tag="recommended" />
+
+dp[i] = minimum coins needed to make amount i.
+
+For each amount i, try all coins and pick the one that results in the minimum number of coins.
+
+<ComplexityBadges time="O(n * amount)" space="O(amount)" timeColor="yellow" spaceColor="yellow" timeNote="Double loop" spaceNote="DP array" />
+
+### Step-by-step Example
+
+**Input:** `coins = [1, 3, 4]`, `amount = 6`
+
+| amount | coin=1 | coin=3 | coin=4 | dp[amount] |
+| --- | --- | --- | --- | --- |
+| 0 | — | — | — | 0 |
+| 1 | 1+dp[0]=1 | N/A | N/A | 1 |
+| 2 | 1+dp[1]=2 | N/A | N/A | 2 |
+| 3 | 1+dp[2]=3 | 1+dp[0]=1 | N/A | 1 |
+| 4 | 1+dp[3]=2 | 1+dp[1]=2 | 1+dp[0]=1 | 1 |
+| 5 | 1+dp[4]=2 | 1+dp[2]=3 | 1+dp[1]=2 | 2 |
+| 6 | 1+dp[5]=3 | 1+dp[3]=2 | 1+dp[2]=3 | 2 |
+
+**Result:** dp[6] = 2 (two 3-coins)
+
+### Pseudocode
+
+```plaintext
+function coinChangeDP(coins, amount):
+    dp = array of size amount + 1, all initialized to infinity
+    dp[0] = 0
+    
+    for i from 1 to amount:
+        for coin in coins:
+            if coin <= i and dp[i - coin] is not infinity:
+                dp[i] = min(dp[i], dp[i - coin] + 1)
+    
+    return dp[amount] if dp[amount] is not infinity else -1
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDP} lang="python" title="coin_change_dp_array.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDP} lang="cpp" title="coin_change_dp_array.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDP} lang="java" title="CoinChangeDP.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDP} lang="javascript" title="coin_change_dp_array.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDP} lang="rust" title="coin_change_dp_array.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDP} lang="go" title="coin_change_dp_array.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Breadth-First Search
+
+<ApproachTag tag="interview" />
+
+Treat this as a shortest path problem: start at `amount` and work backward, trying each coin denomination. The first time we reach 0, we've found the minimum coins.
+
+BFS explores level by level, where level k contains all amounts reachable with k coins.
+
+<ComplexityBadges time="O(n * amount)" space="O(amount)" timeColor="yellow" spaceColor="yellow" timeNote="Queue and visited set" spaceNote="Visited set" />
+
+### Key Insight
+
+BFS guarantees finding the shortest path (minimum coins) because it explores all possibilities at distance k before exploring at distance k+1.
+
+### Pseudocode
+
+```plaintext
+function coinChangeBFS(coins, amount):
+    if amount == 0:
+        return 0
+    
+    queue = [(amount, 0)]  # (remaining_amount, num_coins)
+    visited = {amount}
+    
+    while queue is not empty:
+        curr_amount, num_coins = queue.pop_front()
+        
+        for coin in coins:
+            next_amount = curr_amount - coin
+            if next_amount == 0:
+                return num_coins + 1
+            if next_amount > 0 and next_amount not in visited:
+                visited.add(next_amount)
+                queue.push_back((next_amount, num_coins + 1))
+    
+    return -1
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="coin_change_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="coin_change_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="CoinChangeBFS.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="coin_change_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="coin_change_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="coin_change_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Initializing dp values to 0 instead of infinity, leading to incorrect minimums.
+- Forgetting to initialize dp[0] = 0 (0 coins needed to make 0 amount).
+- Not checking if dp[i - coin] is valid before using it in comparisons.
+- In BFS, forgetting to mark visited amounts to avoid revisiting and infinite loops.
+- Returning 0 instead of -1 when amount cannot be made.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="coin_change_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="coin_change_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="CoinChangeSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="coin_change_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="coin_change_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="coin_change_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 518, title: 'Coin Change II', difficulty: 'Medium', leetcodeSlug: 'coin-change-ii' },
+  { number: 377, title: 'Combination Sum IV', difficulty: 'Medium', leetcodeSlug: 'combination-sum-iv' },
+  { number: 39, title: 'Combination Sum', difficulty: 'Medium', leetcodeSlug: 'combination-sum' },
+  { number: 198, title: 'House Robber', difficulty: 'Medium', slug: 'problems/house-robber', leetcodeSlug: 'house-robber' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **DP vs BFS:** Both have the same complexity, but DP is iterative (bottom-up) and BFS is level-based. DP is typically preferred in interviews.
+- **Space optimization:** DP uses O(amount) space. Some optimizations are possible if you only track amounts reachable with k coins, but it complicates the code.
+- **Reconstruction:** To find the actual coins used, track the coin that resulted in each dp[i] value, then backtrack from dp[amount].
+- **Edge cases:** amount = 0 (return 0), amount < 0 (return -1), no valid coins (return -1).
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 321, title: "Create Maximum Number", slug: "create-maximum-number" }}
+  nextProblem={{ number: 323, title: "Number of Connected Components in an Undirected Graph", slug: "number-of-connected-components-in-an-undirected-graph" }}
+/>

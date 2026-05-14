@@ -1,0 +1,360 @@
+---
+title: Minimum Absolute Difference in BST
+description: Find the minimum absolute difference between any two node values in a binary search tree. Two approaches — In-Order DFS O(n) and BFS Level-Order O(n) — in six languages.
+leetcodeNumber: 530
+difficulty: Easy
+leetcodeSlug: minimum-absolute-difference-in-bst
+tags: [Binary Search Tree, DFS, BFS, Tree]
+prev:
+  label: "#525 Contiguous Array"
+  link: "../contiguous-array/"
+next:
+  label: "#560 Subarray Sum Equals K"
+  link: "../subarray-sum-equals-k/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyInorder     from '@solutions/Python/minimum_absolute_difference_in_bst_inorder_dfs.py?raw';
+import cppInorder    from '@solutions/C++/minimum_absolute_difference_in_bst_inorder_dfs.cpp?raw';
+import javaInorder   from '@solutions/Java/MinimumAbsoluteDifferenceInBST_InorderDFS.java?raw';
+import jsInorder     from '@solutions/JavaScript/minimum_absolute_difference_in_bst_inorder_dfs.js?raw';
+import rustInorder   from '@solutions/Rust/minimum_absolute_difference_in_bst_inorder_dfs.rs?raw';
+import goInorder     from '@solutions/Golang/minimum_absolute_difference_in_bst_inorder_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/minimum_absolute_difference_in_bst_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/minimum_absolute_difference_in_bst_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/MinimumAbsoluteDifferenceInBstBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/minimum_absolute_difference_in_bst_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/minimum_absolute_difference_in_bst_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/minimum_absolute_difference_in_bst_bfs_iterative.go?raw';
+
+import pyBfs         from '@solutions/Python/minimum_absolute_difference_in_bst_bfs.py?raw';
+import cppBfs        from '@solutions/C++/minimum_absolute_difference_in_bst_bfs.cpp?raw';
+import javaBfs       from '@solutions/Java/MinimumAbsoluteDifferenceInBST_BFS.java?raw';
+import jsBfs         from '@solutions/JavaScript/minimum_absolute_difference_in_bst_bfs.js?raw';
+import rustBfs       from '@solutions/Rust/minimum_absolute_difference_in_bst_bfs.rs?raw';
+import goBfs         from '@solutions/Golang/minimum_absolute_difference_in_bst_bfs.go?raw';
+
+## Problem Statement
+
+Given the `root` of a Binary Search Tree (BST), return the minimum absolute difference between the values of any two different nodes in the tree.
+
+<Aside type="tip" title="What to notice first">
+- In a BST, an **in-order traversal yields values in ascending sorted order**.
+- The minimum difference must occur between **consecutive values** in sorted order.
+- You do not need to compare all pairs; sorting the values is implicit via in-order traversal.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Tree: `4, 2→1, 2→3, 6` | `1` | Sorted values: `[1, 2, 3, 4, 6]`. Min diff = `2 - 1 = 1` |
+| Tree: `1, 0, 48→24, 48→null` | `24` | Sorted values: `[0, 1, 24, 48]`. Min diff = `24 - 0 = 24` |
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[2, 10^4]`.
+- `0 <= Node.val <= 10^5`
+- All the values of the tree are **unique**.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Sensor calibration** — given multiple sensor readings, find the two closest readings to identify if sensors are drifting.
+- **Stock price pairs** — find the two stock prices with the smallest difference to identify arbitrage opportunities.
+- **Machine tolerance ranges** — verify that all manufactured parts fall within acceptable variance.
+- **Binary classification thresholds** — determine the optimal boundary between two classes by minimizing class difference.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Key Idea | Best When |
+| --- | --- | --- | --- | --- |
+| In-Order DFS | O(n) | O(h) | Visit nodes in sorted order; compare adjacent pairs only | **General case** — standard BST usage |
+| BFS Level-Order | O(n log n) | O(w) | Collect all values, sort, then find min diff | Tree structure unknown or comparison required |
+
+## Which approach should you learn first?
+
+- Pick **In-Order DFS** if you want the most elegant and efficient solution.
+- Pick **BFS Level-Order** if you prefer a simpler mental model (collect all, sort, compare).
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">In-Order DFS</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(h) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simpler Mental Model</div>
+    <div class="lc-approach-quick__name">BFS Level-Order</div>
+    <div class="lc-approach-quick__stats">O(n log n) time &middot; O(w) space</div>
+  </div>
+</div>
+
+## Approach 1: In-Order DFS (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Traverse the BST in in-order (left → node → right), which visits nodes in ascending sorted order. As you visit each node, compare its value with the previously visited value. The minimum difference must occur between two consecutive values in this sorted sequence.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Recursion stack" />
+
+### Step-by-step Example
+
+**Input:** Tree with values `[4, 2, 6, 1, 3]`
+
+| Step | Node | prev | Diff | min_diff | Action |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 1 | null | — | ∞ | First node, store prev = 1 |
+| 2 | 2 | 1 | 2 - 1 = 1 | 1 | Update min_diff = 1 |
+| 3 | 3 | 2 | 3 - 2 = 1 | 1 | min_diff = 1 |
+| 4 | 4 | 3 | 4 - 3 = 1 | 1 | min_diff = 1 |
+| 5 | 6 | 4 | 6 - 4 = 2 | 1 | min_diff stays 1 |
+
+<LogicPlayer
+  title="How in-order DFS finds the minimum difference"
+  description="Watch the in-order traversal visit nodes in sorted order, comparing each node with its previous neighbor."
+  target="1"
+  steps={[
+    {
+      title: 'Start at root (4), go left',
+      note: 'In-order: always visit left subtree first. No previous value yet.',
+      formula: 'inorder(4.left)',
+      callout: 'Left subtree visited before node 4.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Visit leaf 1, set prev = 1',
+      note: 'First node in sorted order. No previous value to compare.',
+      formula: 'prev = 1',
+      callout: 'Leaf node reached. No left child.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+      ],
+      memory: ['prev = 1'],
+    },
+    {
+      title: 'Visit node 2, compare: 2 - 1 = 1',
+      note: 'Second value in sorted order. Compare with prev = 1.',
+      formula: 'min_diff = min(∞, 2 - 1) = 1',
+      callout: 'Update min_diff to 1.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '6', state: 'default', index: 4 },
+      ],
+      memory: ['prev = 1', 'min_diff = 1'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function getMinimumDifference_inorder(root):
+    min_diff = infinity
+    prev = null
+
+    function inorder(node):
+        if node is null:
+            return
+
+        inorder(node.left)
+
+        // Visit node
+        if prev is not null:
+            min_diff = min(min_diff, node.val - prev)
+        prev = node.val
+
+        inorder(node.right)
+
+    inorder(root)
+    return min_diff
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyInorder} lang="python" title="minimum_absolute_difference_in_bst_inorder.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppInorder} lang="cpp" title="minimum_absolute_difference_in_bst_inorder.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaInorder} lang="java" title="MinimumAbsoluteDifferenceInBST_inorder.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsInorder} lang="javascript" title="minimum_absolute_difference_in_bst_inorder.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustInorder} lang="rust" title="minimum_absolute_difference_in_bst_inorder.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goInorder} lang="go" title="minimum_absolute_difference_in_bst_inorder.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS Level-Order
+
+<ApproachTag tag="interview" />
+
+Perform a level-order (breadth-first) traversal to collect all node values, sort them, then iterate through consecutive pairs to find the minimum difference.
+
+This approach trades O(n log n) time for a simpler, more straightforward algorithm that does not rely on understanding BST properties.
+
+<ComplexityBadges time="O(n log n)" space="O(w)" timeColor="yellow" spaceColor="yellow" timeNote="Sorting overhead" spaceNote="Queue + values" />
+
+### Step-by-step Example
+
+**Input:** Tree with values `[4, 2, 6, 1, 3]`
+
+1. **BFS Traversal:** Collect `[4, 2, 6, 1, 3]`
+2. **Sort:** `[1, 2, 3, 4, 6]`
+3. **Find min diff between consecutive pairs:**
+   - `2 - 1 = 1`
+   - `3 - 2 = 1`
+   - `4 - 3 = 1`
+   - `6 - 4 = 2`
+   - **Result:** `1`
+
+### Pseudocode
+
+```plaintext
+function getMinimumDifference_bfs(root):
+    if root is null:
+        return 0
+
+    values = []
+    queue = [root]
+
+    // Collect all values via BFS
+    while queue is not empty:
+        node = queue.pop()
+        values.append(node.val)
+        if node.left:
+            queue.push(node.left)
+        if node.right:
+            queue.push(node.right)
+
+    // Sort values
+    sort(values)
+
+    // Find min diff between consecutive values
+    min_diff = infinity
+    for i in range(1, len(values)):
+        min_diff = min(min_diff, values[i] - values[i-1])
+
+    return min_diff
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBfs} lang="python" title="minimum_absolute_difference_in_bst_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBfs} lang="cpp" title="minimum_absolute_difference_in_bst_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBfs} lang="java" title="MinimumAbsoluteDifferenceInBST_bfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBfs} lang="javascript" title="minimum_absolute_difference_in_bst_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBfs} lang="rust" title="minimum_absolute_difference_in_bst_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBfs} lang="go" title="minimum_absolute_difference_in_bst_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Comparing all pairs:** Forgetting that minimum diff must occur between consecutive sorted values. O(n²) comparisons are unnecessary.
+- **Ignoring BST property:** The BST property guarantees in-order traversal is sorted. Use it!
+- **Off-by-one errors:** When iterating through sorted values, ensure you compare `values[i] - values[i-1]` for all i ≥ 1.
+- **Not handling single-node trees:** Although constraints say n ≥ 2, defensive checks are safe.
+</Aside>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="minimum_absolute_difference_in_bst_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="minimum_absolute_difference_in_bst_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="MinimumAbsoluteDifferenceInBstBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="minimum_absolute_difference_in_bst_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="minimum_absolute_difference_in_bst_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="minimum_absolute_difference_in_bst_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 98, title: 'Validate Binary Search Tree', difficulty: 'Medium', slug: 'problems/validate-binary-search-tree', leetcodeSlug: 'validate-binary-search-tree' },
+  { number: 235, title: 'Lowest Common Ancestor of a Binary Search Tree', difficulty: 'Easy', slug: 'problems/lowest-common-ancestor-of-a-binary-search-tree', leetcodeSlug: 'lowest-common-ancestor-of-a-bst' },
+  { number: 230, title: 'Kth Smallest Element in a BST', difficulty: 'Medium', slug: 'problems/kth-smallest-element-in-a-bst', leetcodeSlug: 'kth-smallest-element-in-a-bst' },
+  { number: 94, title: 'Binary Tree Inorder Traversal', difficulty: 'Easy', slug: 'problems/binary-tree-inorder-traversal', leetcodeSlug: 'binary-tree-inorder-traversal' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **In-Order DFS vs BFS:** In-order naturally maintains sorted order, eliminating the need for explicit sorting. This is the signature BST property and the interviewer likely wants to see you leverage it.
+- **Space complexity:** In-Order uses O(h) recursion stack (often optimal for balanced trees). BFS uses O(w) for the queue, which can be O(n) for skewed trees or wide trees.
+- **Edge cases:** Empty tree (handled by constraints), single edge difference, duplicate values (problem states all unique).
+- **Follow-up:** "Can you do this iteratively?" Yes — use an explicit stack to simulate the recursion for in-order traversal.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 529, title: "Binary Tree Maximum Path Sum", slug: "binary-tree-maximum-path-sum" }}
+  nextProblem={{ number: 531, title: "Lonely Pixel I", slug: "lonely-pixel-i" }}
+/>

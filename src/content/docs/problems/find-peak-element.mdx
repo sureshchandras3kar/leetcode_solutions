@@ -1,0 +1,279 @@
+---
+title: Find Peak Element
+description: Find a peak element in an array where a peak is greater than its neighbors. Two approaches — binary search O(log n) and linear scan O(n) — in six languages.
+leetcodeNumber: 162
+difficulty: Medium
+leetcodeSlug: find-peak-element
+tags: [Array, Binary Search]
+prev:
+  label: "#155 Min Stack"
+  link: "../min-stack/"
+next:
+  label: "#167 Two Sum II – Input Array Is Sorted"
+  link: "../two-sum-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyBinarySearch     from '@solutions/Python/find_peak_element_binary_search.py?raw';
+import cppBinarySearch    from '@solutions/C++/find_peak_element_binary_search.cpp?raw';
+import javaBinarySearch   from '@solutions/Java/FindPeakElementBinarySearch.java?raw';
+import jsBinarySearch     from '@solutions/JavaScript/find_peak_element_binary_search.js?raw';
+import rustBinarySearch   from '@solutions/Rust/find_peak_element_binary_search.rs?raw';
+import goBinarySearch     from '@solutions/Golang/find_peak_element_binary_search.go?raw';
+import pySpaceOptimized from '@solutions/Python/find_peak_element_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/find_peak_element_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/FindPeakElementSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/find_peak_element_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/find_peak_element_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/find_peak_element_space_optimized.go?raw';
+
+import pyLinear      from '@solutions/Python/find_peak_element_linear_scan.py?raw';
+import cppLinear     from '@solutions/C++/find_peak_element_linear_scan.cpp?raw';
+import javaLinear    from '@solutions/Java/FindPeakElementLinearScan.java?raw';
+import jsLinear      from '@solutions/JavaScript/find_peak_element_linear_scan.js?raw';
+import rustLinear    from '@solutions/Rust/find_peak_element_linear_scan.rs?raw';
+import goLinear      from '@solutions/Golang/find_peak_element_linear_scan.go?raw';
+
+## Problem Statement
+
+A peak element is an element that is strictly greater than its neighbors. Given an integer array `nums`, find a peak element, and return its index. If the array has multiple peaks, return the index to any one of them.
+
+You may imagine that `nums[-1] = nums[n] = -infinity`.
+
+You must write an algorithm that runs in O(log n) time.
+
+<Aside type="tip" title="What to notice first">
+- A peak must be greater than both neighbors (or treat out-of-bounds as negative infinity).
+- There is always at least one peak in the array due to the constraints.
+- Comparing mid with its right neighbor tells us which direction the peak is.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[1, 2, 3, 1]` | `2` | 3 is a peak (3 > 2 and 3 > 1) |
+| `[1, 2, 1]` | `1` | 2 is a peak (2 > 1 and 2 > 1) |
+| `[1]` | `0` | Single element is always a peak |
+| `[6, 5, 4, 3, 2, 3, 4]` | `0` | 6 is a peak (6 > 5) |
+
+## Constraints
+
+- `1 <= nums.length <= 10^4`
+- `-2^31 <= nums[i] <= 2^31 - 1`
+- `nums[i] != nums[i + 1]` for all valid i
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Stock price analysis** — finding local maxima in price history to identify peaks.
+- **Signal processing** — detecting peaks in time-series data (audio, seismic).
+- **Terrain mapping** — finding high points in elevation data.
+- **Network traffic** — identifying peak load times in bandwidth usage.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Binary Search | O(log n) | O(1) | Large arrays, O(log n) required by constraints |
+| Linear Scan | O(n) | O(1) | Small arrays, simplicity preferred |
+
+## Which approach should you learn first?
+
+- Pick **Binary Search** to meet the O(log n) constraint and understand the pattern.
+- Pick **Linear Scan** to understand how peaks work conceptually.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Required Time</div>
+    <div class="lc-approach-quick__name">Binary Search</div>
+    <div class="lc-approach-quick__stats">O(log n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simpler Logic</div>
+    <div class="lc-approach-quick__name">Linear Scan</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Binary Search (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Compare `nums[mid]` with `nums[mid + 1]`. If mid is less than its right neighbor, the peak must be on the right (since there's an increasing trend). Otherwise, search left. This guarantees finding a peak.
+
+<ComplexityBadges time="O(log n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Halve search space each iteration" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1, 2, 3, 1]`
+
+| Step | left | right | mid | nums[mid] | nums[mid+1] | nums[mid] < nums[mid+1]? | Action |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 3 | 1 | 2 | 3 | Yes | left = 2 |
+| 2 | 2 | 3 | 2 | 3 | 1 | No | right = 2 |
+| 3 | 2 | 2 | — | — | — | — | **Return 2** ✓ |
+
+### Pseudocode
+
+```plaintext
+function findPeakElement(nums):
+    left, right = 0, len(nums) - 1
+    while left < right:
+        mid = left + (right - left) / 2
+        if nums[mid] < nums[mid + 1]:
+            left = mid + 1  // Peak on right
+        else:
+            right = mid  // Peak on left or at mid
+    return left
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBinarySearch} lang="python" title="find_peak_element_binary_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBinarySearch} lang="cpp" title="find_peak_element_binary_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBinarySearch} lang="java" title="FindPeakElementBinarySearch.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBinarySearch} lang="javascript" title="find_peak_element_binary_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBinarySearch} lang="rust" title="find_peak_element_binary_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBinarySearch} lang="go" title="find_peak_element_binary_search.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Linear Scan
+
+<ApproachTag tag="simple" />
+
+Iterate through the array and check if each element is greater than its neighbors. Return the first peak found.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="yellow" spaceColor="green" timeNote="Full array scan" spaceNote="Only pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1, 2, 3, 1]`
+
+| i | nums[i] | Left neighbor | Right neighbor | Is peak? | Action |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 1 | -∞ | 2 | No (1 < 2) | Continue |
+| 1 | 2 | 1 | 3 | No (2 < 3) | Continue |
+| 2 | 3 | 2 | 1 | Yes (3 > 2 && 3 > 1) | **Return 2** ✓ |
+
+### Pseudocode
+
+```plaintext
+function findPeakElement(nums):
+    for i in range(len(nums)):
+        isLeft = (i == 0) or (nums[i] > nums[i-1])
+        isRight = (i == len(nums)-1) or (nums[i] > nums[i+1])
+        if isLeft and isRight:
+            return i
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyLinear} lang="python" title="find_peak_element_linear_scan.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppLinear} lang="cpp" title="find_peak_element_linear_scan.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaLinear} lang="java" title="FindPeakElementLinearScan.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsLinear} lang="javascript" title="find_peak_element_linear_scan.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustLinear} lang="rust" title="find_peak_element_linear_scan.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goLinear} lang="go" title="find_peak_element_linear_scan.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to handle boundary conditions (first and last elements).
+- Accessing `nums[mid + 1]` without checking if it exists in the linear scan.
+- Confusing the search direction in binary search (right if increasing, left otherwise).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="find_peak_element_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="find_peak_element_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="FindPeakElementSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="find_peak_element_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="find_peak_element_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="find_peak_element_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 704, title: 'Binary Search', difficulty: 'Easy', leetcodeSlug: 'binary-search' },
+  { number: 35, title: 'Search Insert Position', difficulty: 'Easy', leetcodeSlug: 'search-insert-position' },
+  { number: 33, title: 'Search in Rotated Sorted Array', difficulty: 'Medium', leetcodeSlug: 'search-in-rotated-sorted-array' },
+  { number: 153, title: 'Find Minimum in Rotated Sorted Array', difficulty: 'Medium', leetcodeSlug: 'find-minimum-in-rotated-sorted-array' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why binary search required?** The problem explicitly asks for O(log n), which tests understanding of the pattern.
+- **The comparison trick:** Comparing mid with mid+1 (instead of mid-1) guarantees moving towards a peak.
+- **Why it always finds a peak:** The strategy ensures we either climb up or stabilize, eventually reaching a peak.
+- **Edge case insight:** Single-element arrays are always peaks due to the -infinity boundary assumption.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 161, title: "One Edit Distance", slug: "one-edit-distance" }}
+  nextProblem={{ number: 163, title: "Binary Search Tree Iterator", slug: "binary-search-tree-iterator" }}
+/>

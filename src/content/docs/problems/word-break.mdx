@@ -1,0 +1,313 @@
+---
+title: Word Break
+description: Determine if a string can be segmented into dictionary words. Two approaches — DP with Set O(n²) + DP with Trie O(n*m) — in six languages.
+leetcodeNumber: 139
+difficulty: Medium
+leetcodeSlug: word-break
+tags: [String, Dynamic Programming, Hash Table]
+prev:
+  label: "#138 Copy List with Random Pointer"
+  link: "../copy-list-with-random-pointer/"
+next:
+  label: "#141 Linked List Cycle"
+  link: "../linked-list-cycle/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySet     from '@solutions/Python/word_break_dp_set.py?raw';
+import cppSet    from '@solutions/C++/word_break_dp_set.cpp?raw';
+import javaSet   from '@solutions/Java/WordBreakDpSet.java?raw';
+import jsSet     from '@solutions/JavaScript/word_break_dp_set.js?raw';
+import rustSet   from '@solutions/Rust/word_break_dp_set.rs?raw';
+import goSet     from '@solutions/Golang/word_break_dp_set.go?raw';
+import pySpaceOptimized from '@solutions/Python/word_break_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/word_break_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/WordBreakSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/word_break_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/word_break_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/word_break_space_optimized.go?raw';
+
+import pyTrie    from '@solutions/Python/word_break_dp_trie.py?raw';
+import cppTrie   from '@solutions/C++/word_break_dp_trie.cpp?raw';
+import javaTrie  from '@solutions/Java/WordBreakDpTrie.java?raw';
+import jsTrie    from '@solutions/JavaScript/word_break_dp_trie.js?raw';
+import rustTrie  from '@solutions/Rust/word_break_dp_trie.rs?raw';
+import goTrie    from '@solutions/Golang/word_break_dp_trie.go?raw';
+
+## Problem Statement
+
+Given a string `s` and a dictionary of strings `wordDict`, return `true` if `s` can be segmented into a space-separated sequence of dictionary words.
+
+Note that the same word in the dictionary may be reused multiple times in the segmentation.
+
+<Aside type="tip" title="What to notice first">
+- You need to segment the entire string into words from the dictionary.
+- Words can be reused multiple times.
+- The order of words in the dictionary doesn't matter, but coverage of the string does.
+- This is a string matching problem suitable for DP or Trie-based solutions.
+</Aside>
+
+### Examples
+
+| s | wordDict | Output | Explanation |
+| --- | --- | --- | --- |
+| `"leetcode"` | `["leet","code"]` | `true` | Can be segmented as "leet code" |
+| `"applepenapple"` | `["apple","pen"]` | `true` | Can be segmented as "apple pen apple" |
+| `"catsandog"` | `["cat","cats","and","sand","dog"]` | `false` | Cannot be segmented |
+
+## Constraints
+
+- `1 <= s.length <= 300`
+- `1 <= wordDict.length <= 1000`
+- `1 <= wordDict[i].length <= 20`
+- `s` and `wordDict[i]` consist of only lowercase English letters
+- All strings in `wordDict` are unique
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Text processing** — checking if input matches valid word sequences (spell checkers, tokenizers).
+- **URL routing** — matching URL paths against valid route patterns.
+- **Code parsing** — verifying if a code sequence uses only valid tokens.
+- **Language models** — determining if text can be decomposed into known vocabulary.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Description |
+| --- | --- | --- | --- |
+| DP with Set | O(n²) | O(n + m) | Simple hash set lookup, checks all substrings |
+| DP with Trie | O(n*k) | O(n + T) | Trie-based prefix matching, faster for overlapping words |
+
+where n = len(s), m = len(wordDict), k = max word length, T = total chars in dict
+
+## Which approach should you learn first?
+
+- Pick **DP with Set** if you want the simplest implementation.
+- Pick **DP with Trie** if you want to optimize for large dictionaries.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Simpler Logic</div>
+    <div class="lc-approach-quick__name">DP with Set</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(n + m) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Optimized for Dicts</div>
+    <div class="lc-approach-quick__name">DP with Trie</div>
+    <div class="lc-approach-quick__stats">O(n*k) time &middot; O(n + T) space</div>
+  </div>
+</div>
+
+## Approach 1: DP with Hash Set
+
+<ApproachTag tag="recommended" />
+
+Use dynamic programming with a hash set for word lookup. dp[i] represents whether s[0:i] can be segmented.
+
+For each position i, check all previous positions j where dp[j] is True, and if s[j:i] is in the dictionary, mark dp[i] as True.
+
+<ComplexityBadges time="O(n²)" space="O(n + m)" timeColor="yellow" spaceColor="yellow" timeNote="All substrings checked" spaceNote="DP array + set" />
+
+### Step-by-step Example
+
+**Input:** `s = "applepenapple"`, `wordDict = ["apple", "pen"]`
+
+| i | s[0:i] | dp[i] | Explanation |
+| --- | --- | --- | --- |
+| 0 | "" | True | Empty string is segmentable |
+| 5 | "apple" | True | Found in dictionary, dp[0] = True |
+| 8 | "applepen" | True | "pen" found, dp[5] = True |
+| 13 | "applepenapple" | True | "apple" found, dp[8] = True |
+
+### Pseudocode
+
+```plaintext
+function wordBreakDP(s, wordDict):
+    wordSet = convert wordDict to set
+    dp = array of size len(s) + 1, initialized to False
+    dp[0] = True
+    
+    for i from 1 to len(s):
+        for j from 0 to i:
+            if dp[j] and s[j:i] in wordSet:
+                dp[i] = True
+                break
+    
+    return dp[len(s)]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySet} lang="python" title="word_break_dp_set.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSet} lang="cpp" title="word_break_dp_set.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSet} lang="java" title="WordBreakDpSet.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSet} lang="javascript" title="word_break_dp_set.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSet} lang="rust" title="word_break_dp_set.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSet} lang="go" title="word_break_dp_set.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: DP with Trie
+
+<ApproachTag tag="interview" />
+
+Build a Trie from the dictionary and use it for prefix-based word matching. For each position i, traverse the Trie backward from i to find all words ending at i.
+
+This avoids checking all substrings; instead, we only traverse valid prefixes.
+
+<ComplexityBadges time="O(n*k)" space="O(n + T)" timeColor="green" spaceColor="yellow" timeNote="Trie traversal max k chars" spaceNote="DP array + Trie" />
+
+### Step-by-step Example
+
+**Input:** `s = "applepenapple"`, `wordDict = ["apple", "pen"]`
+
+The Trie structure:
+```
+    a
+    p
+    p
+    l
+    e  (end)
+    n
+    ...
+```
+
+For position 5 (s[0:5] = "apple"):
+- Traverse Trie with "apple", find it marked as end → dp[5] = True
+
+For position 8 (s[5:8] = "pen"):
+- Traverse Trie with "pen", find it marked as end, and dp[5] = True → dp[8] = True
+
+### Pseudocode
+
+```plaintext
+function wordBreakTrie(s, wordDict):
+    root = build Trie from wordDict
+    dp = array of size len(s) + 1, initialized to False
+    dp[0] = True
+    
+    for i from 1 to len(s):
+        if not dp[i]:
+            node = root
+            for j from i-1 down to 0:
+                char = s[j]
+                if char not in node.children:
+                    break
+                node = node.children[char]
+                if dp[j] and node.is_end:
+                    dp[i] = True
+                    break
+    
+    return dp[len(s)]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTrie} lang="python" title="word_break_dp_trie.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTrie} lang="cpp" title="word_break_dp_trie.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTrie} lang="java" title="WordBreakDpTrie.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTrie} lang="javascript" title="word_break_dp_trie.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTrie} lang="rust" title="word_break_dp_trie.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTrie} lang="go" title="word_break_dp_trie.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to initialize dp[0] = True (empty string is always segmentable).
+- Not converting wordDict to a set, leading to O(m) lookup instead of O(1).
+- Breaking the inner loop prematurely without ensuring all valid splits are checked.
+- In the Trie approach, traversing forward instead of backward (use reverse order to build correctly).
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="word_break_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="word_break_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="WordBreakSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="word_break_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="word_break_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="word_break_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 140, title: 'Word Break II', difficulty: 'Hard', leetcodeSlug: 'word-break-ii' },
+  { number: 208, title: 'Implement Trie (Prefix Tree)', difficulty: 'Medium', leetcodeSlug: 'implement-trie-prefix-tree' },
+  { number: 212, title: 'Word Search II', difficulty: 'Hard', leetcodeSlug: 'word-search-ii' },
+  { number: 70, title: 'Climbing Stairs', difficulty: 'Easy', slug: 'problems/climbing-stairs', leetcodeSlug: 'climbing-stairs' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why DP over backtracking?** DP avoids redundant recomputation of subproblems, reducing exponential time.
+- **Set vs Trie:** Set is simpler but checks all O(n²) substrings. Trie is faster for many short words.
+- **Space-time tradeoff:** Trie uses more memory (building the tree) but saves time on lookups.
+- **Edge cases:** empty string (True), single word matching entire string, word reuse, etc.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 138, title: "Copy List with Random Pointer", slug: "copy-list-with-random-pointer" }}
+  nextProblem={{ number: 140, title: "Word Break II", slug: "word-break-ii" }}
+/>

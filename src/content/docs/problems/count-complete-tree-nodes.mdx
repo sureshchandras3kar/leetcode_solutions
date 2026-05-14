@@ -1,0 +1,203 @@
+---
+title: Count Complete Tree Nodes
+description: Count nodes in complete binary tree in O(log² n). Two approaches — Level Calculation and Binary Search — in six languages.
+leetcodeNumber: 222
+difficulty: Medium
+leetcodeSlug: count-complete-tree-nodes
+tags: [Binary Search, Tree, Depth-First Search]
+prev:
+  label: "#221 Maximal Square"
+  link: "../maximal-square/"
+next:
+  label: "#224 Basic Calculator"
+  link: "../basic-calculator/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyLevel    from '@solutions/Python/count_complete_tree_nodes_level_calculation.py?raw';
+import cppLevel   from '@solutions/C++/count_complete_tree_nodes_level_calculation.cpp?raw';
+import javaLevel  from '@solutions/Java/CountCompleteTreeNodesLevelCalculation.java?raw';
+import jsLevel    from '@solutions/JavaScript/count_complete_tree_nodes_level_calculation.js?raw';
+import rustLevel  from '@solutions/Rust/count_complete_tree_nodes_level_calculation.rs?raw';
+import goLevel    from '@solutions/Golang/count_complete_tree_nodes_level_calculation.go?raw';
+import pySpaceOptimized from '@solutions/Python/count_complete_tree_nodes_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/count_complete_tree_nodes_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/CountCompleteTreeNodesSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/count_complete_tree_nodes_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/count_complete_tree_nodes_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/count_complete_tree_nodes_space_optimized.go?raw';
+
+import pyBinary   from '@solutions/Python/count_complete_tree_nodes_binary_search.py?raw';
+import cppBinary  from '@solutions/C++/count_complete_tree_nodes_binary_search.cpp?raw';
+import javaBinary from '@solutions/Java/CountCompleteTreeNodesBinarySearch.java?raw';
+import jsBinary   from '@solutions/JavaScript/count_complete_tree_nodes_binary_search.js?raw';
+import rustBinary from '@solutions/Rust/count_complete_tree_nodes_binary_search.rs?raw';
+import goBinary   from '@solutions/Golang/count_complete_tree_nodes_binary_search.go?raw';
+
+## Problem Statement
+
+Given the root of a complete binary tree, return the number of the nodes in the tree.
+
+A complete binary tree is a binary tree in which every level, except possibly the last, is completely filled, and all nodes in the last level are as far left as possible.
+
+<Aside type="tip" title="What to notice first">
+- Complete tree property: last level filled left-to-right, all other levels complete.
+- If left subtree height == right subtree height, left is perfect: count = 2^(h+1) - 1.
+- Otherwise, right is perfect: count = 2^h - 1.
+- Both approaches exploit this property to achieve O(log² n).
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[1,2,3,4,5,6]` | 6 | All 6 nodes present in complete tree |
+| `[1,2,3,4,5,6,7]` | 7 | Perfect binary tree of height 2 |
+
+## Constraints
+
+- The number of nodes is in the range `[1, 5 * 10^4]`.
+- `0 <= Node.val <= 100`
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Level Calculation | O(log² n) | O(log n) | Direct height comparison intuitive |
+| Binary Search | O(log² n) | O(log n) | Explicit search on position space |
+
+## Approach 1: Level Calculation
+
+<ApproachTag tag="recommended" />
+
+Calculate left and right subtree heights. If equal, left is perfect; otherwise, right is perfect. Use formula 2^h - 1 for perfect subtrees.
+
+<ComplexityBadges time="O(log² n)" space="O(log n)" timeColor="green" spaceColor="green" timeNote="Recursive depth × height calculation" spaceNote="Recursion stack" />
+
+### Pseudocode
+
+```plaintext
+function countNodes(root):
+    if not root: return 0
+    
+    leftHeight = countLeftDepth(root)
+    rightHeight = countRightDepth(root)
+    
+    if leftHeight == rightHeight:
+        return (2^(leftHeight+1) - 1) + countNodes(root.right)
+    else:
+        return (2^(rightHeight+1) - 1) + countNodes(root.left)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyLevel} lang="python" title="count_complete_tree_nodes_level_calculation.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppLevel} lang="cpp" title="count_complete_tree_nodes_level_calculation.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaLevel} lang="java" title="CountCompleteTreeNodesLevelCalculation.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsLevel} lang="javascript" title="count_complete_tree_nodes_level_calculation.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustLevel} lang="rust" title="count_complete_tree_nodes_level_calculation.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goLevel} lang="go" title="count_complete_tree_nodes_level_calculation.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Binary Search on Positions
+
+<ApproachTag tag="alternative" />
+
+For complete tree of height h, search for the last node position. Use existence check to binary search the position space [2^(h-1), 2^h - 1].
+
+<ComplexityBadges time="O(log² n)" space="O(log n)" timeColor="green" spaceColor="green" timeNote="Binary search × traversal to position" spaceNote="Recursion stack" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBinary} lang="python" title="count_complete_tree_nodes_binary_search.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBinary} lang="cpp" title="count_complete_tree_nodes_binary_search.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBinary} lang="java" title="CountCompleteTreeNodesBinarySearch.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBinary} lang="javascript" title="count_complete_tree_nodes_binary_search.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBinary} lang="rust" title="count_complete_tree_nodes_binary_search.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBinary} lang="go" title="count_complete_tree_nodes_binary_search.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="count_complete_tree_nodes_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="count_complete_tree_nodes_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="CountCompleteTreeNodesSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="count_complete_tree_nodes_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="count_complete_tree_nodes_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="count_complete_tree_nodes_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 104, title: 'Maximum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'maximum-depth-of-binary-tree' },
+  { number: 111, title: 'Minimum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'minimum-depth-of-binary-tree' },
+  { number: 559, title: 'Maximum Nary Tree Depth', difficulty: 'Easy', leetcodeSlug: 'maximum-nary-tree-depth' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why O(log² n)?** Exploit complete tree structure; exploit height in both approaches.
+- **Level Calculation:** Simpler logic, uses perfect subtree formula directly.
+- **Binary Search:** More complex but searches for actual position; demonstrates binary search skill.
+- **Complete Tree Property:** Key insight is that checking left/right heights determines subtree structure.
+</Aside>

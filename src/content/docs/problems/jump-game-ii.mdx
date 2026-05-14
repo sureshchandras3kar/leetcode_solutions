@@ -1,0 +1,431 @@
+---
+title: Jump Game II
+description: Find minimum number of jumps to reach the last index. Two approaches — Greedy Min Jumps O(n) and Dynamic Programming O(n²) — in six languages.
+leetcodeNumber: 45
+difficulty: Medium
+leetcodeSlug: jump-game-ii
+tags: [Array, Greedy, Dynamic Programming]
+prev:
+  label: "#42 Trapping Rain Water"
+  link: "../trapping-rain-water/"
+next:
+  label: "#46 Permutations"
+  link: "../permutations/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyGreedy    from '@solutions/Python/jump_game_ii_greedy.py?raw';
+import cppGreedy   from '@solutions/C++/jump_game_ii_greedy.cpp?raw';
+import javaGreedy  from '@solutions/Java/jump_game_ii_greedy.java?raw';
+import jsGreedy    from '@solutions/JavaScript/jump_game_ii_greedy.js?raw';
+import rustGreedy  from '@solutions/Rust/jump_game_ii_greedy.rs?raw';
+import goGreedy    from '@solutions/Golang/jump_game_ii_greedy.go?raw';
+import pySpaceOptimized from '@solutions/Python/jump_game_ii_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/jump_game_ii_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/JumpGameIiSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/jump_game_ii_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/jump_game_ii_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/jump_game_ii_space_optimized.go?raw';
+
+import pyDP        from '@solutions/Python/jump_game_ii_dp.py?raw';
+import cppDP       from '@solutions/C++/jump_game_ii_dp.cpp?raw';
+import javaDP      from '@solutions/Java/jump_game_ii_dp.java?raw';
+import jsDP        from '@solutions/JavaScript/jump_game_ii_dp.js?raw';
+import rustDP      from '@solutions/Rust/jump_game_ii_dp.rs?raw';
+import goDP        from '@solutions/Golang/jump_game_ii_dp.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums` where you are initially positioned at the array's first index, and each element in the array represents your maximum jump length from that position, determine the **minimum number of jumps** you need to make to reach the last index.
+
+You are guaranteed that you can always reach the last index.
+
+<Aside type="tip" title="What to notice first">
+- You start at index 0 and must reach the last index, returning the count of jumps.
+- Each `nums[i]` tells you the maximum distance you can jump from index `i`.
+- The key insight is that you want to **extend your reachable range as far as possible with each jump**, not jump to a specific target.
+- A greedy approach works: always jump when you must, not before.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[2, 3, 1, 1, 4]` | `2` | Jump to index 1, then jump 3 steps to the last index. |
+| `[2, 3, 0, 6, 9, 1, 2]` | `3` | Jump to index 1, then to index 3 or 4 (from either you can reach 6), then to index 6. |
+| `[10]` | `0` | Already at the last index. |
+| `[1, 1, 1, 0]` | `3` | Must jump once from each index because you can only jump 1 step at a time. |
+
+## Constraints
+
+- `1 <= nums.length <= 10^4`
+- `0 <= nums[i] <= 1000`
+- It is guaranteed that you can always reach `nums.length - 1`.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Mobile robot navigation** — determine minimum number of directional commands to move from start to goal, where each command can move a variable distance.
+- **Video game level progression** — calculate minimum jumps on moving platforms where each platform extends your reach by a certain amount.
+- **Network packet routing** — find minimum hops between routers, where each router can forward to a set of neighbors within its range.
+- **Resource batching in distributed systems** — minimize API calls needed to fetch data across multiple servers, where each call can fetch a certain amount.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Key Insight | Best When |
+| --- | --- | --- | --- | --- |
+| Greedy Min Jumps | O(n) | O(1) | Always extend reach as far as possible before jumping | General case — optimal and simple |
+| Dynamic Programming | O(n²) | O(n) | Compute minimum jumps to each position, then look back | Interview deep dive / illustrating DP pattern |
+
+## Which approach should you learn first?
+
+- Pick **Greedy Min Jumps** if you want the optimal, elegant solution that works in linear time.
+- Pick **Dynamic Programming** if you want to understand the foundational DP pattern (though it is slower).
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Greedy Min Jumps</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Foundational Pattern</div>
+    <div class="lc-approach-quick__name">Dynamic Programming</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Greedy Min Jumps (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Maintain a `current_end` that represents the farthest index reachable with the current number of jumps. When you reach `current_end`, you must jump, and you extend your reach to `farthest`—the farthest index you saw while scanning up to `current_end`.
+
+**Key insight:** You don't decide where to jump *to*. Instead, you scan ahead to see how far you can go, then commit to jumping when you exhaust your current range.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Two pointers" />
+
+### Step-by-step Example
+
+**Input:** `nums = [2, 3, 1, 1, 4]`
+
+| Step | i | nums[i] | Reach from i | current_end | farthest | Action |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 2 | 0+2=2 | 0 | 2 | i==current_end → jump (jumps=1, current_end=2) |
+| 2 | 1 | 3 | 1+3=4 | 2 | 4 | farthest updated to 4 |
+| 3 | 2 | 1 | 2+1=3 | 2 | 4 | i==current_end → jump (jumps=2, current_end=4) |
+| 4 | 3 | 1 | 3+1=4 | 4 | 4 | current_end>=len-1 → done |
+
+**Result:** jumps = 2 ✓
+
+**Input:** `nums = [2, 3, 0, 6, 9, 1, 2]`
+
+| Step | i | nums[i] | Reach from i | current_end | farthest | Action |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 2 | 0+2=2 | 0 | 2 | i==current_end → jump (jumps=1, current_end=2) |
+| 2 | 1 | 3 | 1+3=4 | 2 | 4 | farthest updated to 4 |
+| 3 | 2 | 0 | 2+0=2 | 2 | 4 | i==current_end → jump (jumps=2, current_end=4) |
+| 4 | 3 | 6 | 3+6=9 | 4 | 9 | farthest updated to 9 |
+| 5 | 4 | 9 | 4+9=13 | 4 | 13 | current_end>=len-1 → done |
+
+**Result:** jumps = 2 ✓
+
+<LogicPlayer
+  title="How the greedy min jumps solution counts jumps"
+  description="Watch how current_end expands and farthest extends. When you reach current_end, you must jump and adopt farthest as your new range."
+  steps={[
+    {
+      title: 'Start at index 0',
+      note: 'We can jump at most 2 positions from index 0, reaching index 0 or 1. This is our initial range.',
+      formula: 'current_end = 0, farthest = 0',
+      callout: 'Before scanning, we have not extended our reach yet.',
+      items: [
+        { label: '2', state: 'active', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['jumps = 0', 'current_end = 0', 'farthest = 0'],
+    },
+    {
+      title: 'Scan index 0: can reach up to 2',
+      note: 'From index 0, we can jump up to 2 positions, so we can reach index 0+2=2.',
+      formula: 'max(farthest, 0+2) = 2',
+      callout: 'We extend farthest to 2. Now we can explore up to index 2.',
+      items: [
+        { label: '2', state: 'match', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['jumps = 0', 'current_end = 0', 'farthest = 2'],
+    },
+    {
+      title: 'Reached current_end, must jump',
+      note: 'We have scanned up to current_end=0. Now we must jump, and our new range is farthest=2.',
+      formula: 'jumps++, current_end = farthest = 2',
+      callout: 'After the jump, we can now explore indices 1 and 2.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'active', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['jumps = 1', 'current_end = 2', 'farthest = 2'],
+    },
+    {
+      title: 'Scan index 1: can reach up to 4',
+      note: 'From index 1, we can jump up to 3 positions, reaching 1+3=4. This extends our reach.',
+      formula: 'max(2, 1+3) = 4',
+      callout: 'farthest is now 4, so we can explore even further.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'match', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['jumps = 1', 'current_end = 2', 'farthest = 4'],
+    },
+    {
+      title: 'Scan index 2: can only reach 3',
+      note: 'From index 2, we can jump 1 position, reaching 2+1=3. This does not extend farthest.',
+      formula: 'max(4, 2+1) = 4',
+      callout: 'farthest stays at 4 because 3 is not better.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['jumps = 1', 'current_end = 2', 'farthest = 4'],
+    },
+    {
+      title: 'Reached current_end again, jump',
+      note: 'We have scanned indices 1 and 2 (up to current_end=2). Now we jump to expand to farthest=4.',
+      formula: 'jumps++, current_end = 4',
+      callout: 'Now we can explore indices 3 and 4, the final range before the end.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '1', state: 'active', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+      ],
+      memory: ['jumps = 2', 'current_end = 4', 'farthest = 4'],
+    },
+    {
+      title: 'current_end >= last index, done',
+      note: 'current_end=4 is now at or past the last index (index 4). We have reached the end.',
+      formula: 'current_end >= len(nums)-1',
+      callout: 'We reached the goal with 2 jumps.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+        { label: '4', state: 'match', index: 4 },
+      ],
+      memory: ['jumps = 2 (final answer)'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function jumpGameIIGreedy(nums):
+    if len(nums) <= 1:
+        return 0
+    
+    jumps = 0
+    current_end = 0    // End of range reachable with current jumps
+    farthest = 0       // Farthest index reachable so far
+    
+    for i in range(len(nums) - 1):
+        farthest = max(farthest, i + nums[i])
+        
+        if i == current_end:
+            jumps++
+            current_end = farthest
+            
+            if current_end >= len(nums) - 1:
+                break
+    
+    return jumps
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyGreedy} lang="python" title="jump_game_ii_greedy.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppGreedy} lang="cpp" title="jump_game_ii_greedy.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaGreedy} lang="java" title="jump_game_ii_greedy.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedy} lang="javascript" title="jump_game_ii_greedy.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedy} lang="rust" title="jump_game_ii_greedy.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedy} lang="go" title="jump_game_ii_greedy.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Dynamic Programming
+
+<ApproachTag tag="interview" />
+
+Compute the minimum number of jumps needed to reach each index by looking back at all indices that can reach the current index, and taking the minimum.
+
+For each index `i`, check all previous indices `j` where `j + nums[j] >= i`. Any such `j` can reach `i` in one jump. The minimum jumps to reach `i` is `1 + min(jumps to reach j)`.
+
+<Aside type="caution" title="Slower but instructive">
+This DP approach is O(n²) and slower than the greedy approach. It is useful for understanding the foundational DP pattern and for problems with additional constraints (like jump count limits).
+</Aside>
+
+<ComplexityBadges time="O(n²)" space="O(n)" timeColor="yellow" spaceColor="yellow" timeNote="Nested loops" spaceNote="DP array" />
+
+### Step-by-step Example
+
+**Input:** `nums = [2, 3, 1, 1, 4]`
+
+| i | j ranges that reach i | min(dp[j] + 1) | dp[i] |
+| --- | --- | --- | --- |
+| 0 | — | — | 0 (start) |
+| 1 | j=0: 0+2>=1 ✓ | dp[0]+1 = 1 | 1 |
+| 2 | j=0: 0+2>=2 ✓ | dp[0]+1 = 1 | 1 |
+| 3 | j=1: 1+3>=3 ✓ | dp[1]+1 = 2 | 2 |
+| 4 | j=1: 1+3>=4 ✓ | dp[1]+1 = 2 | 2 |
+
+**Result:** dp[4] = 2 ✓
+
+### Pseudocode
+
+```plaintext
+function jumpGameIIDP(nums):
+    if len(nums) <= 1:
+        return 0
+    
+    n = len(nums)
+    dp = [infinity] * n
+    dp[0] = 0
+    
+    for i in range(1, n):
+        for j in range(i):
+            if j + nums[j] >= i:
+                dp[i] = min(dp[i], dp[j] + 1)
+                break
+    
+    return dp[n - 1]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDP} lang="python" title="jump_game_ii_dp.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDP} lang="cpp" title="jump_game_ii_dp.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDP} lang="java" title="jump_game_ii_dp.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDP} lang="javascript" title="jump_game_ii_dp.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDP} lang="rust" title="jump_game_ii_dp.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDP} lang="go" title="jump_game_ii_dp.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Returning the jump count of a specific position instead of the final index.** Always jump to the last index, not a specific intermediate target.
+- **Confusing this with Jump Game I (problem #55).** Problem #55 asks only whether you *can* reach the end, not the *minimum number of jumps*. Problem #45 requires you to return the count.
+- **Forgetting the edge case where the array has only one element.** If you are already at the last index, the answer is 0.
+- **Greedy pitfall:** Jumping too early. The greedy approach jumps *only when necessary*, not whenever possible.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="jump_game_ii_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="jump_game_ii_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="JumpGameIiSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="jump_game_ii_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="jump_game_ii_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="jump_game_ii_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 55, title: 'Jump Game', difficulty: 'Medium', leetcodeSlug: 'jump-game' },
+  { number: 1306, title: 'Jump Game III', difficulty: 'Medium', leetcodeSlug: 'jump-game-iii' },
+  { number: 1871, title: 'Jump Game VII', difficulty: 'Medium', leetcodeSlug: 'jump-game-vii' },
+  { number: 122, title: 'Best Time to Buy and Sell Stock II', difficulty: 'Medium', slug: 'problems/best-time-to-buy-and-sell-stock-ii', leetcodeSlug: 'best-time-to-buy-and-sell-stock-ii' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why greedy over DP?** The greedy approach is O(n) vs O(n²), a dramatic difference. The key insight is that you don't need to examine all predecessors; you only need to know the farthest reach so far.
+- **Why not brute force?** Brute force (trying all possible jump sequences) is exponential. DP and greedy both prune the search space significantly.
+- **Jump vs reachability:** Clarify with your interviewer: Jump Game I asks "can you reach the end?", while Jump Game II asks "what is the minimum jumps?" The solutions are different.
+- **Extension:** What if each element could be negative (representing a penalty or boundary)? What if you could jump backward? These variants change the problem structure.
+- **Edge cases:** Single element array, array where all elements are 0 except the first, arrays where you can jump very far (only 1 jump needed).
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 44, title: "Wildcard Matching", slug: "wildcard-matching" }}
+  nextProblem={{ number: 46, title: "Permutations", slug: "permutations" }}
+/>

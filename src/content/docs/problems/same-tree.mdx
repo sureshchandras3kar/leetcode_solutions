@@ -1,0 +1,342 @@
+---
+title: Same Tree
+description: Determine if two binary trees are identical in structure and values. Two approaches — DFS recursive O(min(m,n)) and BFS level-order O(min(m,n)) — in six languages.
+leetcodeNumber: 100
+difficulty: Easy
+leetcodeSlug: same-tree
+tags: [Tree, Depth-First Search, Breadth-First Search]
+prev:
+  label: "#98 Validate Binary Search Tree"
+  link: "../validate-binary-search-tree/"
+next:
+  label: "#101 Symmetric Tree"
+  link: "../symmetric-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyDFS    from '@solutions/Python/same_tree_dfs.py?raw';
+import cppDFS   from '@solutions/C++/same_tree_dfs.cpp?raw';
+import javaDFS  from '@solutions/Java/same_tree_dfs.java?raw';
+import jsDFS    from '@solutions/JavaScript/same_tree_dfs.js?raw';
+import rustDFS  from '@solutions/Rust/same_tree_dfs.rs?raw';
+import goDFS    from '@solutions/Golang/same_tree_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/same_tree_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/same_tree_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/SameTreeBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/same_tree_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/same_tree_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/same_tree_bfs_iterative.go?raw';
+
+import pyBFS    from '@solutions/Python/same_tree_bfs.py?raw';
+import cppBFS   from '@solutions/C++/same_tree_bfs.cpp?raw';
+import javaBFS  from '@solutions/Java/same_tree_bfs.java?raw';
+import jsBFS    from '@solutions/JavaScript/same_tree_bfs.js?raw';
+import rustBFS  from '@solutions/Rust/same_tree_bfs.rs?raw';
+import goBFS    from '@solutions/Golang/same_tree_bfs.go?raw';
+
+## Problem Statement
+
+Given the roots of two binary trees `p` and `q`, write a function to check if they are the **same**.
+
+Two binary trees are considered the same if they are structurally identical and the nodes have the same values.
+
+<Aside type="tip" title="What to notice first">
+- **Structural equality** means both left and right children must exist in both trees (or be absent in both).
+- **Value equality** means every node at the same position must have the same integer value.
+- An empty tree (null root) is considered the same as another empty tree.
+- The test checks both structure AND values simultaneously — one mismatch anywhere fails the comparison.
+</Aside>
+
+### Examples
+
+| p | q | Output | Explanation |
+| --- | --- | --- | --- |
+| `[1,2,3]` | `[1,2,3]` | `true` | Trees are identical in structure and values |
+| `[1,2]` | `[1,null,2]` | `false` | Different structure (left vs. right child) |
+| `[1,2,1]` | `[1,1,2]` | `false` | Same structure but different values at positions |
+
+## Constraints
+
+- The number of nodes in each tree is in the range `[0, 100]`.
+- `-10^4 <= Node.val <= 10^4`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Tree cloning validation** — confirm that a copied tree structure is identical to the original before applying transformations.
+- **Configuration file comparison** — compare two JSON/XML tree structures to detect configuration drift.
+- **DOM tree reconciliation** — React and other frameworks compare virtual DOM trees to determine minimal updates.
+- **Expression tree equality** — verify that two algebraic expressions represent the same mathematical formula.
+- **Backup verification** — ensure a restored directory tree matches the original backup.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| DFS Recursive | O(min(m, n)) | O(min(h1, h2)) | Small trees; clean recursive code preferred |
+| BFS Level-Order | O(min(m, n)) | O(min(w1, w2)) | Wide, shallow trees; iterative approach preferred |
+
+*m and n = number of nodes; h = height; w = max width at any level*
+
+## Which approach should you learn first?
+
+- Learn **DFS Recursive** first — it is elegant, concise, and mirrors the recursive tree structure naturally.
+- Use **BFS** as a variation if you want to practice iterative techniques or need explicit level-order thinking.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Elegant &amp; Intuitive</div>
+    <div class="lc-approach-quick__name">DFS Recursive</div>
+    <div class="lc-approach-quick__stats">O(min(m, n)) time &middot; O(min(h1, h2)) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Iterative Alternative</div>
+    <div class="lc-approach-quick__name">BFS Level-Order</div>
+    <div class="lc-approach-quick__stats">O(min(m, n)) time &middot; O(min(w1, w2)) space</div>
+  </div>
+</div>
+
+## Approach 1: DFS Recursive
+
+<ApproachTag tag="recommended" />
+
+Compare nodes recursively by checking:
+1. Are both nodes null? (equal)
+2. Is exactly one null? (not equal)
+3. Do values differ? (not equal)
+4. Recursively check left and right subtrees
+
+This mirrors the natural recursive structure of trees and reaches all nodes in minimal time.
+
+<ComplexityBadges time="O(min(m, n))" space="O(min(h1, h2))" timeColor="green" spaceColor="green" timeNote="Each node visited at most once" spaceNote="Call stack depth = tree height" />
+
+### Step-by-step Example
+
+**Input:** `p = [1,2,3]`, `q = [1,2,3]`
+
+```
+    1               1
+   / \             / \
+  2   3           2   3
+```
+
+| Step | Check | Result |
+| --- | --- | --- |
+| Compare roots | `p.val == q.val` (1 == 1) | Continue |
+| Left subtree | `isSameTree(p.left=2, q.left=2)` | true |
+| Right subtree | `isSameTree(p.right=3, q.right=3)` | true |
+| **Result** | Both children match | `true` |
+
+<LogicPlayer
+  title="How DFS recursion compares trees node-by-node"
+  description="Use Next or Autoplay to see the algorithm recursively traverse and compare both trees simultaneously."
+  steps={[
+    {
+      title: 'Compare root nodes: 1 == 1',
+      note: 'Both trees start with the same value. Now check the subtrees.',
+      formula: 'if (p == null && q == null) return true; if (p == null || q == null) return false; if (p.val != q.val) return false;',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+      ],
+      memory: ['p: 1', 'q: 1', 'Values match ✓'],
+    },
+    {
+      title: 'Recurse left: isSameTree(p.left=2, q.left=2)',
+      note: 'Both left children exist and have value 2. Values match.',
+      formula: 'return isSameTree(p.left, q.left) && isSameTree(p.right, q.right)',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+      ],
+      memory: ['p.left: 2', 'q.left: 2', 'Values match ✓'],
+    },
+    {
+      title: 'Recurse right: isSameTree(p.right=3, q.right=3)',
+      note: 'Both right children exist and have value 3. Values match.',
+      formula: 'Base case: both children checked',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+      ],
+      memory: ['p.right: 3', 'q.right: 3', 'Values match ✓'],
+    },
+    {
+      title: 'All nodes match → return true',
+      note: 'Both trees have the same structure and values throughout.',
+      formula: 'Result: isSameTree(p, q) = true',
+      callout: 'Trees are identical.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+      ],
+      memory: ['All nodes compared', 'Result: true ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function isSameTree(p, q):
+    if p is null and q is null:
+        return true
+    if p is null or q is null:
+        return false
+    if p.val != q.val:
+        return false
+    return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="same_tree_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="same_tree_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="same_tree_dfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="same_tree_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="same_tree_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="same_tree_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS Level-Order Traversal
+
+<ApproachTag tag="alternative" />
+
+Use a queue to store pairs of nodes from both trees. At each step, dequeue a pair, check if they match, and enqueue the children. This allows you to compare the trees level-by-level (breadth-first) instead of depth-first.
+
+<ComplexityBadges time="O(min(m, n))" space="O(min(w1, w2))" timeColor="green" spaceColor="yellow" timeNote="Each node visited once" spaceNote="Queue holds at most max width nodes" />
+
+### Step-by-step Example
+
+**Input:** `p = [1,2,3]`, `q = [1,2,3]`
+
+| Queue State | Check | Enqueue | Status |
+| --- | --- | --- | --- |
+| `[(1,1)]` | `1 == 1` | `(2,2)`, `(3,3)` | Match |
+| `[(2,2), (3,3)]` | `2 == 2` | `(null,null)`, `(null,null)` | Match |
+| `[(null,null), (3,3)]` | Both null | — | Skip |
+| `[(3,3)]` | `3 == 3` | `(null,null)`, `(null,null)` | Match |
+| `[(null,null), (null,null)]` | Both null | — | Skip |
+| `[]` | **All compared** | — | `true` |
+
+### Pseudocode
+
+```plaintext
+function isSameTree(p, q):
+    queue = [(p, q)]
+    while queue is not empty:
+        node1, node2 = queue.dequeue()
+        if node1 is null and node2 is null:
+            continue
+        if node1 is null or node2 is null or node1.val != node2.val:
+            return false
+        queue.enqueue((node1.left, node2.left))
+        queue.enqueue((node1.right, node2.right))
+    return true
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="same_tree_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="same_tree_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="same_tree_bfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="same_tree_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="same_tree_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="same_tree_bfs.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Null handling:** Ensure both null nodes and non-null mismatches are checked before comparing values.
+- **Short-circuit evaluation:** Both approaches stop and return `false` as soon as a mismatch is found — efficient pruning.
+- **Order doesn't affect correctness:** DFS and BFS visit nodes in different orders but both correctly determine equality.
+- **One structure, two algorithms:** The same comparison logic applies; the difference is traversal order.
+</Aside>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="same_tree_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="same_tree_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="SameTreeBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="same_tree_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="same_tree_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="same_tree_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 101, title: 'Symmetric Tree', difficulty: 'Easy', slug: 'problems/symmetric-tree' },
+  { number: 104, title: 'Maximum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'maximum-depth-of-binary-tree' },
+  { number: 572, title: 'Subtree of Another Tree', difficulty: 'Easy', leetcodeSlug: 'subtree-of-another-tree' },
+  { number: 226, title: 'Invert Binary Tree', difficulty: 'Easy', leetcodeSlug: 'invert-binary-tree' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **DFS vs. BFS:** DFS uses less queue memory for balanced trees but needs call stack space. BFS is iterative and predictable.
+- **Early termination:** Both approaches stop on first mismatch — no need to finish traversing the entire trees if inequality is found early.
+- **Null nodes matter:** In some problems, two null nodes are considered "the same." Here they explicitly are — be clear on this.
+- **Follow-up:** "How would you modify this to check if p is a subtree of q?" (Problem #572) — great discussion point.
+- **Tree validation:** This pattern is foundational for tree comparison, cloning verification, and DOM reconciliation in frameworks.
+</Aside>

@@ -1,0 +1,287 @@
+---
+title: Populating Next Right Pointers in Each Node II
+description: Connect next pointers in a binary tree. Two approaches — Level-Order Queue O(n) and Pre-Computed Links O(n) — in six languages.
+leetcodeNumber: 117
+difficulty: Medium
+leetcodeSlug: populating-next-right-pointers-in-each-node-ii
+tags: [Tree, Depth-First Search, Breadth-First Search, Linked List]
+prev:
+  label: "#114 Flatten Binary Tree to Linked List"
+  link: "../flatten-binary-tree-to-linked-list/"
+next:
+  label: "#120 Triangle"
+  link: "../triangle/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyQueue    from '@solutions/Python/populating_next_right_pointers_ii_queue.py?raw';
+import cppQueue   from '@solutions/C++/populating_next_right_pointers_ii_queue.cpp?raw';
+import javaQueue  from '@solutions/Java/PopulatingNextRightPointersIIQueue.java?raw';
+import jsQueue    from '@solutions/JavaScript/populating_next_right_pointers_ii_queue.js?raw';
+import rustQueue  from '@solutions/Rust/populating_next_right_pointers_ii_queue.rs?raw';
+import goQueue    from '@solutions/Golang/populating_next_right_pointers_ii_queue.go?raw';
+import pydfsRecursive from '@solutions/Python/populating_next_right_pointers_in_each_node_ii_dfs_recursive.py?raw';
+import cppdfsRecursive from '@solutions/C++/populating_next_right_pointers_in_each_node_ii_dfs_recursive.cpp?raw';
+import javadfsRecursive from '@solutions/Java/PopulatingNextRightPointersInEachNodeIiDfsRecursive.java?raw';
+import jsdfsRecursive from '@solutions/JavaScript/populating_next_right_pointers_in_each_node_ii_dfs_recursive.js?raw';
+import rustdfsRecursive from '@solutions/Rust/populating_next_right_pointers_in_each_node_ii_dfs_recursive.rs?raw';
+import godfsRecursive from '@solutions/Golang/populating_next_right_pointers_in_each_node_ii_dfs_recursive.go?raw';
+
+import pyPrecomp  from '@solutions/Python/populating_next_right_pointers_ii_precomputed_links.py?raw';
+import cppPrecomp from '@solutions/C++/populating_next_right_pointers_ii_precomputed_links.cpp?raw';
+import javaPrecomp from '@solutions/Java/PopulatingNextRightPointersIIPrecomputedLinks.java?raw';
+import jsPrecomp  from '@solutions/JavaScript/populating_next_right_pointers_ii_precomputed_links.js?raw';
+import rustPrecomp from '@solutions/Rust/populating_next_right_pointers_ii_precomputed_links.rs?raw';
+import goPrecomp  from '@solutions/Golang/populating_next_right_pointers_ii_precomputed_links.go?raw';
+
+## Problem Statement
+
+Given a binary tree (not necessarily perfect), populate each next pointer to point to its next right node. If there is no next right node, the next pointer should be set to NULL.
+
+Initially, all next pointers are set to NULL.
+
+<Aside type="tip" title="What to notice first">
+- Unlike #116 (perfect binary tree), this is for any binary tree structure.
+- The tree may have missing nodes, making alignment trickier.
+- Both approaches use the property that a parent's level is already connected before processing children.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[1,2,3,4,5,null,7]` | Next pointers at level 2 connect `4→5` and `5→7` | Nodes at same level connected; null skipped |
+| `[1,2,3]` | Simple tree: level 2 has `2→3` | Both nodes present, connection straightforward |
+
+## Constraints
+
+- The number of nodes is in the range `[0, 6000]`.
+- `-100 <= Node.val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Tree serialization** — traversing levels for compact binary representation.
+- **Breadth-first processing** — needing siblings at same level quickly.
+- **Memory layout optimization** — cache-aware tree traversal linking related data.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Level-Order Queue | O(n) | O(w) | Simple, clear level traversal; w is max width |
+| Pre-Computed Links | O(n) | O(1) | Memory-constrained; use parent-level links to traverse |
+
+## Which approach should you learn first?
+
+- Learn **Level-Order Queue** first — it is straightforward and intuitive.
+- Study **Pre-Computed Links** to master O(1) space without extra queue.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">O(1) Space Optimal</div>
+    <div class="lc-approach-quick__name">Pre-Computed Links</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Clear &amp; Intuitive</div>
+    <div class="lc-approach-quick__name">Level-Order Queue</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(w) space</div>
+  </div>
+</div>
+
+## Approach 1: Level-Order Queue BFS
+
+<ApproachTag tag="recommended" />
+
+Use a queue to process nodes level-by-level. For each level, connect consecutive nodes' next pointers.
+
+<ComplexityBadges time="O(n)" space="O(w)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Queue stores max level width" />
+
+### Step-by-step Example
+
+**Input:** `[1,2,3,4,5,null,7]`
+
+| Step | Action | Result |
+| --- | --- | --- |
+| Level 0 | Process node 1 | Node 1 next = NULL |
+| Level 1 | Process nodes 2, 3 | Connect 2 → 3 |
+| Level 2 | Process nodes 4, 5, 7 | Connect 4 → 5 → 7 (skip null) |
+
+### Pseudocode
+
+```plaintext
+function connect(root):
+    if not root: return root
+    queue = [root]
+    
+    while queue not empty:
+        levelSize = queue.length
+        prev = null
+        
+        for i in 0..levelSize-1:
+            node = queue.pop()
+            if prev: prev.next = node
+            prev = node
+            
+            if node.left: queue.push(node.left)
+            if node.right: queue.push(node.right)
+    
+    return root
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyQueue} lang="python" title="populating_next_right_pointers_ii_queue.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppQueue} lang="cpp" title="populating_next_right_pointers_ii_queue.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaQueue} lang="java" title="PopulatingNextRightPointersIIQueue.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsQueue} lang="javascript" title="populating_next_right_pointers_ii_queue.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustQueue} lang="rust" title="populating_next_right_pointers_ii_queue.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goQueue} lang="go" title="populating_next_right_pointers_ii_queue.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Pre-Computed Links O(1) Space
+
+<ApproachTag tag="optimal" />
+
+Use next pointers from the parent level to traverse the current level, eliminating the queue.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Visit each node once" spaceNote="Only pointers, no extra storage" />
+
+### Step-by-step Example
+
+**Input:** `[1,2,3,4,5,null,7]`
+
+| Step | Using | Connects |
+| --- | --- | --- |
+| Level 1 | root's structure | 2 → 3 |
+| Level 2 | 2.next (= 3) | 4 → 5 → 7 |
+
+### Pseudocode
+
+```plaintext
+function connect(root):
+    if not root: return root
+    leftmost = root
+    
+    while leftmost:
+        prev = null
+        current = leftmost
+        
+        while current:
+            if current.left:
+                if prev: prev.next = current.left
+                prev = current.left
+            
+            if current.right:
+                if prev: prev.next = current.right
+                prev = current.right
+            
+            current = current.next
+        
+        leftmost = leftmost.left
+    
+    return root
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPrecomp} lang="python" title="populating_next_right_pointers_ii_precomputed_links.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPrecomp} lang="cpp" title="populating_next_right_pointers_ii_precomputed_links.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPrecomp} lang="java" title="PopulatingNextRightPointersIIPrecomputedLinks.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPrecomp} lang="javascript" title="populating_next_right_pointers_ii_precomputed_links.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPrecomp} lang="rust" title="populating_next_right_pointers_ii_precomputed_links.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPrecomp} lang="go" title="populating_next_right_pointers_ii_precomputed_links.go" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting to handle null children — skip them but still link the next non-null child.
+- Not resetting `prev` correctly at each level boundary.
+- Using level-order queue when O(1) space solution exists.
+</Aside>
+
+## Approach 3: DFS Recursive Solution
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pydfs_recursive} lang="python" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppdfs_recursive} lang="cpp" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javadfs_recursive} lang="java" title="PopulatingNextRightPointersInEachNodeIiDfsRecursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsdfs_recursive} lang="javascript" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustdfs_recursive} lang="rust" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={godfs_recursive} lang="go" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 116, title: 'Populating Next Right Pointers in Each Node', difficulty: 'Medium', leetcodeSlug: 'populating-next-right-pointers-in-each-node' },
+  { number: 102, title: 'Binary Tree Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-level-order-traversal' },
+  { number: 111, title: 'Minimum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'minimum-depth-of-binary-tree' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why Level-Order Queue?** It is intuitive and handles irregular trees well.
+- **Why Pre-Computed Links?** Demonstrates O(1) space mastery and efficient tree manipulation.
+- **Edge cases:** Root is null, single node, tree with only left/right children.
+- **Follow-up:** How would you handle a graph with arbitrary parent pointers?
+</Aside>

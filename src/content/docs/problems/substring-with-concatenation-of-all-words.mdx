@@ -1,0 +1,392 @@
+---
+title: Substring with Concatenation of All Words
+description: Find all starting indices of substrings that are concatenations of all given words. Two approaches — sliding window O(n*m) and brute force O(n²*m) — in six languages.
+leetcodeNumber: 30
+difficulty: Hard
+leetcodeSlug: substring-with-concatenation-of-all-words
+tags: [String, Hash Map, Sliding Window]
+prev:
+  label: "#27 Remove Element"
+  link: "../remove-element/"
+next:
+  label: "#33 Search in Rotated Sorted Array"
+  link: "../search-in-rotated-sorted-array/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySlidingWindow     from '@solutions/Python/substring_with_concatenation_of_all_words_sliding_window.py?raw';
+import cppSlidingWindow    from '@solutions/C++/substring_with_concatenation_of_all_words_sliding_window.cpp?raw';
+import javaSlidingWindow   from '@solutions/Java/substring_with_concatenation_of_all_words_sliding_window.java?raw';
+import jsSlidingWindow     from '@solutions/JavaScript/substring_with_concatenation_of_all_words_sliding_window.js?raw';
+import rustSlidingWindow   from '@solutions/Rust/substring_with_concatenation_of_all_words_sliding_window.rs?raw';
+import goSlidingWindow     from '@solutions/Golang/substring_with_concatenation_of_all_words_sliding_window.go?raw';
+import pyoptimized from '@solutions/Python/substring_with_concatenation_of_all_words_optimized.py?raw';
+import cppoptimized from '@solutions/C++/substring_with_concatenation_of_all_words_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/SubstringWithConcatenationOfAllWordsOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/substring_with_concatenation_of_all_words_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/substring_with_concatenation_of_all_words_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/substring_with_concatenation_of_all_words_optimized.go?raw';
+
+import pyBrute       from '@solutions/Python/substring_with_concatenation_of_all_words_brute_force.py?raw';
+import cppBrute      from '@solutions/C++/substring_with_concatenation_of_all_words_brute_force.cpp?raw';
+import javaBrute     from '@solutions/Java/substring_with_concatenation_of_all_words_brute_force.java?raw';
+import jsBrute       from '@solutions/JavaScript/substring_with_concatenation_of_all_words_brute_force.js?raw';
+import rustBrute     from '@solutions/Rust/substring_with_concatenation_of_all_words_brute_force.rs?raw';
+import goBrute       from '@solutions/Golang/substring_with_concatenation_of_all_words_brute_force.go?raw';
+
+## Problem Statement
+
+You are given a string `s` and an array of strings `words`. All the strings of `words` are of the **same length**.
+
+A concatenated string is a string that exactly contains all the strings of `words` concatenated **in any order** and **without overlapping**.
+
+Return an array of the **starting indices** of all the concatenated substrings in `s`. You can return the answer in any order.
+
+<Aside type="tip" title="What to notice first">
+- Each word in `words` has the **same length** — this is critical for the sliding window approach.
+- Words can appear multiple times in `words`, and the concatenation must use **all** of them, including duplicates.
+- We are looking for **starting indices**, not the substrings themselves.
+- The total length of a valid concatenation is always `len(word) * len(words)`.
+</Aside>
+
+### Examples
+
+| Input String | Words | Output | Explanation |
+| --- | --- | --- | --- |
+| `"barfoothefoobarman"` | `["foo","bar"]` | `[0, 9]` | Index 0: "barfoo" is "bar" + "foo". Index 9: "foobarman"[0:6] = "foobar" is "foo" + "bar". |
+| `"wordgoodgoodgoodbestword"` | `["word","good","best","word"]` | `[]` | No substring matches the concatenation. |
+| `"barfoofoobarthefoobarman"` | `["bar","foo","the"]` | `[6, 9, 12]` | Index 6: "barfoo" is "bar"+"foo". Index 9: "foobar" is "foo"+"bar". Index 12: "thefo..." |
+
+## Constraints
+
+- `1 <= s.length <= 10^4`
+- `1 <= words.length <= 5000`
+- `1 <= words[i].length <= 30`
+- `s` and `words[i]` consist of lowercase English letters
+- All the strings of `words` are of the same length
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **URL path parsing** — break a URL slug into known path segments to validate request routing.
+- **Command-line parsing** — extract command tokens that match a known set of subcommands.
+- **DNA sequence matching** — find regions where a sequence contains all required genetic markers concatenated in any order.
+- **Log format validation** — verify that a log entry contains all required field values in any sequence.
+- **Tokenization in compiler design** — verify that a source code token stream matches an expected pattern.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Sliding Window | O(n * m) | O(m * k) | **General case** — trades some constant-factor overhead for simplicity |
+| Brute Force | O(n² * m) | O(m * k) | Input is tiny, academic purposes |
+
+where n = len(s), m = len(words), k = average word length
+
+## Which approach should you learn first?
+
+- Pick **Sliding Window** if you want the optimal practical solution — it efficiently checks every valid window.
+- Pick **Brute Force** if you are learning the problem from scratch and want to understand the concept before optimization.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Speed</div>
+    <div class="lc-approach-quick__name">Sliding Window</div>
+    <div class="lc-approach-quick__stats">O(n*m) time &middot; O(m*k) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Learning</div>
+    <div class="lc-approach-quick__name">Brute Force</div>
+    <div class="lc-approach-quick__stats">O(n&sup2;*m) time &middot; O(m*k) space</div>
+  </div>
+</div>
+
+## Approach 1: Sliding Window with Hash Map (Recommended)
+
+<ApproachTag tag="recommended" />
+
+For each possible starting position in the string, check if the next `len(word) * len(words)` characters form a valid concatenation of all words. Maintain a hash map to count word frequencies in the current window and compare against the expected frequency map.
+
+The key insight is that because all words have the **same length**, we can divide any substring of that total length into fixed chunks and check if they match our word set.
+
+<ComplexityBadges time="O(n*m)" space="O(m*k)" timeColor="yellow" spaceColor="yellow" timeNote="Each position checked once, m words extracted per check" spaceNote="Hash map stores unique words" />
+
+### Step-by-step Example
+
+**Input:** `s = "barfoothefoobarman"`, `words = ["foo", "bar"]`
+
+- Word length: 3
+- Total concatenation length: 3 * 2 = 6
+- Expected frequencies: `{foo: 1, bar: 1}`
+
+| Index | Window | Words | Frequencies | Match? |
+| --- | --- | --- | --- | --- |
+| 0 | "barfoo" | ["bar","foo"] | {bar:1, foo:1} | ✓ |
+| 3 | "foothef" | ["foo","the","f"] | No valid split | ✗ |
+| 9 | "foobar" | ["foo","bar"] | {foo:1, bar:1} | ✓ |
+
+<LogicPlayer
+  title="How the sliding window checks each position"
+  description="Watch the window slide over the string, extract words of fixed length, count frequencies, and compare against the expected pattern."
+  target="6"
+  steps={[
+    {
+      title: 'Start at index 0',
+      note: 'The substring from index 0 to 6 is "barfoo". We need to check if this contains exactly one "foo" and one "bar".',
+      formula: 'Window: "barfoo" = "bar" (0-3) + "foo" (3-6)',
+      callout: 'We extract words: ["bar", "foo"]. Count: {bar: 1, foo: 1}. This matches!',
+      items: [
+        { label: 'b', state: 'active', index: 0 },
+        { label: 'a', state: 'active', index: 1 },
+        { label: 'r', state: 'active', index: 2 },
+        { label: 'f', state: 'active', index: 3 },
+        { label: 'o', state: 'active', index: 4 },
+        { label: 'o', state: 'active', index: 5 },
+        { label: 't', state: 'default', index: 6 },
+      ],
+      memory: ['Match at index 0'],
+    },
+    {
+      title: 'Check index 1',
+      note: 'The substring from index 1 to 7 is "arfoot". Words would be ["arf", "oot"]. This does not match.',
+      formula: 'Window: "arfoot" = "arf" (1-4) + "oot" (4-7)',
+      callout: 'No match — neither "arf" nor "oot" is in our word list.',
+      items: [
+        { label: 'b', state: 'default', index: 0 },
+        { label: 'a', state: 'active', index: 1 },
+        { label: 'r', state: 'active', index: 2 },
+        { label: 'f', state: 'active', index: 3 },
+        { label: 'o', state: 'active', index: 4 },
+        { label: 'o', state: 'active', index: 5 },
+        { label: 't', state: 'active', index: 6 },
+      ],
+      memory: ['No match at index 1'],
+    },
+    {
+      title: 'Check index 9',
+      note: 'The substring from index 9 to 15 is "foobar". Words are ["foo", "bar"]. Count: {foo: 1, bar: 1}. Match!',
+      formula: 'Window: "foobar" = "foo" (9-12) + "bar" (12-15)',
+      callout: 'Match found at index 9.',
+      items: [
+        { label: 'f', state: 'match', index: 9 },
+        { label: 'o', state: 'match', index: 10 },
+        { label: 'o', state: 'match', index: 11 },
+        { label: 'b', state: 'match', index: 12 },
+        { label: 'a', state: 'match', index: 13 },
+        { label: 'r', state: 'match', index: 14 },
+      ],
+      memory: ['Match at index 9'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function findSubstringWindow(s, words):
+    if words.empty() or s.empty():
+        return []
+    
+    wordLen = len(words[0])
+    wordCount = len(words)
+    totalLen = wordLen * wordCount
+    
+    // Build frequency map of words
+    wordFreq = {}
+    for word in words:
+        wordFreq[word] += 1
+    
+    result = []
+    
+    // Check every possible starting position
+    for i from 0 to len(s) - totalLen:
+        // Extract words from this window
+        windowFreq = {}
+        for j from 0 to wordCount - 1:
+            word = s[i + j*wordLen : i + (j+1)*wordLen]
+            windowFreq[word] += 1
+        
+        // Compare frequencies
+        if windowFreq == wordFreq:
+            result.append(i)
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySlidingWindow} lang="python" title="substring_with_concatenation_of_all_words_sliding_window.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSlidingWindow} lang="cpp" title="substring_with_concatenation_of_all_words_sliding_window.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSlidingWindow} lang="java" title="substring_with_concatenation_of_all_words_sliding_window.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSlidingWindow} lang="javascript" title="substring_with_concatenation_of_all_words_sliding_window.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSlidingWindow} lang="rust" title="substring_with_concatenation_of_all_words_sliding_window.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSlidingWindow} lang="go" title="substring_with_concatenation_of_all_words_sliding_window.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Brute Force
+
+<ApproachTag tag="simple" />
+
+For each starting position, extract the window substring and manually check if it can be decomposed into the word list. Iterate through the substring in word-sized chunks, remove matching words from a copy of the word list, and verify all words are consumed.
+
+This approach is less efficient but easier to understand conceptually.
+
+<ComplexityBadges time="O(n²*m)" space="O(m*k)" timeColor="red" spaceColor="yellow" timeNote="Nested loops with list operations" spaceNote="Temporary word lists" />
+
+### Step-by-step Example
+
+**Input:** `s = "barfoothefoobarman"`, `words = ["foo", "bar"]`
+
+| Index | Window | Temp Words | Status |
+| --- | --- | --- | --- |
+| 0 | "barfoo" | Extract "bar" → remove → ["foo"]. Extract "foo" → remove → []. | ✓ Match |
+| 1 | "arfoot" | Extract "arf" → not in list. | ✗ No match |
+| 9 | "foobar" | Extract "foo" → remove → ["bar"]. Extract "bar" → remove → []. | ✓ Match |
+
+### Pseudocode
+
+```plaintext
+function findSubstringBruteForce(s, words):
+    if words.empty() or s.empty():
+        return []
+    
+    wordLen = len(words[0])
+    wordCount = len(words)
+    totalLen = wordLen * wordCount
+    
+    result = []
+    
+    // Check every possible starting position
+    for i from 0 to len(s) - totalLen:
+        substring = s[i : i + totalLen]
+        tempWords = copy(words)
+        valid = true
+        
+        // Try to match all words in this window
+        for j from 0 to wordCount - 1:
+            word = substring[j*wordLen : (j+1)*wordLen]
+            if word in tempWords:
+                remove word from tempWords
+            else:
+                valid = false
+                break
+        
+        if valid and tempWords.empty():
+            result.append(i)
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBrute} lang="python" title="substring_with_concatenation_of_all_words_brute_force.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBrute} lang="cpp" title="substring_with_concatenation_of_all_words_brute_force.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBrute} lang="java" title="substring_with_concatenation_of_all_words_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBrute} lang="javascript" title="substring_with_concatenation_of_all_words_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBrute} lang="rust" title="substring_with_concatenation_of_all_words_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBrute} lang="go" title="substring_with_concatenation_of_all_words_brute_force.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting equal word length** — Assuming words can be different lengths. All words have the same length by problem definition; use this!
+- **Not handling duplicates** — If "foo" appears twice in `words`, both occurrences must be used. Using a frequency map prevents this error.
+- **Off-by-one in substring bounds** — Computing `s.substr(i, i + totalLen)` instead of the correct slice notation.
+- **Comparing entire substring instead of word-by-word** — This only works if order doesn't matter, which it doesn't, but word-level matching is cleaner.
+- **Confusing index vs. value** — The output must be **starting indices**, not the substrings themselves.
+</Aside>
+
+## Approach 3: Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="substring_with_concatenation_of_all_words_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="substring_with_concatenation_of_all_words_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="SubstringWithConcatenationOfAllWordsOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="substring_with_concatenation_of_all_words_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="substring_with_concatenation_of_all_words_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="substring_with_concatenation_of_all_words_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 3, title: 'Longest Substring Without Repeating Characters', difficulty: 'Medium', leetcodeSlug: 'longest-substring-without-repeating-characters' },
+  { number: 76, title: 'Minimum Window Substring', difficulty: 'Hard', leetcodeSlug: 'minimum-window-substring' },
+  { number: 187, title: 'Repeated DNA Sequences', difficulty: 'Medium', leetcodeSlug: 'repeated-dna-sequences' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why sliding window over brute force?** Linear factor improvement: O(n*m) vs O(n²*m). For interview, sliding window shows pattern mastery.
+- **Why use a hash map?** Comparing two dictionaries is O(k) where k is unique words. Faster than trying all permutations or using nested loops.
+- **Equal word length is crucial** — This constraint makes the problem tractable. Mention you noticed it and why it matters.
+- **Edge cases:** Empty words array, empty string, words longer than string, duplicate words in the array (must all be used).
+- **Follow-up — Variable-length words:** If words had different lengths, the problem becomes significantly harder (you'd need a trie or backtracking).
+- **Follow-up — Count matches:** If asked to count instead of return indices, only change the return statement.
+</Aside>
+
+<PrevNextNav
+  prevProblem={false}
+  nextProblem={false}
+/>

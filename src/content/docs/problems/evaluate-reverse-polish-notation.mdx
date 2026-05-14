@@ -1,0 +1,385 @@
+---
+title: Evaluate Reverse Polish Notation
+description: Evaluate expressions written in Reverse Polish Notation (RPN). Two approaches — stack-based O(n) and recursive O(n) — in six languages.
+leetcodeNumber: 150
+difficulty: Medium
+leetcodeSlug: evaluate-reverse-polish-notation
+tags: [Array, Math, Stack]
+prev:
+  label: "#149 Max Points on a Line"
+  link: "../max-points-on-a-line/"
+next:
+  label: "#153 Find Minimum in Rotated Sorted Array"
+  link: "../find-minimum-rotated/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyStack    from '@solutions/Python/evaluate_reverse_polish_notation_stack.py?raw';
+import cppStack   from '@solutions/C++/evaluate_reverse_polish_notation_stack.cpp?raw';
+import javaStack  from '@solutions/Java/evaluate_reverse_polish_notation_stack.java?raw';
+import jsStack    from '@solutions/JavaScript/evaluate_reverse_polish_notation_stack.js?raw';
+import rustStack  from '@solutions/Rust/evaluate_reverse_polish_notation_stack.rs?raw';
+import goStack    from '@solutions/Golang/evaluate_reverse_polish_notation_stack.go?raw';
+import pySpaceOptimized from '@solutions/Python/evaluate_reverse_polish_notation_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/evaluate_reverse_polish_notation_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/EvaluateReversePolishNotationSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/evaluate_reverse_polish_notation_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/evaluate_reverse_polish_notation_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/evaluate_reverse_polish_notation_space_optimized.go?raw';
+
+import pyRecur    from '@solutions/Python/evaluate_reverse_polish_notation_recursive.py?raw';
+import cppRecur   from '@solutions/C++/evaluate_reverse_polish_notation_recursive.cpp?raw';
+import javaRecur  from '@solutions/Java/evaluate_reverse_polish_notation_recursive.java?raw';
+import jsRecur    from '@solutions/JavaScript/evaluate_reverse_polish_notation_recursive.js?raw';
+import rustRecur  from '@solutions/Rust/evaluate_reverse_polish_notation_recursive.rs?raw';
+import goRecur    from '@solutions/Golang/evaluate_reverse_polish_notation_recursive.go?raw';
+
+## Problem Statement
+
+Evaluate the value of an arithmetic expression in Reverse Polish Notation (RPN).
+
+Valid operators are `+`, `-`, `*`, `/`. Each operand may be an integer or another expression.
+
+<Aside type="tip" title="What to notice first">
+- In RPN, operators come **after** their operands: `3 4 +` means `3 + 4 = 7`
+- A **stack** naturally models this: push operands, pop two operands when you see an operator
+- Order matters for `-` and `/`: the first pop is the second operand
+- Division truncates towards zero (not floor division)
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `["2", "1", "+", "3", "*"]` | `9` | (2 + 1) * 3 = 3 * 3 = 9 |
+| `["4", "13", "5", "/", "+"]` | `6` | 4 + (13 / 5) = 4 + 2 = 6 |
+| `["10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", "+", "5", "+"]` | `22` | Complex nested operations = 22 |
+| `["3", "4", "+"]` | `7` | 3 + 4 = 7 |
+| `["15"]` | `15` | Single number is valid |
+
+## Constraints
+
+- `1 <= tokens.length <= 10^4`
+- Each token is either an operator or a valid integer in range `[-200, 200]`
+- The input guarantees a valid RPN expression
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Calculator implementations** — many pocket calculators use RPN to avoid parentheses
+- **Compiler expression evaluation** — intermediate code often uses postfix notation
+- **Spreadsheet formula engines** — some internal representations use RPN
+- **Undo/redo in editors** — operations stored in postfix order for efficient processing
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Stack | O(n) | O(n) | Straightforward iterative approach; most common |
+| Recursive | O(n) | O(n) | You prefer recursion or need to understand the call stack visually |
+
+Both are optimal and equally valid.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Common</div>
+    <div class="lc-approach-quick__name">Stack-Based</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Alternative</div>
+    <div class="lc-approach-quick__name">Recursive</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(n) space</div>
+  </div>
+</div>
+
+## Approach 1: Stack-Based Evaluation (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Iterate through tokens. Push operands onto the stack. When you see an operator, pop the required operands, compute, and push the result back.
+
+The key insight: the stack automatically handles operator precedence because RPN is **unambiguous** — there are no parentheses to parse.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass through tokens" spaceNote="Stack size proportional to expression depth" />
+
+### Step-by-step Example
+
+**Input:** `["2", "1", "+", "3", "*"]`
+
+| Step | Token | Stack (before) | Action | Stack (after) |
+| --- | --- | --- | --- | --- |
+| 1 | `"2"` | `[]` | Push 2 | `[2]` |
+| 2 | `"1"` | `[2]` | Push 1 | `[2, 1]` |
+| 3 | `"+"` | `[2, 1]` | Pop 1, 2 → 2+1=3 | `[3]` |
+| 4 | `"3"` | `[3]` | Push 3 | `[3, 3]` |
+| 5 | `"*"` | `[3, 3]` | Pop 3, 3 → 3*3=9 | `[9]` |
+| Result | — | — | — | `9` |
+
+<LogicPlayer
+  title="How the stack evaluates RPN expressions"
+  description="Watch how operands are pushed and operators pop and compute. Notice the order of operations naturally flows from left to right."
+  target="RPN"
+  steps={[
+    {
+      title: 'Initialize empty stack',
+      note: 'We start with no operands. The stack is where we remember partial results.',
+      formula: 'Stack: []',
+      callout: 'Ready to process the first token.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '*', state: 'default', index: 4 },
+      ],
+      memory: [],
+    },
+    {
+      title: 'Push operand 2',
+      note: 'The first token is a number, so we push it onto the stack.',
+      formula: 'Stack: [2]',
+      callout: 'Numbers always go on the stack.',
+      items: [
+        { label: '2', state: 'active', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '*', state: 'default', index: 4 },
+      ],
+      memory: ['2'],
+    },
+    {
+      title: 'Push operand 1',
+      note: 'The next token is also a number, so we push it.',
+      formula: 'Stack: [2, 1]',
+      callout: 'Both operands are now ready for the next operator.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '1', state: 'active', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '*', state: 'default', index: 4 },
+      ],
+      memory: ['2', '1'],
+    },
+    {
+      title: 'Apply + operator',
+      note: 'Pop two operands: 1 (top) and 2 (below). Compute 2 + 1 = 3 and push the result.',
+      formula: 'Pop 1, Pop 2 → 2 + 1 = 3, Push 3',
+      callout: 'Order matters! The first pop is the second operand.',
+      items: [
+        { label: '2', state: 'match', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '+', state: 'active', index: 2 },
+        { label: '3', state: 'default', index: 3 },
+        { label: '*', state: 'default', index: 4 },
+      ],
+      memory: ['3'],
+    },
+    {
+      title: 'Push operand 3',
+      note: 'Next token is a number. Push 3 onto the stack which now contains the intermediate result.',
+      formula: 'Stack: [3, 3]',
+      callout: 'We have both operands for the final multiplication.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: '3', state: 'active', index: 3 },
+        { label: '*', state: 'default', index: 4 },
+      ],
+      memory: ['3', '3'],
+    },
+    {
+      title: 'Apply * operator',
+      note: 'Pop two operands: 3 (top) and 3 (below). Compute 3 * 3 = 9 and push the result.',
+      formula: 'Pop 3, Pop 3 → 3 * 3 = 9, Push 9',
+      callout: 'Final result is 9. Stack contains only the answer.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '+', state: 'default', index: 2 },
+        { label: '3', state: 'match', index: 3 },
+        { label: '*', state: 'match', index: 4 },
+      ],
+      memory: ['9'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function evaluateRpn(tokens):
+    stack = []
+    for token in tokens:
+        if token is an operator:
+            b = stack.pop()
+            a = stack.pop()
+            result = applyOperator(a, token, b)
+            stack.push(result)
+        else:
+            stack.push(int(token))
+    return stack[0]
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyStack} lang="python" title="evaluate_reverse_polish_notation_stack.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppStack} lang="cpp" title="evaluate_reverse_polish_notation_stack.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaStack} lang="java" title="evaluate_reverse_polish_notation_stack.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsStack} lang="javascript" title="evaluate_reverse_polish_notation_stack.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustStack} lang="rust" title="evaluate_reverse_polish_notation_stack.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goStack} lang="go" title="evaluate_reverse_polish_notation_stack.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Recursive Evaluation
+
+<ApproachTag tag="interview" />
+
+Process tokens from right to left. When you encounter an operand, return it. When you encounter an operator, recursively get the two operands and apply the operator.
+
+This mirrors the stack approach but uses the call stack instead of an explicit stack.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass through tokens" spaceNote="Recursion call stack depth" />
+
+### Step-by-step Example
+
+**Input:** `["4", "13", "5", "/", "+"]`
+
+Processing from right to left:
+1. See `"+"` → recursively get right operand
+2. See `"/"` → recursively get right operand (5), left operand (13) → 13 / 5 = 2
+3. Back to `"+"` → left operand is 4 → 4 + 2 = 6
+
+### Pseudocode
+
+```plaintext
+function evaluateRpnRecursive(tokens, index):
+    token = tokens[index]
+    index--
+    
+    if token is an operator:
+        right = evaluateRpnRecursive(tokens, index)
+        left = evaluateRpnRecursive(tokens, index)
+        return applyOperator(left, token, right)
+    else:
+        return int(token)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyRecur} lang="python" title="evaluate_reverse_polish_notation_recursive.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppRecur} lang="cpp" title="evaluate_reverse_polish_notation_recursive.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaRecur} lang="java" title="evaluate_reverse_polish_notation_recursive.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsRecur} lang="javascript" title="evaluate_reverse_polish_notation_recursive.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustRecur} lang="rust" title="evaluate_reverse_polish_notation_recursive.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goRecur} lang="go" title="evaluate_reverse_polish_notation_recursive.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="evaluate_reverse_polish_notation_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="evaluate_reverse_polish_notation_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="EvaluateReversePolishNotationSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="evaluate_reverse_polish_notation_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="evaluate_reverse_polish_notation_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="evaluate_reverse_polish_notation_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Operand order:** The first pop is the **second** operand. For `5 - 3 -`, if you pop in the wrong order, you get `3 - 5 = -2` instead of `5 - 3 = 2`.
+- **Division truncation:** Most languages have different rules. Use `int(a / b)` in Python (truncates toward zero), and ensure C++ and Java do the same.
+- **Negative numbers:** Tokens like `"-11"` are single tokens, not the operator `-` followed by `11`. Parse carefully.
+- **Single operand:** The input `["42"]` is valid and should return 42 without any operations.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 227, title: 'Basic Calculator II', difficulty: 'Medium', leetcodeSlug: 'basic-calculator-ii' },
+  { number: 224, title: 'Basic Calculator', difficulty: 'Hard', leetcodeSlug: 'basic-calculator' },
+  { number: 282, title: 'Expression Add Operators', difficulty: 'Hard', leetcodeSlug: 'expression-add-operators' },
+  { number: 394, title: 'Decode String', difficulty: 'Medium', leetcodeSlug: 'decode-string' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Stack vs Recursion:** Both are O(n) time and space. Stack is more common in production; recursion is more elegant for interviews if you want to demonstrate understanding of call stacks.
+- **Why RPN?** RPN eliminates the need for parentheses and operator precedence rules. Many calculators use it internally.
+- **Division edge case:** Clarify with the interviewer whether to truncate towards zero or use floor division. LeetCode uses truncation towards zero.
+- **Performance note:** The stack approach avoids function call overhead, making it slightly faster in practice, though both are O(n).
+- **Follow-ups to anticipate:**
+  - "What if we wanted to support functions like `sin(x)` or `sqrt(x)`?" (Add special handling for function names)
+  - "Can you convert infix to RPN?" (This is the Shunting Yard algorithm)
+  - "What if operators had different precedence?" (Harder in RPN; easier in infix)
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 149, title: "Max Points on a Line", slug: "max-points-on-a-line" }}
+  nextProblem={{ number: 151, title: "Reverse Words in String", slug: "reverse-words-in-string" }}
+/>

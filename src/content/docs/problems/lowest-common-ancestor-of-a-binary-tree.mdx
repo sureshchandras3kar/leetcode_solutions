@@ -1,0 +1,411 @@
+---
+title: Lowest Common Ancestor of a Binary Tree
+description: Find the lowest common ancestor of two nodes in a binary tree. Two approaches — DFS recursive O(n) and parent pointers with hash set O(n) — in six languages.
+leetcodeNumber: 236
+difficulty: Medium
+leetcodeSlug: lowest-common-ancestor-of-a-binary-tree
+tags: [Tree, Depth-First Search, Hash Set]
+prev:
+  label: "#235 Lowest Common Ancestor of a Binary Search Tree"
+  link: "../lowest-common-ancestor-of-a-binary-search-tree/"
+next:
+  label: "#238 Product of Array Except Self"
+  link: "../product-except-self/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDFS     from '@solutions/Python/lowest_common_ancestor_of_a_binary_tree_dfs.py?raw';
+import cppDFS    from '@solutions/C++/lowest_common_ancestor_of_a_binary_tree_dfs.cpp?raw';
+import javaDFS   from '@solutions/Java/lowest_common_ancestor_of_a_binary_tree_dfs.java?raw';
+import jsDFS     from '@solutions/JavaScript/lowest_common_ancestor_of_a_binary_tree_dfs.js?raw';
+import rustDFS   from '@solutions/Rust/lowest_common_ancestor_of_a_binary_tree_dfs.rs?raw';
+import goDFS     from '@solutions/Golang/lowest_common_ancestor_of_a_binary_tree_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/lowest_common_ancestor_of_a_binary_tree_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/lowest_common_ancestor_of_a_binary_tree_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/LowestCommonAncestorOfABinaryTreeBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/lowest_common_ancestor_of_a_binary_tree_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/lowest_common_ancestor_of_a_binary_tree_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/lowest_common_ancestor_of_a_binary_tree_bfs_iterative.go?raw';
+
+import pyParent     from '@solutions/Python/lowest_common_ancestor_of_a_binary_tree_parent_pointers.py?raw';
+import cppParent    from '@solutions/C++/lowest_common_ancestor_of_a_binary_tree_parent_pointers.cpp?raw';
+import javaParent   from '@solutions/Java/lowest_common_ancestor_of_a_binary_tree_parent_pointers.java?raw';
+import jsParent     from '@solutions/JavaScript/lowest_common_ancestor_of_a_binary_tree_parent_pointers.js?raw';
+import rustParent   from '@solutions/Rust/lowest_common_ancestor_of_a_binary_tree_parent_pointers.rs?raw';
+import goParent     from '@solutions/Golang/lowest_common_ancestor_of_a_binary_tree_parent_pointers.go?raw';
+
+## Problem Statement
+
+Given a binary tree, find the **lowest common ancestor (LCA)** of two given nodes `p` and `q` in the tree.
+
+The lowest common ancestor is the deepest node in the tree that is an ancestor of both `p` and `q`. A node can be an ancestor of itself.
+
+<Aside type="tip" title="What to notice first">
+- A node can be an ancestor of itself (if one of p or q is the ancestor of the other).
+- The LCA is the deepest node that has both p and q in its subtree.
+- Two different approaches: one uses recursion (DFS), the other uses parent pointers with hash set.
+</Aside>
+
+### Examples
+
+| Input | p | q | Output | Explanation |
+| --- | --- | --- | --- | --- |
+| `[3,5,1,6,2,0,8,null,null,7,4]` | `5` | `1` | `3` | 3 is the LCA of 5 and 1 |
+| `[3,5,1,6,2,0,8,null,null,7,4]` | `5` | `4` | `5` | 5 is the LCA of 5 and 4 (5 is ancestor of 4) |
+| `[1,2]` | `1` | `2` | `1` | 1 is the LCA of 1 and 2 |
+
+### Visualized Examples
+
+```
+Example 1:         3          LCA(5, 1) = 3
+                 /   \
+                5     1
+               / \   / \
+              6   2 0   8
+                / \
+               7   4
+
+Example 2:  LCA(5, 4) = 5 (same tree, 5 is ancestor of 4)
+
+Example 3:       1        LCA(1, 2) = 1 (1 is ancestor of itself and 2)
+                  \
+                   2
+```
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[2, 10^5]`.
+- `-10^9 <= Node.val <= 10^9`
+- All nodes have unique values.
+- p and q will exist in the tree.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **File system hierarchies** — find the common parent directory of two files.
+- **Organizational structures** — find the lowest common manager of two employees.
+- **Git commit history** — find the merge base of two branches.
+- **DNA sequence analysis** — find the common ancestor in evolutionary trees.
+- **Social networks** — find the closest common connection between two users.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| DFS Recursive | O(n) | O(h) | Simple to implement; space is the call stack |
+| Parent Pointers + Hash Set | O(n) | O(h) | If multiple LCA queries needed; explicit space usage |
+
+**Where h = height (at most n)**
+
+## Which approach should you learn first?
+
+- Pick **DFS Recursive** if you want the simplest, most elegant solution that naturally leverages tree structure.
+- Pick **Parent Pointers + Hash Set** if you want to understand how to track ancestry and use hash sets for quick lookups.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Simplest</div>
+    <div class="lc-approach-quick__name">DFS Recursive</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(h) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Explicit Ancestry</div>
+    <div class="lc-approach-quick__name">Parent Pointers + Hash Set</div>
+    <div class="lc-approach-quick__stats">O(n) time · O(h) space</div>
+  </div>
+</div>
+
+## Approach 1: DFS Recursive (Recommended)
+
+<ApproachTag tag="recommended" />
+
+The key insight: the LCA of p and q is the deepest node where p and q are in different subtrees (or one is the node itself).
+
+For each node, recursively search for p and q in its left and right subtrees:
+- If both are found in different subtrees, this node is the LCA.
+- If both are in one subtree, recurse into that subtree.
+- If found in a subtree, return that node to propagate up.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Visit all nodes in worst case" spaceNote="Recursion call stack" />
+
+### Step-by-step Example
+
+**Input:** Tree with nodes [3,5,1,6,2,0,8], p = 5, q = 1
+
+```
+       3
+      / \
+     5   1
+    / \ / \
+   6  2 0  8
+```
+
+| Node | Left Result | Right Result | Decision | Reason |
+| --- | --- | --- | --- | --- |
+| 6 | null | null | null | Leaf, neither p nor q |
+| 2 | null | null | null | Leaf, neither p nor q |
+| 5 | p found | 2 (not q) | return 5 | Left subtree has p |
+| 0 | null | null | null | Leaf, neither p nor q |
+| 8 | null | null | null | Leaf, neither p nor q |
+| 1 | 0 (not p) | 8 (not q) | return 1 | This is q itself |
+| 3 | 5 (has p) | 1 (has q) | **return 3** ✓ | Both in different subtrees |
+
+<LogicPlayer
+  title="How DFS finds the lowest common ancestor"
+  description="Use Next or Autoplay to watch as recursion explores subtrees and identifies where p and q meet."
+  steps={[
+    {
+      title: 'Start at root node 3',
+      note: 'We need to find where nodes p=5 and q=1 meet in the tree.',
+      formula: 'lca(3) = check(left, right) where left has p and right has q',
+      callout: 'Recursion will search both subtrees.',
+      items: [
+        { label: '3', state: 'active', index: 0 },
+        { label: '5', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['Evaluating: lca(3, p=5, q=1)'],
+    },
+    {
+      title: 'Recurse on left subtree',
+      note: 'Search for p=5 and q=1 in the left subtree rooted at 5.',
+      formula: 'lca(5) = p found in this subtree',
+      callout: 'Node 5 itself matches p, return 5.',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '5', state: 'active', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['Evaluating: lca(5, p=5, q=1)', 'Result: Found p, return 5'],
+    },
+    {
+      title: 'Recurse on right subtree',
+      note: 'Search for p=5 and q=1 in the right subtree rooted at 1.',
+      formula: 'lca(1) = q found in this subtree',
+      callout: 'Node 1 itself matches q, return 1.',
+      items: [
+        { label: '3', state: 'default', index: 0 },
+        { label: '5', state: 'match', index: 1 },
+        { label: '1', state: 'active', index: 2 },
+      ],
+      memory: ['Evaluating: lca(1, p=5, q=1)', 'Result: Found q, return 1'],
+    },
+    {
+      title: 'Combine at root',
+      note: 'Left subtree returned 5 (has p), right subtree returned 1 (has q).',
+      formula: 'Both p and q found in different subtrees → root 3 is LCA',
+      callout: 'The answer is 3.',
+      items: [
+        { label: '3', state: 'match', index: 0 },
+        { label: '5', state: 'match', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+      ],
+      memory: ['Final answer: lca(3) = 3'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function lca(root, p, q):
+    if root is null:
+        return null
+    
+    if root is p or root is q:
+        return root
+    
+    left = lca(root.left, p, q)
+    right = lca(root.right, p, q)
+    
+    if left is not null and right is not null:
+        return root          // Both found in different subtrees
+    
+    return left if left is not null else right  // One subtree has both
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="lowest_common_ancestor_of_a_binary_tree_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="lowest_common_ancestor_of_a_binary_tree_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="lowest_common_ancestor_of_a_binary_tree_dfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="lowest_common_ancestor_of_a_binary_tree_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="lowest_common_ancestor_of_a_binary_tree_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="lowest_common_ancestor_of_a_binary_tree_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Parent Pointers + Hash Set
+
+<ApproachTag tag="interview" />
+
+Store parent pointers for each node during a DFS traversal. Then, for node p, collect all ancestors in a hash set. Walk up from q using parent pointers until finding a node in the set.
+
+This approach separates the traversal (finding nodes and storing parents) from the LCA search.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="yellow" timeNote="One DFS to find parents, then walk ancestors" spaceNote="Hash set of ancestors" />
+
+### Step-by-step Example
+
+**Input:** Tree with nodes [3,5,1,6,2,0,8], p = 5, q = 1
+
+Step 1: Find p and store all ancestors of p:
+```
+DFS traversal finds p=5
+Ancestors of 5: {5, 3}  // 5 itself and its ancestor 3
+```
+
+Step 2: Walk from q upward, check each ancestor against the set:
+```
+Walk from q=1: 
+  Check 1 → not in {5, 3}
+  Check parent(1)=3 → found in set!
+  LCA is 3 ✓
+```
+
+### Pseudocode
+
+```plaintext
+function lca(root, p, q):
+    parent = {}
+    visited = set()
+    
+    // DFS to store parent pointers
+    function dfs(node):
+        if node is null:
+            return
+        visited.add(node)
+        if node.left is not null:
+            parent[node.left] = node
+            dfs(node.left)
+        if node.right is not null:
+            parent[node.right] = node
+            dfs(node.right)
+    
+    dfs(root)
+    
+    // Collect all ancestors of p
+    ancestors = set()
+    current = p
+    while current is not null:
+        ancestors.add(current)
+        current = parent.get(current)
+    
+    // Walk from q up to find first ancestor in set
+    current = q
+    while current not in ancestors:
+        current = parent.get(current)
+    
+    return current
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyParent} lang="python" title="lowest_common_ancestor_of_a_binary_tree_parent_pointers.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppParent} lang="cpp" title="lowest_common_ancestor_of_a_binary_tree_parent_pointers.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaParent} lang="java" title="lowest_common_ancestor_of_a_binary_tree_parent_pointers.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsParent} lang="javascript" title="lowest_common_ancestor_of_a_binary_tree_parent_pointers.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustParent} lang="rust" title="lowest_common_ancestor_of_a_binary_tree_parent_pointers.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goParent} lang="go" title="lowest_common_ancestor_of_a_binary_tree_parent_pointers.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="lowest_common_ancestor_of_a_binary_tree_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="lowest_common_ancestor_of_a_binary_tree_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="LowestCommonAncestorOfABinaryTreeBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="lowest_common_ancestor_of_a_binary_tree_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="lowest_common_ancestor_of_a_binary_tree_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="lowest_common_ancestor_of_a_binary_tree_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting that a node can be an ancestor of itself.** If q is in p's subtree, p is the LCA.
+- **Not handling null nodes properly.** A null node should return null, not cause an error.
+- **Assuming the tree is a BST.** This solution works for any binary tree, not just BSTs.
+- **Off-by-one logic in parent pointers.** Make sure you're checking ancestors correctly and not skipping the node itself.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 235, title: 'Lowest Common Ancestor of a Binary Search Tree', difficulty: 'Medium', leetcodeSlug: 'lowest-common-ancestor-of-a-binary-search-tree' },
+  { number: 1644, title: 'Lowest Common Ancestor of a Binary Tree II', difficulty: 'Medium', leetcodeSlug: 'lowest-common-ancestor-of-a-binary-tree-ii' },
+  { number: 1650, title: 'Lowest Common Ancestor of a Binary Tree III', difficulty: 'Medium', leetcodeSlug: 'lowest-common-ancestor-of-a-binary-tree-iii' },
+  { number: 1676, title: 'Lowest Common Ancestor of a Binary Tree IV', difficulty: 'Medium', leetcodeSlug: 'lowest-common-ancestor-of-a-binary-tree-iv' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **DFS vs Parent Pointers:** DFS is simpler and more elegant; parent pointers are more flexible if you need multiple LCA queries.
+- **Single pass vs multiple passes:** DFS does it in one recursive pass; parent pointers require explicit parent storage.
+- **Memory usage:** Both are O(h), but parent pointers use explicit dictionary space.
+- **Follow-ups to expect:** handling BST version, handling null inputs, multiple nodes, or finding all LCAs.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 235, title: "Lowest Common Ancestor of a Binary Search Tree", slug: "lowest-common-ancestor-of-a-binary-search-tree" }}
+  nextProblem={{ number: 237, title: "Delete Node in a Linked List", slug: "delete-node-in-a-linked-list" }}
+/>

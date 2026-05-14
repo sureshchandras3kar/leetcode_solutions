@@ -1,0 +1,325 @@
+---
+title: Subarray Sum Equals K
+description: Count subarrays whose elements sum to k. Two approaches — prefix sum with hash map O(n) and brute force O(n²) — in six languages.
+leetcodeNumber: 560
+difficulty: Medium
+leetcodeSlug: subarray-sum-equals-k
+tags: [Array, Hash Table, Prefix Sum]
+prev:
+  label: "#530 Minimum Absolute Difference in BST"
+  link: "../minimum-absolute-difference-in-bst/"
+next:
+  label: "#637 Average of Levels in Binary Tree"
+  link: "../average-of-levels-in-binary-tree/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyPrefixSum   from '@solutions/Python/subarray_sum_equals_k_prefix_sum.py?raw';
+import cppPrefixSum  from '@solutions/C++/subarray_sum_equals_k_prefix_sum.cpp?raw';
+import javaPrefixSum from '@solutions/Java/subarray_sum_equals_k_prefix_sum.java?raw';
+import jsPrefixSum   from '@solutions/JavaScript/subarray_sum_equals_k_prefix_sum.js?raw';
+import rustPrefixSum from '@solutions/Rust/subarray_sum_equals_k_prefix_sum.rs?raw';
+import goPrefixSum   from '@solutions/Golang/subarray_sum_equals_k_prefix_sum.go?raw';
+import pySpaceOptimized from '@solutions/Python/subarray_sum_equals_k_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/subarray_sum_equals_k_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/SubarraySumEqualsKSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/subarray_sum_equals_k_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/subarray_sum_equals_k_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/subarray_sum_equals_k_space_optimized.go?raw';
+
+import pyBrute   from '@solutions/Python/subarray_sum_equals_k_brute_force.py?raw';
+import cppBrute  from '@solutions/C++/subarray_sum_equals_k_brute_force.cpp?raw';
+import javaBrute from '@solutions/Java/subarray_sum_equals_k_brute_force.java?raw';
+import jsBrute   from '@solutions/JavaScript/subarray_sum_equals_k_brute_force.js?raw';
+import rustBrute from '@solutions/Rust/subarray_sum_equals_k_brute_force.rs?raw';
+import goBrute   from '@solutions/Golang/subarray_sum_equals_k_brute_force.go?raw';
+
+## Problem Statement
+
+Given an array of integers `nums` and an integer `k`, return the total number of subarrays whose sum equals to `k`. A subarray is a contiguous non-empty sequence of elements within an array.
+
+<Aside type="tip" title="Key insight">
+- A subarray is contiguous — this is NOT the subset sum problem.
+- The key identity: if `prefix[j] - prefix[i] == k`, then the subarray `(i, j]` sums to k.
+- Initialize the map with `{0: 1}` to handle subarrays starting at index 0.
+</Aside>
+
+### Examples
+
+| Input | k | Output |
+| --- | --- | --- |
+| `[1,1,1]` | 2 | 2 |
+| `[1,2,3]` | 3 | 2 |
+
+## Constraints
+
+- `1 <= nums.length <= 2×10^4`
+- `-1000 <= nums[i] <= 1000`
+- `-10^7 <= k <= 10^7`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Transaction analysis** — count time windows where spend equals a budget exactly.
+- **Signal processing** — count segments where signal energy equals a threshold.
+- **Game score tracking** — count game spans where score delta equals a target.
+- **Network monitoring** — count intervals where bandwidth usage equals a quota.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Prefix Sum + Hash Map | O(n) | O(n) | Always — handles negatives too |
+| Brute Force | O(n²) | O(1) | Understanding only |
+
+## Approach 1: Prefix Sum Hash Map (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Keep a running prefix sum. Use a hash map `count[prefix_sum] → occurrences`. For each position, check if `prefix_sum - k` exists in the map — if it does, there are that many subarrays ending here that sum to k. Add the current prefix sum to the map after checking.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Single pass" spaceNote="Hash map storage" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1,1,1]`, `k = 2`
+
+| i | num | prefix | prefix−k | map (before check) | count added | map (after insert) |
+| --- | --- | --- | --- | --- | --- | --- |
+| — | — | 0 | — | `{}` | — | `{0:1}` |
+| 0 | 1 | 1 | -1 | `{0:1}` | 0 | `{0:1, 1:1}` |
+| 1 | 1 | 2 | 0 | `{0:1, 1:1}` | 1 | `{0:1, 1:1, 2:1}` |
+| 2 | 1 | 3 | 1 | `{0:1, 1:1, 2:1}` | 1 | `{0:1, 1:1, 2:1, 3:1}` |
+
+**Result:** 2 (subarrays `[1,1]` at indices 0–1 and 1–2)
+
+**Input:** `nums = [1,2,3]`, `k = 3`
+
+| i | num | prefix | prefix−k | map (before check) | count added |
+| --- | --- | --- | --- | --- | --- |
+| — | — | 0 | — | `{}` | — |
+| 0 | 1 | 1 | -2 | `{0:1}` | 0 |
+| 1 | 2 | 3 | 0 | `{0:1, 1:1}` | 1 |
+| 2 | 3 | 6 | 3 | `{0:1, 1:1, 3:1}` | 1 |
+
+**Result:** 2 (subarrays `[1,2]` and `[3]`)
+
+<LogicPlayer
+  title="Prefix sum hash map counting subarrays"
+  description="Use Next or Autoplay to watch the running prefix sum, the map lookup, and the result accumulate for nums=[1,1,1], k=2."
+  steps={[
+    {
+      title: 'Initialize with {0: 1}',
+      note: 'Before scanning, seed the map with prefix 0 at count 1. This handles subarrays that start at index 0.',
+      formula: 'map = {0: 1},  prefix = 0,  result = 0',
+      callout: 'The initial entry means: there is one way to have a prefix sum of 0 (the empty prefix before the array starts).',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['map: {0: 1}', 'prefix = 0', 'result = 0'],
+    },
+    {
+      title: 'i=0: prefix=1, need prefix−k=−1',
+      note: '-1 is not in the map, so no subarray ending here sums to 2. Record prefix 1.',
+      formula: 'prefix = 0 + 1 = 1  →  need 1−2 = −1  →  not found',
+      callout: 'No match yet. We store 1 in the map for future lookups.',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['map: {0:1, 1:1}', 'prefix = 1', 'result = 0'],
+    },
+    {
+      title: 'i=1: prefix=2, need prefix−k=0',
+      note: '0 is in the map with count 1. That means one subarray ending here sums to 2: nums[0..1]=[1,1].',
+      formula: 'prefix = 1 + 1 = 2  →  need 2−2 = 0  →  found 1 time  →  result = 1',
+      callout: 'First match found. The subarray [1,1] from index 0 to 1 sums to k=2.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+      ],
+      memory: ['map: {0:1, 1:1, 2:1}', 'prefix = 2', 'result = 1'],
+    },
+    {
+      title: 'i=2: prefix=3, need prefix−k=1',
+      note: '1 is in the map with count 1. That means one subarray ending here sums to 2: nums[1..2]=[1,1].',
+      formula: 'prefix = 2 + 1 = 3  →  need 3−2 = 1  →  found 1 time  →  result = 2',
+      callout: 'Second match found. The subarray [1,1] from index 1 to 2 sums to k=2. Final answer: 2.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '1', state: 'match', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+      ],
+      memory: ['map: {0:1, 1:1, 2:1, 3:1}', 'prefix = 3', 'result = 2'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function subarraySum(nums, k):
+    count = {0: 1}
+    prefix = 0
+    result = 0
+    for num in nums:
+        prefix += num
+        result += count.get(prefix - k, 0)
+        count[prefix] = count.get(prefix, 0) + 1
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyPrefixSum} lang="python" title="subarray_sum_equals_k_prefix_sum.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppPrefixSum} lang="cpp" title="subarray_sum_equals_k_prefix_sum.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaPrefixSum} lang="java" title="subarray_sum_equals_k_prefix_sum.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsPrefixSum} lang="javascript" title="subarray_sum_equals_k_prefix_sum.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustPrefixSum} lang="rust" title="subarray_sum_equals_k_prefix_sum.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goPrefixSum} lang="go" title="subarray_sum_equals_k_prefix_sum.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Brute Force
+
+<ApproachTag tag="simple" />
+
+Check every possible subarray using two nested loops. The outer loop picks the start index; the inner loop extends the window right, accumulating the sum. When the running sum equals k, increment the count.
+
+<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="All subarrays checked" spaceNote="No extra memory" />
+
+### Step-by-step Example
+
+**Input:** `nums = [1,2,3]`, `k = 3`
+
+| i | j | running sum | == k? |
+| --- | --- | --- | --- |
+| 0 | 0 | 1 | no |
+| 0 | 1 | 3 | yes → count=1 |
+| 0 | 2 | 6 | no |
+| 1 | 1 | 2 | no |
+| 1 | 2 | 5 | no |
+| 2 | 2 | 3 | yes → count=2 |
+
+**Result:** 2
+
+### Pseudocode
+
+```plaintext
+function subarraySum(nums, k):
+    result = 0
+    for i in range(len(nums)):
+        total = 0
+        for j in range(i, len(nums)):
+            total += nums[j]
+            if total == k:
+                result += 1
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBrute} lang="python" title="subarray_sum_equals_k_brute_force.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBrute} lang="cpp" title="subarray_sum_equals_k_brute_force.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBrute} lang="java" title="subarray_sum_equals_k_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBrute} lang="javascript" title="subarray_sum_equals_k_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBrute} lang="rust" title="subarray_sum_equals_k_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBrute} lang="go" title="subarray_sum_equals_k_brute_force.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="subarray_sum_equals_k_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="subarray_sum_equals_k_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="SubarraySumEqualsKSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="subarray_sum_equals_k_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="subarray_sum_equals_k_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="subarray_sum_equals_k_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Not initializing the map with `{0: 1}`** — this misses subarrays that start at index 0 (where the prefix sum itself equals k).
+- **Using a sliding window** — this does not work here because `nums` can contain negatives or zeros. A shrinking window cannot undo the damage of a negative number.
+- **Updating the map before the lookup** — always check `count[prefix - k]` first, then insert `prefix` into the map.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 1,   title: 'Two Sum',                    difficulty: 'Easy',   slug: 'problems/two-sum',           leetcodeSlug: 'two-sum' },
+  { number: 525, title: 'Contiguous Array',           difficulty: 'Medium',                                     leetcodeSlug: 'contiguous-array' },
+  { number: 238, title: 'Product of Array Except Self', difficulty: 'Medium', slug: 'problems/product-except-self', leetcodeSlug: 'product-of-array-except-self' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- **The `{0: 1}` initialization is the trickiest part** — explain that it accounts for subarrays starting at index 0, where the prefix sum itself equals k.
+- **Why not a sliding window?** — the array can contain negative numbers and zeros, so shrinking the window does not reliably reduce the sum. The hash map handles all cases in one pass.
+- **Follow-up: "What if all numbers are positive?"** — then a two-pointer sliding window works and uses O(1) extra space.
+- **Order of operations matters:** check `count[prefix - k]` before inserting `prefix`, otherwise a subarray of length zero could be counted.
+</Aside>

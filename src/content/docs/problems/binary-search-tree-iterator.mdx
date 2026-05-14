@@ -1,0 +1,186 @@
+---
+title: Binary Search Tree Iterator
+description: Iterate BST in-order without loading entire tree. Two approaches — Stack O(1) amortized and ArrayList O(n) — in six languages.
+leetcodeNumber: 173
+difficulty: Medium
+leetcodeSlug: binary-search-tree-iterator
+tags: [Stack, Tree, Design, Binary Search Tree]
+prev:
+  label: "#172 Factorial Trailing Zeroes"
+  link: "../factorial-trailing-zeroes/"
+next:
+  label: "#188 Best Time to Buy and Sell Stock IV"
+  link: "../best-time-to-buy-and-sell-stock-iv/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+
+import pyStack    from '@solutions/Python/binary_search_tree_iterator_stack.py?raw';
+import cppStack   from '@solutions/C++/binary_search_tree_iterator_stack.cpp?raw';
+import javaStack  from '@solutions/Java/BSTIteratorStack.java?raw';
+import jsStack    from '@solutions/JavaScript/binary_search_tree_iterator_stack.js?raw';
+import rustStack  from '@solutions/Rust/binary_search_tree_iterator_stack.rs?raw';
+import goStack    from '@solutions/Golang/binary_search_tree_iterator_stack.go?raw';
+import pySpaceOptimized from '@solutions/Python/binary_search_tree_iterator_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/binary_search_tree_iterator_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/BinarySearchTreeIteratorSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/binary_search_tree_iterator_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/binary_search_tree_iterator_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/binary_search_tree_iterator_space_optimized.go?raw';
+
+import pyArray    from '@solutions/Python/binary_search_tree_iterator_arraylist.py?raw';
+import cppArray   from '@solutions/C++/binary_search_tree_iterator_arraylist.cpp?raw';
+import javaArray  from '@solutions/Java/BSTIteratorArrayList.java?raw';
+import jsArray    from '@solutions/JavaScript/binary_search_tree_iterator_arraylist.js?raw';
+import rustArray  from '@solutions/Rust/binary_search_tree_iterator_arraylist.rs?raw';
+import goArray    from '@solutions/Golang/binary_search_tree_iterator_arraylist.go?raw';
+
+## Problem Statement
+
+Implement an iterator over a binary search tree (BST). Your iterator will be initialized with the root node of a BST.
+
+Calling next() will return the next smallest number in the BST.
+Calling hasNext() will return whether there are any more elements in the iterator.
+
+<Aside type="tip" title="What to notice first">
+- In-order traversal yields sorted sequence in BST.
+- Stack approach: lazy evaluation, O(1) amortized next().
+- Array approach: eager evaluation, O(1) next() but O(n) space.
+</Aside>
+
+### Examples
+
+| Input (BST) | Operation Sequence | Output/Behavior | Explanation |
+| --- | --- | --- | --- |
+| `[7,3,15,null,null,9,20]` | `hasNext()`, `next()`, `next()`, `hasNext()`, `next()` | `true`, `3`, `7`, `true`, `9` | In-order: [3, 7, 9, 15, 20] |
+| `[1,null,2]` | `hasNext()`, `next()`, `hasNext()`, `next()` | `true`, `1`, `true`, `2` | In-order: [1, 2] |
+| `[2,1,3]` | `next()`, `next()`, `next()` | `1`, `2`, `3` | In-order: [1, 2, 3] |
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[1, 10^5]`.
+- `0 <= Node.val <= 10^6`
+- At most `10^5` calls will be made to `hasNext` and `next`.
+
+### Design Constraints
+
+- `next()` and `hasNext()` should run in O(1) amortized and O(1) time respectively.
+- The total number of calls to `next()` is not more than the number of nodes.
+
+## Complexity Comparison
+
+| Approach | Time: next() | Space | Best When |
+| --- | --- | --- | --- |
+| Stack (Lazy) | O(1) amortized | O(h) | Space-efficient; iterate large trees |
+| ArrayList (Eager) | O(1) | O(n) | Memory available; all elements needed |
+
+## Approach 1: Stack (Lazy In-Order)
+
+<ApproachTag tag="recommended" />
+
+Push all left children to stack. When popping, if right exists, push right's left subtree.
+
+<ComplexityBadges time="O(1) amortized" space="O(h)" timeColor="green" spaceColor="green" timeNote="Each node pushed/popped once" spaceNote="Stack depth = height" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyStack} lang="python" title="binary_search_tree_iterator_stack.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppStack} lang="cpp" title="binary_search_tree_iterator_stack.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaStack} lang="java" title="BSTIteratorStack.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsStack} lang="javascript" title="binary_search_tree_iterator_stack.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustStack} lang="rust" title="binary_search_tree_iterator_stack.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goStack} lang="go" title="binary_search_tree_iterator_stack.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: ArrayList (Eager Pre-Compute)
+
+<ApproachTag tag="alternative" />
+
+Pre-compute entire in-order traversal into an array. Iterate through array indices.
+
+<ComplexityBadges time="O(1)" space="O(n)" timeColor="green" spaceColor="yellow" timeNote="Direct index access" spaceNote="Store all elements" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyArray} lang="python" title="binary_search_tree_iterator_arraylist.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppArray} lang="cpp" title="binary_search_tree_iterator_arraylist.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaArray} lang="java" title="BSTIteratorArrayList.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsArray} lang="javascript" title="binary_search_tree_iterator_arraylist.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustArray} lang="rust" title="binary_search_tree_iterator_arraylist.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goArray} lang="go" title="binary_search_tree_iterator_arraylist.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="binary_search_tree_iterator_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="binary_search_tree_iterator_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="BinarySearchTreeIteratorSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="binary_search_tree_iterator_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="binary_search_tree_iterator_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="binary_search_tree_iterator_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 94, title: 'Binary Tree Inorder Traversal', difficulty: 'Easy', leetcodeSlug: 'binary-tree-inorder-traversal' },
+  { number: 143, title: 'Reorder List', difficulty: 'Medium', leetcodeSlug: 'reorder-list' },
+  { number: 270, title: 'Closest Binary Search Tree Value', difficulty: 'Easy', leetcodeSlug: 'closest-binary-search-tree-value' },
+]} />

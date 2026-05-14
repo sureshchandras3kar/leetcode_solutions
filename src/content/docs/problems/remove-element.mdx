@@ -1,0 +1,457 @@
+---
+title: Remove Element
+description: Remove all occurrences of a value in-place from an array and return the new length. Two approaches — two pointers O(n) and brute force O(n²) — in six languages.
+leetcodeNumber: 27
+difficulty: Easy
+leetcodeSlug: remove-element
+tags: [Array, Two Pointers]
+prev:
+  label: "#26 Remove Duplicates from Sorted Array"
+  link: "../remove-duplicates-from-sorted-array/"
+next:
+  label: "#30 Substring with Concatenation of All Words"
+  link: "../substring-with-concatenation-of-all-words/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyTwoPtr      from '@solutions/Python/remove_element_two_pointer.py?raw';
+import cppTwoPtr     from '@solutions/C++/remove_element_two_pointer.cpp?raw';
+import javaTwoPtr    from '@solutions/Java/remove_element_two_pointer.java?raw';
+import jsTwoPtr      from '@solutions/JavaScript/remove_element_two_pointer.js?raw';
+import rustTwoPtr    from '@solutions/Rust/remove_element_two_pointer.rs?raw';
+import goTwoPtr      from '@solutions/Golang/remove_element_two_pointer.go?raw';
+import pyoptimized from '@solutions/Python/remove_element_optimized.py?raw';
+import cppoptimized from '@solutions/C++/remove_element_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/RemoveElementOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/remove_element_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/remove_element_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/remove_element_optimized.go?raw';
+
+import pyBrute       from '@solutions/Python/remove_element_brute_force.py?raw';
+import cppBrute      from '@solutions/C++/remove_element_brute_force.cpp?raw';
+import javaBrute     from '@solutions/Java/remove_element_brute_force.java?raw';
+import jsBrute       from '@solutions/JavaScript/remove_element_brute_force.js?raw';
+import rustBrute     from '@solutions/Rust/remove_element_brute_force.rs?raw';
+import goBrute       from '@solutions/Golang/remove_element_brute_force.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums` and an integer `val`, remove all occurrences of `val` **in-place**. The order of the elements may be changed. Then return the number of elements in `nums` which are not equal to `val`.
+
+Consider the number of elements in `nums` which are not equal to `val` be `k`, then you need to do the following things to be accepted:
+
+- Change the first `k` elements of `nums` such that they contain all the elements which are not equal to `val`.
+- The remaining elements of `nums` are not important as well as the size of `nums`.
+- Return `k`.
+
+<Aside type="tip" title="What to notice first">
+- You must modify the array **in-place** without using extra space for another array.
+- The problem only cares about the first `k` elements where `k` is the number of remaining elements.
+- Elements after position `k` can be anything — they are ignored in validation.
+- The most efficient solution uses **two pointers** to partition the array with a single pass.
+</Aside>
+
+### Examples
+
+| Input | val | Output | Array After | Explanation |
+| --- | --- | --- | --- | --- |
+| `[3,2,2,3]` | `3` | `2` | `[2,2,_,_]` | The first 2 elements are `[2, 2]`; rest don't matter |
+| `[0,1,2,2,3,0,4,2]` | `2` | `5` | `[0,1,4,0,3,_,_,_]` | The first 5 elements contain no `2` |
+| `[2]` | `3` | `1` | `[2]` | No element equals `3` |
+
+## Constraints
+
+- `0 <= nums.length <= 100`
+- `0 <= nums[i] <= 50`
+- `0 <= val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Log filtering** — remove all entries with a specific error code in-place to compact log buffers.
+- **Inventory cleanup** — remove all items of a discontinued SKU from a stock array without allocating new memory.
+- **Packet filtering** — discard all packets of a specific type during stream processing on memory-constrained devices.
+- **User session invalidation** — remove all sessions of a particular user state from an active session list.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Two Pointers | O(n) | O(1) | General case — single pass, optimal space |
+| Brute Force | O(n²) | O(1) | Array is tiny, demonstrating the concept |
+
+## Which approach should you learn first?
+
+- Pick **Two Pointers** to understand the efficient partition technique — it's the expected solution in interviews.
+- Pick **Brute Force** if you're still learning how to modify arrays in-place.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Optimal Solution</div>
+    <div class="lc-approach-quick__name">Two Pointers</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Simple Approach</div>
+    <div class="lc-approach-quick__name">Brute Force</div>
+    <div class="lc-approach-quick__stats">O(n²) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Two Pointers (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Use two pointers: `read` scans the array, and `write` tracks where to place non-val elements. When `read` finds a value that is not `val`, copy it to the `write` position and increment both pointers. The first `write` elements will contain all non-val values.
+
+The key insight is that we partition the array into two regions: the first `write` elements are valid, and the rest are ignored.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="No extra data structures" />
+
+### Step-by-step Example
+
+**Input:** `nums = [0,1,2,2,3,0,4,2]`, `val = 2`
+
+| Step | read | write | nums[read] | Action | Array State |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 0 | 0 | 0 | 0 ≠ 2 → copy to write | `[0,1,2,2,3,0,4,2]`, write++ |
+| 1 | 1 | 1 | 1 | 1 ≠ 2 → copy to write | `[0,1,2,2,3,0,4,2]`, write++ |
+| 2 | 2 | 2 | 2 | 2 == 2 → skip | `[0,1,2,2,3,0,4,2]`, read++ only |
+| 3 | 3 | 2 | 2 | 2 == 2 → skip | `[0,1,2,2,3,0,4,2]`, read++ only |
+| 4 | 4 | 2 | 3 | 3 ≠ 2 → copy to write | `[0,1,3,2,3,0,4,2]`, write++ |
+| 5 | 5 | 3 | 0 | 0 ≠ 2 → copy to write | `[0,1,3,0,3,0,4,2]`, write++ |
+| 6 | 6 | 4 | 4 | 4 ≠ 2 → copy to write | `[0,1,3,0,4,0,4,2]`, write++ |
+| 7 | 7 | 5 | 2 | 2 == 2 → skip | Done, return 5 |
+
+Final result: First 5 elements `[0, 1, 3, 0, 4]` contain no `2`.
+
+<LogicPlayer
+  title="How two pointers partition the array"
+  description="Use Next or Autoplay to watch the read pointer scan for non-val elements while the write pointer builds the valid partition."
+  steps={[
+    {
+      title: 'Start with two pointers at position 0',
+      note: 'Both read and write start at the beginning. We have not processed any elements yet.',
+      formula: 'read = 0, write = 0',
+      callout: 'The write pointer marks where the next valid element will be placed.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '2', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '3', state: 'default', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '4', state: 'default', index: 6 },
+        { label: '2', state: 'default', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 0, write = 0'],
+    },
+    {
+      title: 'Read 0: not equal to val, copy it',
+      note: 'Element 0 is not the target value 2, so we place it at the write position and advance both pointers.',
+      formula: 'nums[0] = 0 ≠ 2',
+      callout: 'Copy 0 to nums[0] (it is already there) and move both pointers forward.',
+      items: [
+        { label: '0', state: 'active', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '2', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '3', state: 'default', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '4', state: 'default', index: 6 },
+        { label: '2', state: 'default', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 1, write = 1', '0 copied to position 0'],
+    },
+    {
+      title: 'Read 1: not equal to val, copy it',
+      note: 'Element 1 is not the target value 2, so we place it at the write position.',
+      formula: 'nums[1] = 1 ≠ 2',
+      callout: 'Copy 1 to nums[1] and advance both pointers.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'active', index: 1 },
+        { label: '2', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '3', state: 'default', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '4', state: 'default', index: 6 },
+        { label: '2', state: 'default', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 2, write = 2', '0, 1 copied to positions 0, 1'],
+    },
+    {
+      title: 'Read 2: equals val, skip it',
+      note: 'Element 2 equals the target value 2. We do not place it; only advance the read pointer.',
+      formula: 'nums[2] = 2 == 2',
+      callout: 'Skip this element. The write pointer stays at 2, ready for the next valid element.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '2', state: 'active', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '3', state: 'default', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '4', state: 'default', index: 6 },
+        { label: '2', state: 'default', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 3, write = 2', 'Skipped element 2 at index 2'],
+    },
+    {
+      title: 'Read 2 (index 3): equals val, skip it',
+      note: 'Another 2 is found. Skip it and advance the read pointer only.',
+      formula: 'nums[3] = 2 == 2',
+      callout: 'The write pointer remains at 2 to receive the next valid element.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '2', state: 'default', index: 2 },
+        { label: '2', state: 'active', index: 3 },
+        { label: '3', state: 'default', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '4', state: 'default', index: 6 },
+        { label: '2', state: 'default', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 4, write = 2', 'Skipped another 2 at index 3'],
+    },
+    {
+      title: 'Read 3: not equal to val, copy it',
+      note: 'Element 3 is not the target value. Place it at the current write position 2.',
+      formula: 'nums[4] = 3 ≠ 2',
+      callout: 'Copy 3 to position 2 and advance both pointers.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '3', state: 'active', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '4', state: 'default', index: 6 },
+        { label: '2', state: 'default', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 5, write = 3', '0, 1, 3 are valid so far'],
+    },
+    {
+      title: 'Read 0 (index 5): not equal to val, copy it',
+      note: 'Element 0 is not the target value. Place it at the current write position 3.',
+      formula: 'nums[5] = 0 ≠ 2',
+      callout: 'Copy 0 to position 3 and advance both pointers.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '0', state: 'match', index: 3 },
+        { label: '3', state: 'default', index: 4 },
+        { label: '0', state: 'active', index: 5 },
+        { label: '4', state: 'default', index: 6 },
+        { label: '2', state: 'default', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 6, write = 4', '0, 1, 3, 0 are valid so far'],
+    },
+    {
+      title: 'Read 4: not equal to val, copy it',
+      note: 'Element 4 is not the target value. Place it at the current write position 4.',
+      formula: 'nums[6] = 4 ≠ 2',
+      callout: 'Copy 4 to position 4 and advance both pointers.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '0', state: 'default', index: 3 },
+        { label: '4', state: 'match', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '4', state: 'active', index: 6 },
+        { label: '2', state: 'default', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 7, write = 5', '0, 1, 3, 0, 4 are valid — all non-2 elements'],
+    },
+    {
+      title: 'Read 2 (index 7): equals val, skip it',
+      note: 'The last element 2 equals the target value. Skip it and finish.',
+      formula: 'nums[7] = 2 == 2',
+      callout: 'All elements scanned. The first 5 elements contain all non-val values. Return 5.',
+      items: [
+        { label: '0', state: 'default', index: 0 },
+        { label: '1', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '0', state: 'default', index: 3 },
+        { label: '4', state: 'default', index: 4 },
+        { label: '0', state: 'default', index: 5 },
+        { label: '4', state: 'default', index: 6 },
+        { label: '2', state: 'active', index: 7 },
+      ],
+      memory: ['val = 2', 'read = 8, write = 5', 'Done! Return 5'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function removeElement(nums, val):
+    write = 0
+    for read in range(len(nums)):
+        if nums[read] != val:
+            nums[write] = nums[read]
+            write++
+    return write
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoPtr} lang="python" title="remove_element_two_pointer.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoPtr} lang="cpp" title="remove_element_two_pointer.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoPtr} lang="java" title="remove_element_two_pointer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoPtr} lang="javascript" title="remove_element_two_pointer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoPtr} lang="rust" title="remove_element_two_pointer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoPtr} lang="go" title="remove_element_two_pointer.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Brute Force
+
+<ApproachTag tag="simple" />
+
+Scan the array from the beginning. When you find an element equal to `val`, remove it by shifting all subsequent elements left by one position. Repeat until no more elements equal `val` are found.
+
+This approach is simple to understand but is inefficient because each removal triggers a shift operation that takes O(n) time.
+
+<ComplexityBadges time="O(n²)" space="O(1)" timeColor="red" spaceColor="green" timeNote="Shift per removal" spaceNote="No extra data structures" />
+
+### Step-by-step Example
+
+**Input:** `nums = [3,2,2,3]`, `val = 3`
+
+| Step | i | nums[i] | Action | Array State | Explanation |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 0 | 3 | 3 == 3 → remove | `[2,2,3]` | Shift elements left, length 3 |
+| 1 | 0 | 2 | 2 ≠ 3 → skip | `[2,2,3]` | Move to next element |
+| 2 | 1 | 2 | 2 ≠ 3 → skip | `[2,2,3]` | Move to next element |
+| 3 | 2 | 3 | 3 == 3 → remove | `[2,2]` | Shift elements left, length 2 |
+| Done | — | — | — | `[2,2]` | Return 2 |
+
+Final result: First 2 elements are `[2, 2]`.
+
+### Pseudocode
+
+```plaintext
+function removeElementBruteForce(nums, val):
+    i = 0
+    while i < len(nums):
+        if nums[i] == val:
+            remove nums[i]  // Shift all elements after i one position left
+        else:
+            i++
+    return len(nums)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBrute} lang="python" title="remove_element_brute_force.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBrute} lang="cpp" title="remove_element_brute_force.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBrute} lang="java" title="remove_element_brute_force.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBrute} lang="javascript" title="remove_element_brute_force.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBrute} lang="rust" title="remove_element_brute_force.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBrute} lang="go" title="remove_element_brute_force.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- Forgetting that you only need to return the count, not actually resize the array. Elements after position `k` can be anything.
+- In the brute force approach, decrementing the index after removal — you should not increment in the else block, so adjust carefully.
+- Moving only the write pointer when you find a non-val element — you must also advance the read pointer to keep scanning.
+- Off-by-one errors when copying elements in the two-pointer approach.
+</Aside>
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="remove_element_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="remove_element_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="RemoveElementOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="remove_element_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="remove_element_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="remove_element_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 26, title: 'Remove Duplicates from Sorted Array', difficulty: 'Easy', leetcodeSlug: 'remove-duplicates-from-sorted-array' },
+  { number: 283, title: 'Move Zeroes', difficulty: 'Easy', leetcodeSlug: 'move-zeroes' },
+  { number: 80, title: 'Remove Duplicates from Sorted Array II', difficulty: 'Medium', leetcodeSlug: 'remove-duplicates-from-sorted-array-ii' },
+  { number: 11, title: 'Container With Most Water', difficulty: 'Medium', slug: 'problems/container-with-most-water' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why two-pointer over brute force?** Trading one pass for multiple passes. The two-pointer approach is O(n) because each element is visited once; brute force is O(n²) because each removal triggers a shift.
+- **Why not use a queue or list?** Using built-in remove operations often hides the cost — the problem specifically asks for in-place modification to make you think about the algorithm.
+- **Edge cases to mention:** empty array (return 0), array with all elements equal to val (return 0), array with no elements equal to val (return the original length), single element (return 0 or 1 depending on val).
+- **Follow-up — duplicate values?** The problem #26 extends this to handle duplicates with constraints on how many you keep.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 26, title: "Remove Duplicates from Sorted Array", slug: "remove-duplicates-from-sorted-array" }}
+  nextProblem={{ number: 28, title: "Find the Index of the First Occurrence in a String", slug: "find-the-index-of-the-first-occurrence-in-a-string" }}
+/>

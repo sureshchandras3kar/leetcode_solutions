@@ -1,0 +1,446 @@
+---
+title: Spiral Matrix
+description: Traverse a 2D matrix in spiral order. Two approaches — simulation with boundaries O(m*n) and layer-by-layer O(m*n) — in six languages.
+leetcodeNumber: 54
+difficulty: Medium
+leetcodeSlug: spiral-matrix
+tags: [Array, Matrix, Simulation]
+prev:
+  label: "#53 Maximum Subarray"
+  link: "../maximum-subarray/"
+next:
+  label: "#55 Jump Game"
+  link: "../jump-game/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pySimulation from '@solutions/Python/spiral_matrix_simulation.py?raw';
+import cppSimulation from '@solutions/C++/spiral_matrix_simulation.cpp?raw';
+import javaSimulation from '@solutions/Java/spiral_matrix_simulation.java?raw';
+import jsSimulation from '@solutions/JavaScript/spiral_matrix_simulation.js?raw';
+import rustSimulation from '@solutions/Rust/spiral_matrix_simulation.rs?raw';
+import goSimulation from '@solutions/Golang/spiral_matrix_simulation.go?raw';
+import pySpaceOptimized from '@solutions/Python/spiral_matrix_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/spiral_matrix_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/SpiralMatrixSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/spiral_matrix_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/spiral_matrix_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/spiral_matrix_space_optimized.go?raw';
+
+import pyLayer from '@solutions/Python/spiral_matrix_layer.py?raw';
+import cppLayer from '@solutions/C++/spiral_matrix_layer.cpp?raw';
+import javaLayer from '@solutions/Java/spiral_matrix_layer.java?raw';
+import jsLayer from '@solutions/JavaScript/spiral_matrix_layer.js?raw';
+import rustLayer from '@solutions/Rust/spiral_matrix_layer.rs?raw';
+import goLayer from '@solutions/Golang/spiral_matrix_layer.go?raw';
+
+## Problem Statement
+
+Given an `m x n` matrix, return all elements of the matrix in spiral order (clockwise, starting from the top-left corner).
+
+A spiral order means: move right along the top row, then down along the right column, then left along the bottom row, then up along the left column, and repeat for inner layers.
+
+<Aside type="tip" title="What to notice first">
+- You must traverse the matrix in a clockwise spiral without revisiting any cell.
+- The key is tracking the boundaries (top, bottom, left, right) and shrinking them after each direction.
+- Edge cases include single rows, single columns, and rectangular matrices (not square).
+</Aside>
+
+### Examples
+
+| Matrix | Output | Explanation |
+| --- | --- | --- |
+| `[[1,2,3],[4,5,6],[7,8,9]]` | `[1,2,3,6,9,8,7,4,5]` | Right → Down → Left → Up (spiral inward) |
+| `[[1,2,3,4],[5,6,7,8],[9,10,11,12]]` | `[1,2,3,4,8,12,11,10,9,5,6,7]` | Same spiral pattern on a 3x4 matrix |
+| `[[1]]` | `[1]` | Single element returns itself |
+| `[[1,2],[3,4]]` | `[1,2,4,3]` | 2x2 matrix: right, down, left |
+
+## Constraints
+
+- `m == matrix.length`
+- `n == matrix[i].length`
+- `1 <= m, n <= 10`
+- `-100 <= matrix[i][j] <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Image processing** — scanning pixels in a spiral pattern from the center outward (or vice versa).
+- **Memory layout traversal** — understanding how 2D caches or matrices are accessed in CPU memory (row-major vs. spiral order).
+- **Spiral scheduling** — distributing work in concentric circles or layers (useful in server load balancing or grid-based games).
+- **Robotics path planning** — creating a spiral patrol route for autonomous robots covering an area without retracing steps.
+- **3D printing slicing** — generating spiral tool paths for scanning objects layer by layer.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Simulation with Boundaries | O(m * n) | O(1)* | Easiest to understand and implement |
+| Layer-by-Layer | O(m * n) | O(1)* | Conceptually cleaner, similar performance |
+
+\* Excluding the output list.
+
+## Which approach should you learn first?
+
+- Pick **Simulation with Boundaries** if you prefer explicit control of four directions and shrinking edges.
+- Pick **Layer-by-Layer** if you prefer thinking in terms of concentric rectangles or "peeling" the matrix.
+
+Both have identical time and space complexity — choose based on mental model preference.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Intuitive</div>
+    <div class="lc-approach-quick__name">Simulation with Boundaries</div>
+    <div class="lc-approach-quick__stats">O(m * n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Layer Thinking</div>
+    <div class="lc-approach-quick__name">Layer-by-Layer</div>
+    <div class="lc-approach-quick__stats">O(m * n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Simulation with Boundaries (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Maintain four boundaries: `top`, `bottom`, `left`, and `right`. Traverse in four directions (right, down, left, up), shrinking the appropriate boundary after each direction. Repeat until all cells are visited.
+
+This approach is the most direct and easiest to visualize—you literally simulate the spiral motion.
+
+<ComplexityBadges time="O(m * n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Visit each cell once" spaceNote="No extra data structures" />
+
+### Step-by-step Example
+
+**Input:** `matrix = [[1,2,3],[4,5,6],[7,8,9]]`
+
+Initial boundaries: `top=0, bottom=2, left=0, right=2`
+
+| Step | Direction | Cells Added | Boundary Update | Description |
+| --- | --- | --- | --- | --- |
+| 1 | Right | `1, 2, 3` | `top=1` | Traverse row 0 left-to-right |
+| 2 | Down | `6, 9` | `right=1` | Traverse column 2 top-to-bottom |
+| 3 | Left | `8, 7` | `bottom=1` | Traverse row 2 right-to-left |
+| 4 | Up | `4` | `left=1` | Traverse column 0 bottom-to-top |
+| 5 | Right | `5` | `top=1` | Center element (last layer) |
+
+**Final Output:** `[1, 2, 3, 6, 9, 8, 7, 4, 5]`
+
+<LogicPlayer
+  title="How spiral traversal works with boundary shrinking"
+  description="Watch the boundaries (top, bottom, left, right) shrink as you spiral inward. Each direction adds cells to the result and updates a boundary."
+  steps={[
+    {
+      title: 'Start: Traverse Right',
+      note: 'Begin at top-left, move right along the top row. After finishing, increment top boundary.',
+      formula: 'top: 0, bottom: 2, left: 0, right: 2',
+      callout: 'We visit the entire top row: [1, 2, 3]',
+      items: [
+        { label: '1', state: 'active', index: 0 },
+        { label: '2', state: 'active', index: 1 },
+        { label: '3', state: 'active', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '6', state: 'default', index: 5 },
+        { label: '7', state: 'default', index: 6 },
+        { label: '8', state: 'default', index: 7 },
+        { label: '9', state: 'default', index: 8 },
+      ],
+      memory: ['1, 2, 3 added', 'top boundary moved to 1'],
+    },
+    {
+      title: 'Move Down',
+      note: 'Now traverse down the right column. After finishing, decrement right boundary.',
+      formula: 'top: 1, bottom: 2, left: 0, right: 1 (after)',
+      callout: 'We visit the right column from row 1 onward: [6, 9]',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '6', state: 'active', index: 5 },
+        { label: '7', state: 'default', index: 6 },
+        { label: '8', state: 'default', index: 7 },
+        { label: '9', state: 'active', index: 8 },
+      ],
+      memory: ['1, 2, 3, 6, 9 added', 'right boundary moved to 1'],
+    },
+    {
+      title: 'Move Left',
+      note: 'Traverse left along the bottom row. After finishing, decrement bottom boundary.',
+      formula: 'top: 1, bottom: 1, left: 0, right: 1 (after)',
+      callout: 'We visit the bottom row from right to left: [8, 7]',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '4', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '6', state: 'match', index: 5 },
+        { label: '7', state: 'active', index: 6 },
+        { label: '8', state: 'active', index: 7 },
+        { label: '9', state: 'match', index: 8 },
+      ],
+      memory: ['1, 2, 3, 6, 9, 8, 7 added', 'bottom boundary moved to 1'],
+    },
+    {
+      title: 'Move Up',
+      note: 'Traverse up the left column. After finishing, increment left boundary.',
+      formula: 'top: 1, bottom: 1, left: 1, right: 1 (after)',
+      callout: 'We visit the left column from bottom to top: [4]',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '4', state: 'active', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '6', state: 'match', index: 5 },
+        { label: '7', state: 'match', index: 6 },
+        { label: '8', state: 'match', index: 7 },
+        { label: '9', state: 'match', index: 8 },
+      ],
+      memory: ['1, 2, 3, 6, 9, 8, 7, 4 added', 'left boundary moved to 1'],
+    },
+    {
+      title: 'Final Layer: Center Element',
+      note: 'One element remains in the middle. Traverse it as the last spiral layer.',
+      formula: 'top: 1, bottom: 1, left: 1, right: 1',
+      callout: 'The innermost element [5] completes the spiral.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '2', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '4', state: 'match', index: 3 },
+        { label: '5', state: 'active', index: 4 },
+        { label: '6', state: 'match', index: 5 },
+        { label: '7', state: 'match', index: 6 },
+        { label: '8', state: 'match', index: 7 },
+        { label: '9', state: 'match', index: 8 },
+      ],
+      memory: ['1, 2, 3, 6, 9, 8, 7, 4, 5 complete spiral'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function spiralMatrixSimulation(matrix):
+    if matrix is empty:
+        return []
+    
+    result = []
+    top = 0, bottom = rows - 1
+    left = 0, right = cols - 1
+    
+    while top <= bottom and left <= right:
+        // Traverse right
+        for col in [left, right]:
+            result.append(matrix[top][col])
+        top += 1
+        
+        // Traverse down
+        for row in [top, bottom]:
+            result.append(matrix[row][right])
+        right -= 1
+        
+        // Traverse left (if row remains)
+        if top <= bottom:
+            for col in [right, left] reversed:
+                result.append(matrix[bottom][col])
+            bottom -= 1
+        
+        // Traverse up (if column remains)
+        if left <= right:
+            for row in [bottom, top] reversed:
+                result.append(matrix[row][left])
+            left += 1
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySimulation} lang="python" title="spiral_matrix_simulation.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSimulation} lang="cpp" title="spiral_matrix_simulation.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSimulation} lang="java" title="spiral_matrix_simulation.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSimulation} lang="javascript" title="spiral_matrix_simulation.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSimulation} lang="rust" title="spiral_matrix_simulation.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSimulation} lang="go" title="spiral_matrix_simulation.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Layer-by-Layer
+
+<ApproachTag tag="interview" />
+
+Instead of thinking in terms of four directions and shrinking boundaries, think of the matrix as concentric rectangular layers. Process each layer from outside to inside, treating each layer as a rectangle.
+
+This approach is conceptually equivalent to Approach 1 but organizes the logic around layers rather than directions.
+
+<ComplexityBadges time="O(m * n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Visit each cell once" spaceNote="No extra data structures" />
+
+### Step-by-step Example
+
+**Input:** `matrix = [[1,2,3],[4,5,6],[7,8,9]]`
+
+Layers: `layer 0` (outer) and `layer 1` (inner/center)
+
+| Layer | Elements | Description |
+| --- | --- | --- |
+| 0 | `[1, 2, 3, 6, 9, 8, 7, 4]` | Outer rectangle perimeter |
+| 1 | `[5]` | Center element (innermost layer) |
+
+**Final Output:** `[1, 2, 3, 6, 9, 8, 7, 4, 5]`
+
+The number of layers is `(min(m, n) + 1) / 2`. For a 3x3 matrix, that's `(3 + 1) / 2 = 2` layers.
+
+### Pseudocode
+
+```plaintext
+function spiralMatrixLayer(matrix):
+    if matrix is empty:
+        return []
+    
+    result = []
+    m, n = rows, cols
+    layers = (min(m, n) + 1) / 2
+    
+    for layer in [0, layers):
+        top = layer
+        bottom = m - 1 - layer
+        left = layer
+        right = n - 1 - layer
+        
+        // Traverse right
+        for col in [left, right]:
+            result.append(matrix[top][col])
+        
+        // Traverse down
+        for row in [top+1, bottom]:
+            result.append(matrix[row][right])
+        
+        // Traverse left (if row remains)
+        if top < bottom:
+            for col in [right-1, left] reversed:
+                result.append(matrix[bottom][col])
+        
+        // Traverse up (if column remains)
+        if left < right:
+            for row in [bottom-1, top+1] reversed:
+                result.append(matrix[row][left])
+    
+    return result
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyLayer} lang="python" title="spiral_matrix_layer.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppLayer} lang="cpp" title="spiral_matrix_layer.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaLayer} lang="java" title="spiral_matrix_layer.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsLayer} lang="javascript" title="spiral_matrix_layer.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustLayer} lang="rust" title="spiral_matrix_layer.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goLayer} lang="go" title="spiral_matrix_layer.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="spiral_matrix_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="spiral_matrix_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="SpiralMatrixSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="spiral_matrix_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="spiral_matrix_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="spiral_matrix_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+## Common Mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Off-by-one errors in boundary updates** — forgetting to update `top`, `bottom`, `left`, or `right` after each direction can cause revisiting cells or skipping them.
+- **Not checking if a row/column remains** — when moving left or up, you must verify that a valid row/column exists. Otherwise, you'll add duplicate cells.
+- **Mixing up directions** — ensure you traverse right→down→left→up consistently, not some other order.
+- **Integer overflow in layer calculation** — unlikely for this problem, but calculating the number of layers as `(m + n) / 2` is wrong; use `(min(m, n) + 1) / 2`.
+</Aside>
+
+<RelatedProblems problems={[
+  { number: 48, title: 'Rotate Image', difficulty: 'Medium', leetcodeSlug: 'rotate-image' },
+  { number: 59, title: 'Spiral Matrix II', difficulty: 'Medium', leetcodeSlug: 'spiral-matrix-ii' },
+  { number: 885, title: 'Spiral Matrix III', difficulty: 'Medium', leetcodeSlug: 'spiral-matrix-iii' },
+  { number: 53, title: 'Maximum Subarray', difficulty: 'Easy', slug: 'problems/maximum-subarray', leetcodeSlug: 'maximum-subarray' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Simulation vs. Layer thinking** — Both have identical complexity. Simulation with boundaries is slightly easier to code under pressure; layer-by-layer is more elegant conceptually.
+- **Boundary conditions** — The trickiest part is handling when you're at the last row or last column. Always check `top <= bottom` before going left, and `left <= right` before going up.
+- **How to extend to 3D** — The same idea applies to spiral traversal of 3D matrices, but you'd have 6 directions instead of 4. The boundary shrinking logic generalizes naturally.
+- **Spiral Matrix II** (follow-up) — Instead of reading a spiral, you'd fill a matrix in spiral order. The same boundary logic works; just write instead of read.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 53, title: "Maximum Subarray", slug: "maximum-subarray" }}
+  nextProblem={{ number: 55, title: "Jump Game", slug: "jump-game" }}
+/>

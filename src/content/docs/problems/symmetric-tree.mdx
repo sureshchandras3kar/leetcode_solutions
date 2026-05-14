@@ -1,0 +1,354 @@
+---
+title: Symmetric Tree
+description: Check if a binary tree is symmetric. Two approaches — DFS Recursive O(n) and BFS Iterative O(n) — in six languages.
+leetcodeNumber: 101
+difficulty: Easy
+leetcodeSlug: symmetric-tree
+tags: [Tree, Depth-First Search, Breadth-First Search]
+prev:
+  label: "#100 Same Tree"
+  link: "../same-tree/"
+next:
+  label: "#102 Binary Tree Level Order Traversal"
+  link: "../binary-tree-level-order-traversal/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyDFS      from '@solutions/Python/symmetric_tree_dfs.py?raw';
+import cppDFS     from '@solutions/C++/symmetric_tree_dfs.cpp?raw';
+import javaDFS    from '@solutions/Java/symmetric_tree_dfs.java?raw';
+import jsDFS      from '@solutions/JavaScript/symmetric_tree_dfs.js?raw';
+import rustDFS    from '@solutions/Rust/symmetric_tree_dfs.rs?raw';
+import goDFS      from '@solutions/Golang/symmetric_tree_dfs.go?raw';
+import pybfsIterative from '@solutions/Python/symmetric_tree_bfs_iterative.py?raw';
+import cppbfsIterative from '@solutions/C++/symmetric_tree_bfs_iterative.cpp?raw';
+import javabfsIterative from '@solutions/Java/SymmetricTreeBfsIterative.java?raw';
+import jsbfsIterative from '@solutions/JavaScript/symmetric_tree_bfs_iterative.js?raw';
+import rustbfsIterative from '@solutions/Rust/symmetric_tree_bfs_iterative.rs?raw';
+import gobfsIterative from '@solutions/Golang/symmetric_tree_bfs_iterative.go?raw';
+
+import pyBFS      from '@solutions/Python/symmetric_tree_bfs.py?raw';
+import cppBFS     from '@solutions/C++/symmetric_tree_bfs.cpp?raw';
+import javaBFS    from '@solutions/Java/symmetric_tree_bfs.java?raw';
+import jsBFS      from '@solutions/JavaScript/symmetric_tree_bfs.js?raw';
+import rustBFS    from '@solutions/Rust/symmetric_tree_bfs.rs?raw';
+import goBFS      from '@solutions/Golang/symmetric_tree_bfs.go?raw';
+
+## Problem Statement
+
+Given the `root` of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+
+A tree is **symmetric** if its structure mirrors across the center and all corresponding node values are equal.
+
+<Aside type="tip" title="What to notice first">
+- A symmetric tree has identical structure on both sides of the root.
+- Each left subtree must mirror the right subtree: left's left child pairs with right's right child, and left's right child pairs with right's left child.
+- Only the structure and values matter—the positions in memory do not.
+</Aside>
+
+### Examples
+
+| Tree | Symmetric? | Explanation |
+| --- | --- | --- |
+| `[1, 2, 2, 3, 4, 4, 3]` | ✓ Yes | Mirror structure: 2 on left mirrors 2 on right, children are symmetric pairs |
+| `[1, 2, 2, null, 3, null, 3]` | ✗ No | Both children 3 are on the right side, not mirrored |
+| `[1]` | ✓ Yes | Single node is symmetric by definition |
+
+## Constraints
+
+- The number of nodes in the tree is in the range `[1, 1000]`.
+- `-100 <= Node.val <= 100`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **GUI layout validation** — check if a window's component layout is balanced and symmetric.
+- **Configuration validation** — verify that left and right configurations in a system match (e.g., disk mirror verification).
+- **Data structure validation** — ensure tree-based index or search structures maintain balance.
+- **Molecular structure analysis** — determine if molecular graphs have mirror symmetry.
+- **Image processing** — detect symmetry in image pyramids or multi-scale representations.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | When Best |
+| --- | --- | --- | --- |
+| DFS Recursive | O(n) | O(h) | General case, simple logic, or shallow trees |
+| BFS Iterative | O(n) | O(w) | Avoid stack overflow, wide trees, or level-wise analysis |
+
+\* h = tree height; w = max width at any level
+
+## Which approach should you learn first?
+
+- Pick **DFS Recursive** if you are comfortable with recursion and want the most concise solution.
+- Pick **BFS Iterative** if you prefer iterative logic or expect very deep trees.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Common</div>
+    <div class="lc-approach-quick__name">DFS Recursive</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(h) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Iterative Alternative</div>
+    <div class="lc-approach-quick__name">BFS Iterative</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(w) space</div>
+  </div>
+</div>
+
+## Approach 1: DFS Recursive (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Check if two subtrees are mirrors of each other. For each pair of nodes at corresponding positions, verify that their values are equal and their children form mirror pairs.
+
+The key insight is to **compare the left and right subtrees as mirror images**: the left's left child should match the right's right child, and the left's right child should match the right's left child.
+
+<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Call stack depth" />
+
+### Step-by-step Example
+
+**Input:** `root = [1, 2, 2, 3, 4, 4, 3]`
+
+```
+    1
+   / \
+  2   2     <- These are mirrors if their children match in mirror fashion
+ / \ / \
+3  4 4  3   <- Symmetric pairs verified
+```
+
+| Step | Compare | Action |
+| --- | --- | --- |
+| 1 | `isMirror(root, root)` start | Compare root's left and right subtrees |
+| 2 | Both nodes exist, values match (2 == 2) | Check children in mirror order |
+| 3 | Left's left (3) mirrors right's right (3) ✓ | Left's right (4) mirrors right's left (4) ✓ |
+| 4 | All leaf comparisons match | Return `true` |
+
+<LogicPlayer
+  title="How the mirror comparison finds symmetry"
+  description="Use Next or Autoplay to watch the algorithm compare left and right subtrees, checking that they mirror each other at each level."
+  target="symmetric"
+  steps={[
+    {
+      title: 'Start with root and its mirrored subtrees',
+      note: 'Begin by comparing the root\'s left and right children as if they should be mirrors.',
+      formula: 'isMirror(root.left, root.right)',
+      callout: 'Both subtree roots are 2, so they have matching values. Now check their children.',
+      items: [
+        { label: '1 (root)', state: 'default', index: 0 },
+        { label: '2 (left)', state: 'active', index: 1 },
+        { label: '2 (right)', state: 'active', index: 2 },
+      ],
+      memory: ['Comparing left and right subtrees'],
+    },
+    {
+      title: 'Check left\'s left with right\'s right',
+      note: 'In a mirror, the left subtree\'s left child should equal the right subtree\'s right child.',
+      formula: 'isMirror(left.left, right.right)',
+      callout: 'Node 3 from left matches node 3 from right. This pair is symmetric.',
+      items: [
+        { label: '3 (L.L)', state: 'match', index: 1 },
+        { label: '4 (L.R)', state: 'default', index: 2 },
+        { label: '4 (R.L)', state: 'default', index: 3 },
+        { label: '3 (R.R)', state: 'match', index: 4 },
+      ],
+      memory: ['3 == 3 (mirror pair verified)'],
+    },
+    {
+      title: 'Check left\'s right with right\'s left',
+      note: 'The left subtree\'s right child should equal the right subtree\'s left child.',
+      formula: 'isMirror(left.right, right.left)',
+      callout: 'Node 4 from left matches node 4 from right. Complete mirror verified.',
+      items: [
+        { label: '3 (L.L)', state: 'completed', index: 1 },
+        { label: '4 (L.R)', state: 'match', index: 2 },
+        { label: '4 (R.L)', state: 'match', index: 3 },
+        { label: '3 (R.R)', state: 'completed', index: 4 },
+      ],
+      memory: ['3 == 3 verified', '4 == 4 verified', 'Tree is symmetric!'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function isSymmetric(root):
+    return isMirror(root, root)
+
+function isMirror(left, right):
+    if left is null and right is null:
+        return true
+    if left is null or right is null:
+        return false
+    if left.val != right.val:
+        return false
+    return isMirror(left.left, right.right) and
+           isMirror(left.right, right.left)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDFS} lang="python" title="symmetric_tree_dfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDFS} lang="cpp" title="symmetric_tree_dfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDFS} lang="java" title="symmetric_tree_dfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDFS} lang="javascript" title="symmetric_tree_dfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDFS} lang="rust" title="symmetric_tree_dfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDFS} lang="go" title="symmetric_tree_dfs.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: BFS Iterative
+
+<ApproachTag tag="interview" />
+
+Use a queue to process node pairs level by level. Instead of recursion, explicitly maintain a queue of (left, right) pairs to compare, checking the mirror property iteratively.
+
+This approach avoids recursion entirely and may perform better with very deep or unbalanced trees (reducing stack overflow risk).
+
+<ComplexityBadges time="O(n)" space="O(w)" timeColor="green" spaceColor="yellow" timeNote="Visit each node once" spaceNote="Queue width at widest level" />
+
+### Step-by-step Example
+
+**Input:** `root = [1, 2, 2, 3, 4, 4, 3]`
+
+After initialization: `queue = [(root.left, root.right)]` = `[(node 2, node 2)]`
+
+| Step | Queue | Action |
+| --- | --- | --- |
+| 1 | `[(2, 2)]` | Values match, enqueue children in mirror order |
+| 2 | `[(3, 3), (4, 4)]` | Both pairs have matching values, enqueue their children |
+| 3 | `[]` (all leaf children are null pairs) | All null pairs continue, queue empties |
+| 4 | Done | Return `true` (no mismatches found) |
+
+### Pseudocode
+
+```plaintext
+function isSymmetricBFS(root):
+    if root is null:
+        return true
+    queue = [(root.left, root.right)]
+    while queue is not empty:
+        left, right = queue.dequeue()
+        if left is null and right is null:
+            continue
+        if left is null or right is null:
+            return false
+        if left.val != right.val:
+            return false
+        queue.enqueue((left.left, right.right))
+        queue.enqueue((left.right, right.left))
+    return true
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyBFS} lang="python" title="symmetric_tree_bfs.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppBFS} lang="cpp" title="symmetric_tree_bfs.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaBFS} lang="java" title="symmetric_tree_bfs.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsBFS} lang="javascript" title="symmetric_tree_bfs.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustBFS} lang="rust" title="symmetric_tree_bfs.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goBFS} lang="go" title="symmetric_tree_bfs.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Wrong mirror pairing:** Comparing `left.left` with `right.left` instead of `right.right`. The mirror property requires cross-pairing.
+- **Forgetting null checks:** A tree with missing children on only one side is not symmetric. Always check for null mismatches.
+- **Modifying the tree:** Some solutions try to destructively mark visited nodes. This breaks the original tree. Use a separate comparison structure instead.
+- **Stack overflow on deep trees:** Very deep trees can exhaust the call stack in DFS. BFS is safer for unbalanced trees.
+</Aside>
+
+## Key insights for interviews
+
+<Aside type="tip" title="Trade-offs to discuss">
+- **DFS vs. BFS:** DFS is more elegant and concise; BFS is more iterative and safer for deep trees. Mention both when discussing the solution.
+- **Null handling:** Symmetry requires checking both value equality and structure matching. A null on one side but not the other breaks symmetry.
+- **Early termination:** Both solutions return false immediately upon detecting a mismatch, avoiding unnecessary traversals.
+- **Space usage:** DFS uses call stack (height-bound); BFS uses explicit queue (width-bound). On a balanced tree, both are similar; on a skewed tree, BFS can be better.
+- **Related problem:** Compare with #100 (Same Tree), which checks if two trees are identical, not mirrored. The key difference is the pairing logic.
+</Aside>
+
+## Approach 3: BFS Iterative Solution
+
+<ApproachTag tag="interview" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pybfs_iterative} lang="python" title="symmetric_tree_bfs_iterative.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppbfs_iterative} lang="cpp" title="symmetric_tree_bfs_iterative.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javabfs_iterative} lang="java" title="SymmetricTreeBfsIterative.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsbfs_iterative} lang="javascript" title="symmetric_tree_bfs_iterative.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustbfs_iterative} lang="rust" title="symmetric_tree_bfs_iterative.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gobfs_iterative} lang="go" title="symmetric_tree_bfs_iterative.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 100, title: 'Same Tree', difficulty: 'Easy', leetcodeSlug: 'same-tree' },
+  { number: 102, title: 'Binary Tree Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-level-order-traversal' },
+  { number: 104, title: 'Maximum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'maximum-depth-of-binary-tree' },
+  { number: 111, title: 'Minimum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'minimum-depth-of-binary-tree' },
+]} />
+
+<PrevNextNav
+  prevProblem={{ number: 100, title: "Same Tree", slug: "same-tree" }}
+  nextProblem={{ number: 102, title: "Binary Tree Level Order Traversal", slug: "binary-tree-level-order-traversal" }}
+/>

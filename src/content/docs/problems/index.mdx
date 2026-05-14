@@ -1,0 +1,38 @@
+---
+title: Problems
+description: Browse all solved LeetCode problems with difficulty and tags.
+---
+
+import { getCollection } from 'astro:content';
+
+export const problems = (await getCollection('docs'))
+  .filter((p) => p.id.startsWith('problems/') && p.id !== 'problems/index' && p.data.leetcodeNumber !== undefined)
+  .sort((a, b) => (a.data.leetcodeNumber ?? 0) - (b.data.leetcodeNumber ?? 0));
+
+## All Problems
+
+Showing **{problems.length} solved problems**.
+
+Choose a problem below to open the full walkthrough, complexity breakdown, and six-language solutions.
+
+Want a structured view? Open the [grouped problem explorer](./groupby/) to browse by concept, bundle, and rating tier.
+
+<div class="lc-problems-index">
+  {problems.map((p) => (
+    <a
+      href={`./${p.id.replace('problems/', '')}/`}
+      class="lc-problems-index__card"
+    >
+      <span class="lc-problem-meta__number">#{p.data.leetcodeNumber}</span>
+      <span class="lc-problems-index__title">{p.data.title}</span>
+      {p.data.difficulty && (
+        <span class={`lc-problem-meta__diff lc-problem-meta__diff--${p.data.difficulty.toLowerCase()}`}>
+          {p.data.difficulty}
+        </span>
+      )}
+      {p.data.tags && p.data.tags.slice(0, 3).map((tag) => (
+        <span class="lc-problem-meta__tag">{tag}</span>
+      ))}
+    </a>
+  ))}
+</div>

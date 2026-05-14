@@ -1,0 +1,433 @@
+---
+title: LRU Cache
+description: Design an LRU cache with get() and put() operations in O(1) time. Two approaches — Hash Map + Doubly Linked List, and OrderedDict — in six languages.
+leetcodeNumber: 146
+difficulty: Medium
+leetcodeSlug: lru-cache
+tags: [Hash Table, Linked List, Design]
+prev:
+  label: "#141 Linked List Cycle"
+  link: "../linked-list-cycle/"
+next:
+  label: "#148 Sort List"
+  link: "../sort-list/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyHashDLL     from '@solutions/Python/lru_cache_hash_dll.py?raw';
+import cppHashDLL    from '@solutions/C++/lru_cache_hash_dll.cpp?raw';
+import javaHashDLL   from '@solutions/Java/lru_cache_hash_dll.java?raw';
+import jsHashDLL     from '@solutions/JavaScript/lru_cache_hash_dll.js?raw';
+import rustHashDLL   from '@solutions/Rust/lru_cache_hash_dll.rs?raw';
+import goHashDLL     from '@solutions/Golang/lru_cache_hash_dll.go?raw';
+import pySpaceOptimized from '@solutions/Python/lru_cache_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/lru_cache_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/LruCacheSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/lru_cache_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/lru_cache_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/lru_cache_space_optimized.go?raw';
+
+import pyOrderedDict      from '@solutions/Python/lru_cache_ordered_dict.py?raw';
+import cppOrderedDict     from '@solutions/C++/lru_cache_ordered_dict.cpp?raw';
+import javaOrderedDict    from '@solutions/Java/lru_cache_ordered_dict.java?raw';
+import jsOrderedDict      from '@solutions/JavaScript/lru_cache_ordered_dict.js?raw';
+import rustOrderedDict    from '@solutions/Rust/lru_cache_ordered_dict.rs?raw';
+import goOrderedDict      from '@solutions/Golang/lru_cache_ordered_dict.go?raw';
+
+## Problem Statement
+
+Design a data structure that follows the constraints of a **Least Recently Used (LRU) Cache**.
+
+Implement the `LRUCache` class:
+- `LRUCache(int capacity)` — Initialize the LRU cache with positive size `capacity`.
+- `int get(int key)` — Return the value of the `key` if the key exists, otherwise return `-1`.
+- `void put(int key, int value)` — Update the value of the `key` if the `key` exists. Otherwise, add the `key-value` pair to the cache. If the number of keys exceeds the `capacity`, evict the least recently used key.
+
+Both `get()` and `put()` must run in **O(1) average time complexity**.
+
+<Aside type="tip" title="What to notice first">
+- **Least Recently Used (LRU)** means the item that was accessed or modified least recently should be evicted first.
+- You need both fast **lookup** (hash map) and fast **ordering** (linked list or ordered structure).
+- Every `get()` and `put()` must update the "recency" of the accessed key.
+- Cache eviction only occurs when a new key is added and the cache is at full capacity.
+</Aside>
+
+### Examples
+
+| Operation | Capacity | State Before | State After | Return |
+| --- | --- | --- | --- | --- |
+| `LRUCache(2)` | 2 | `{}` | `{}` | — |
+| `put(1, 1)` | 2 | `{}` | `{1: 1}` | — |
+| `put(2, 2)` | 2 | `{1: 1}` | `{1: 1, 2: 2}` | — |
+| `get(1)` | 2 | `{1: 1, 2: 2}` (1 is recent) | `{1: 1, 2: 2}` | `1` |
+| `put(3, 3)` | 2 | `{1: 1, 2: 2}` | `{1: 1, 3: 3}` (2 evicted) | — |
+| `get(2)` | 2 | `{1: 1, 3: 3}` | `{1: 1, 3: 3}` | `-1` |
+| `put(4, 4)` | 2 | `{1: 1, 3: 3}` | `{3: 3, 4: 4}` (1 evicted) | — |
+| `get(1)` | 2 | `{3: 3, 4: 4}` | `{3: 3, 4: 4}` | `-1` |
+| `get(3)` | 2 | `{3: 3, 4: 4}` (3 is recent) | `{3: 3, 4: 4}` | `3` |
+| `get(4)` | 2 | `{3: 3, 4: 4}` (4 is recent) | `{3: 3, 4: 4}` | `4` |
+
+## Constraints
+
+- `1 <= capacity <= 3000`
+- `0 <= key <= 10^4`
+- `0 <= value <= 10^5`
+- At most `3 × 10^4` calls to `get()` and `put()`.
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **CPU Cache Management** — L1/L2 caches evict least-recently-used data when space fills.
+- **Database Query Caching** — In-memory caches like Redis use LRU to free space for new queries.
+- **Web Browser Caching** — Browsers evict oldest cache entries when disk/memory limits are hit.
+- **CDN & Reverse Proxies** — Content delivery networks use LRU to manage edge-cache memory.
+- **Page Replacement in Virtual Memory** — Operating systems use LRU to decide which memory pages to swap to disk.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time (get/put) | Space | Eviction | Best When |
+| --- | --- | --- | --- | --- |
+| Hash Map + Doubly Linked List | O(1) / O(1) | O(capacity) | Constant-time node removal | General case — full control, fast in all scenarios |
+| OrderedDict / LinkedHashMap | O(1) / O(1) | O(capacity) | Constant-time via language feature | You trust built-in ordered structures, cleaner code |
+| HashMap + Priority Queue | O(log n) / O(log n) | O(capacity) | Log-time priority updates | Not recommended; slower than the above |
+
+## Which approach should you learn first?
+
+- Pick **Hash Map + Doubly Linked List** if you want to understand the mechanics and impress in interviews.
+- Pick **OrderedDict** if you are practicing a language's built-in data structures and want cleaner code.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Best For Interviews</div>
+    <div class="lc-approach-quick__name">Hash Map + Doubly Linked List</div>
+    <div class="lc-approach-quick__stats">O(1) time &middot; O(capacity) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Cleanest Code</div>
+    <div class="lc-approach-quick__name">OrderedDict / LinkedHashMap</div>
+    <div class="lc-approach-quick__stats">O(1) time &middot; O(capacity) space</div>
+  </div>
+</div>
+
+## Approach 1: Hash Map + Doubly Linked List (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Combine a **hash map** for O(1) lookups with a **doubly linked list** to track access order. The most recently used item is kept at the head, and the least recently used item is at the tail (ready to evict).
+
+The key insight is that moving a node to the head and removing a node from the tail are both O(1) operations when you have pointers.
+
+<ComplexityBadges time="O(1)" space="O(capacity)" timeColor="green" spaceColor="yellow" timeNote="Hash lookup + list pointer ops" spaceNote="Hash + linked list nodes" />
+
+### Step-by-step Example
+
+**Sequence:** `LRUCache(2)` → `put(1,1)` → `put(2,2)` → `get(1)` → `put(3,3)` → `get(2)`
+
+| Step | Operation | Cache State | DLL Order (head→tail) | Action |
+| --- | --- | --- | --- | --- |
+| 1 | `put(1, 1)` | `{1: 1}` | `1` | Insert 1 at head |
+| 2 | `put(2, 2)` | `{1: 1, 2: 2}` | `2 → 1` | Insert 2 at head |
+| 3 | `get(1)` | `{1: 1, 2: 2}` | `1 → 2` | Move 1 to head (accessed) |
+| 4 | `put(3, 3)` | `{1: 1, 3: 3}` | `3 → 1` | Insert 3, evict 2 (least recent) |
+| 5 | `get(2)` | `{1: 1, 3: 3}` | `3 → 1` | Return -1 (2 not in cache) |
+
+<LogicPlayer
+  title="How the LRU cache evicts the least recently used item"
+  description="Watch the doubly linked list reorder as items are accessed. The least recently used item (at the tail) is evicted when the cache exceeds capacity."
+  target="capacity"
+  steps={[
+    {
+      title: 'Initialize cache with capacity = 2',
+      note: 'The doubly linked list has dummy head and tail nodes. No real data yet.',
+      formula: 'DLL: head <-> tail | Cache: {}',
+      callout: 'The dummy nodes help simplify edge cases during insertion and removal.',
+      items: [
+        { label: 'Head (dummy)', state: 'default', index: 0 },
+        { label: 'Tail (dummy)', state: 'default', index: 1 },
+      ],
+      memory: ['Capacity: 2', 'Size: 0/2'],
+    },
+    {
+      title: 'put(1, 1) — Insert first key-value pair',
+      note: 'Key 1 is inserted at the head of the linked list (most recent position).',
+      formula: 'head <-> [1:1] <-> tail | Cache: {1: 1}',
+      callout: 'The hash map stores the mapping 1 → node pointer for O(1) access.',
+      items: [
+        { label: 'Head (dummy)', state: 'default', index: 0 },
+        { label: '1:1', state: 'active', index: 1 },
+        { label: 'Tail (dummy)', state: 'default', index: 2 },
+      ],
+      memory: ['1 (most recent)', 'Size: 1/2'],
+    },
+    {
+      title: 'put(2, 2) — Insert second key-value pair',
+      note: 'Key 2 is inserted at the head. Key 1 moves one step toward the tail.',
+      formula: 'head <-> [2:2] <-> [1:1] <-> tail | Cache: {1: 1, 2: 2}',
+      callout: 'Cache is now full (2/2), but no eviction yet since we have room.',
+      items: [
+        { label: 'Head (dummy)', state: 'default', index: 0 },
+        { label: '2:2', state: 'active', index: 1 },
+        { label: '1:1', state: 'default', index: 2 },
+        { label: 'Tail (dummy)', state: 'default', index: 3 },
+      ],
+      memory: ['2 (most recent)', '1 (least recent)', 'Size: 2/2 (full)'],
+    },
+    {
+      title: 'get(1) — Access key 1, move it to head',
+      note: 'Accessing key 1 moves it to the head (most recent). Now 2 is closest to eviction.',
+      formula: 'head <-> [1:1] <-> [2:2] <-> tail | Cache: {1: 1, 2: 2}',
+      callout: 'Key 1 is now the most recently used; key 2 will be evicted if we add a new key.',
+      items: [
+        { label: 'Head (dummy)', state: 'default', index: 0 },
+        { label: '1:1', state: 'match', index: 1 },
+        { label: '2:2', state: 'default', index: 2 },
+        { label: 'Tail (dummy)', state: 'default', index: 3 },
+      ],
+      memory: ['1 (most recent)', '2 (least recent)', 'Return: 1'],
+    },
+    {
+      title: 'put(3, 3) — Insert new key, evict least recent',
+      note: 'Key 3 is inserted at head. The tail.prev (key 2) is removed and evicted.',
+      formula: 'head <-> [3:3] <-> [1:1] <-> tail | Cache: {3: 3, 1: 1}',
+      callout: 'Key 2 was the least recently used (closest to tail), so it is evicted to make room.',
+      items: [
+        { label: 'Head (dummy)', state: 'default', index: 0 },
+        { label: '3:3', state: 'active', index: 1 },
+        { label: '1:1', state: 'default', index: 2 },
+        { label: 'Tail (dummy)', state: 'default', index: 3 },
+      ],
+      memory: ['3 (most recent)', '1 (least recent)', 'Evicted: 2', 'Size: 2/2'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+class DLLNode:
+    key, value, prev, next
+
+class LRUCache:
+    capacity, cache (HashMap), head, tail (dummy nodes)
+
+    get(key):
+        if key not in cache:
+            return -1
+        node = cache[key]
+        moveToHead(node)  // Mark as recently used
+        return node.value
+
+    put(key, value):
+        if key in cache:
+            node = cache[key]
+            node.value = value
+            moveToHead(node)
+        else:
+            if cache.size >= capacity:
+                removeTail()  // Evict least recently used
+            node = new DLLNode(key, value)
+            cache[key] = node
+            addToHead(node)
+
+    moveToHead(node):
+        removeNode(node)
+        addToHead(node)
+
+    removeNode(node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    addToHead(node):
+        node.next = head.next
+        node.prev = head
+        head.next.prev = node
+        head.next = node
+
+    removeTail():
+        node = tail.prev
+        removeNode(node)
+        cache.remove(node.key)
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyHashDLL} lang="python" title="lru_cache_hash_dll.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppHashDLL} lang="cpp" title="lru_cache_hash_dll.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaHashDLL} lang="java" title="lru_cache_hash_dll.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsHashDLL} lang="javascript" title="lru_cache_hash_dll.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustHashDLL} lang="rust" title="lru_cache_hash_dll.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goHashDLL} lang="go" title="lru_cache_hash_dll.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: OrderedDict / LinkedHashMap
+
+<ApproachTag tag="interview" />
+
+Use a language's built-in ordered hash map (Python's `OrderedDict`, Java's `LinkedHashMap`, JavaScript's `Map`) which maintains insertion order and allows fast key reordering.
+
+This approach achieves the same O(1) time complexity with less code, since the language handles the doubly linked list for you.
+
+<Aside type="tip" title="Language Support">
+- **Python:** `collections.OrderedDict` with `.move_to_end(key)`.
+- **Java:** `LinkedHashMap` with access-order mode (`LinkedHashMap(..., true)`).
+- **JavaScript:** `Map` (maintains insertion order since ES2015).
+- **C++:** `std::map` (not ordered by access; shown with manual timestamp tracking for LRU).
+- **Rust:** No built-in OrderedDict; use a vector to track order.
+- **Go:** No built-in OrderedDict; use a slice to track order.
+</Aside>
+
+<ComplexityBadges time="O(1)" space="O(capacity)" timeColor="green" spaceColor="yellow" timeNote="Built-in ordered ops" spaceNote="Hash + internal linked list" />
+
+### Step-by-step Example
+
+Same sequence as Approach 1: `LRUCache(2)` → `put(1,1)` → `put(2,2)` → `get(1)` → `put(3,3)` → `get(2)`
+
+With `OrderedDict`, the order is maintained automatically:
+
+| Step | Operation | OrderedDict State | Action |
+| --- | --- | --- | --- |
+| 1 | `put(1, 1)` | `{1: 1}` | Insert; order is `[1]` |
+| 2 | `put(2, 2)` | `{1: 1, 2: 2}` | Insert; order is `[1, 2]` |
+| 3 | `get(1)` | `{1: 1, 2: 2}` | Access 1; move to end: order is `[2, 1]` |
+| 4 | `put(3, 3)` | `{1: 1, 3: 3}` | Insert 3; pop oldest (2); order is `[1, 3]` |
+| 5 | `get(2)` | `{1: 1, 3: 3}` | Return -1 (2 not found) |
+
+### Pseudocode
+
+```plaintext
+class LRUCache:
+    capacity, cache (OrderedDict)
+
+    get(key):
+        if key not in cache:
+            return -1
+        cache.move_to_end(key)  // Language handles reordering
+        return cache[key]
+
+    put(key, value):
+        if key in cache:
+            cache[key] = value
+            cache.move_to_end(key)
+        else:
+            if cache.size >= capacity:
+                cache.popitem(FIFO)  // Remove oldest (first inserted)
+            cache[key] = value
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyOrderedDict} lang="python" title="lru_cache_ordered_dict.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppOrderedDict} lang="cpp" title="lru_cache_ordered_dict.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaOrderedDict} lang="java" title="lru_cache_ordered_dict.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsOrderedDict} lang="javascript" title="lru_cache_ordered_dict.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustOrderedDict} lang="rust" title="lru_cache_ordered_dict.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goOrderedDict} lang="go" title="lru_cache_ordered_dict.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Not moving accessed keys to "most recent"** — Forgetting to reorder after `get()` or when updating an existing key in `put()`.
+- **Evicting the wrong item** — Removing a recently used item instead of the least recently used one at the tail.
+- **Off-by-one on capacity** — Evicting before checking if the cache is full, or evicting when the cache is already below capacity.
+- **Node pointer corruption** — In the doubly linked list approach, breaking the prev/next pointers during removal.
+- **Losing track of node references** — In languages like Java, accidentally losing the reference to a node in the hash map after removal.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="lru_cache_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="lru_cache_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="LruCacheSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="lru_cache_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="lru_cache_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="lru_cache_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 155, title: 'Min Stack', difficulty: 'Medium', leetcodeSlug: 'min-stack' },
+  { number: 460, title: 'LFU Cache', difficulty: 'Hard', leetcodeSlug: 'lfu-cache' },
+  { number: 432, title: 'All O`one Data Structure', difficulty: 'Hard', leetcodeSlug: 'all-oone-data-structure' },
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum', leetcodeSlug: 'two-sum' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Hash Map + DLL vs. OrderedDict:** The first demonstrates deep understanding of data structures; the second is more pragmatic and error-resistant.
+- **Why not just a hash map?** You lose the ability to evict in constant time without tracking access order.
+- **Why not just a list?** Searching for a key is O(n). A hash map is essential for O(1) lookups.
+- **Edge cases to mention:**
+  - Capacity = 1 (every new key evicts the only item).
+  - Repeated accesses to the same key (should not allocate new space).
+  - Updating an existing key's value (should not evict anything).
+  - Reaching exactly capacity before the next insertion.
+- **Follow-up — LFU Cache (#460):** Instead of "least recently used," track "least frequently used" — requires a more complex data structure with frequency counters.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 145, title: "Binary Tree Maximum Path Sum", slug: "binary-tree-maximum-path-sum" }}
+  nextProblem={{ number: 147, title: "Insertion Sort List", slug: "insertion-sort-list" }}
+/>

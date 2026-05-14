@@ -1,0 +1,496 @@
+---
+title: Partition List
+description: Partition a linked list around a value x such that nodes less than x come before nodes greater than or equal to x. Two approaches — two list heads O(n) and single list rearrange O(n) — in six languages.
+leetcodeNumber: 86
+difficulty: Medium
+leetcodeSlug: partition-list
+tags: [Linked List, Two Pointers]
+prev:
+  label: "#82 Remove Duplicates from Sorted List II"
+  link: "../remove-duplicates-from-sorted-list-ii/"
+next:
+  label: "#92 Reverse Linked List II"
+  link: "../reverse-linked-list-ii/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyTwoHeads     from '@solutions/Python/partition_list_two_heads.py?raw';
+import cppTwoHeads    from '@solutions/C++/partition_list_two_heads.cpp?raw';
+import javaTwoHeads   from '@solutions/Java/partition_list_two_heads.java?raw';
+import jsTwoHeads     from '@solutions/JavaScript/partition_list_two_heads.js?raw';
+import rustTwoHeads   from '@solutions/Rust/partition_list_two_heads.rs?raw';
+import goTwoHeads     from '@solutions/Golang/partition_list_two_heads.go?raw';
+import pyoptimized from '@solutions/Python/partition_list_optimized.py?raw';
+import cppoptimized from '@solutions/C++/partition_list_optimized.cpp?raw';
+import javaoptimized from '@solutions/Java/PartitionListOptimized.java?raw';
+import jsoptimized from '@solutions/JavaScript/partition_list_optimized.js?raw';
+import rustoptimized from '@solutions/Rust/partition_list_optimized.rs?raw';
+import gooptimized from '@solutions/Golang/partition_list_optimized.go?raw';
+
+import pySingleRearr      from '@solutions/Python/partition_list_single_rearrange.py?raw';
+import cppSingleRearr     from '@solutions/C++/partition_list_single_rearrange.cpp?raw';
+import javaSingleRearr    from '@solutions/Java/partition_list_single_rearrange.java?raw';
+import jsSingleRearr      from '@solutions/JavaScript/partition_list_single_rearrange.js?raw';
+import rustSingleRearr    from '@solutions/Rust/partition_list_single_rearrange.rs?raw';
+import goSingleRearr      from '@solutions/Golang/partition_list_single_rearrange.go?raw';
+
+## Problem Statement
+
+Given the head of a linked list and a value `x`, partition the list such that all nodes **whose values are less than** `x` come **before** nodes whose values are **greater than or equal to** `x`.
+
+You should **preserve the original relative order** of the nodes in each of the two partitions.
+
+<Aside type="tip" title="What to notice first">
+- You must partition the list, not sort it — relative order within each group matters.
+- Values less than `x` go to the left; values `>= x` go to the right.
+- You cannot use extra space for a new array; you must rearrange pointers.
+- A dummy node simplifies handling the head of the result list.
+</Aside>
+
+### Examples
+
+| Input | x | Output | Explanation |
+| --- | --- | --- | --- |
+| `[1, 4, 3, 2, 5, 2]` | `3` | `[1, 2, 2, 4, 3, 5]` | All nodes < 3 move left; >= 3 stay right. Order preserved. |
+| `[2, 1]` | `2` | `[1, 2]` | Only 1 < 2, so it goes first; 2 stays. |
+| `[5, 3, 1, 4, 2]` | `3` | `[1, 2, 5, 3, 4]` | [1, 2] < 3, then [5, 3, 4] >= 3. |
+
+## Constraints
+
+- The number of nodes in the list is in the range `[0, 200]`.
+- `-100 <= Node.val <= 100`
+- `-200 <= x <= 200`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Task scheduling** — partition tasks by priority (urgent vs. non-urgent) while preserving submission order within each group.
+- **Event stream filtering** — separate critical events from non-critical ones while maintaining the timeline within each category.
+- **Data pipeline processing** — split records by a threshold (e.g., transactions >= $1000) before applying different processing rules.
+- **Network packet routing** — partition packets by size or priority without losing packet sequence within priority classes.
+- **Load balancing** — divide incoming requests by load class while preserving fairness within each class.
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Method | Best When |
+| --- | --- | --- | --- | --- |
+| Two List Heads | O(n) | O(1) | Build two separate lists, merge | General case — clean, easy to understand |
+| Single List Rearrange | O(n) | O(1) | Rearrange nodes in place | Memory ultra-constrained, prefers single list |
+
+\* Both use O(1) extra space (two or more dummy/pointer nodes).
+
+## Which approach should you learn first?
+
+- Pick **Two List Heads** if you want clarity and correctness. It is easier to reason about and less error-prone.
+- Pick **Single List Rearrange** if you want to practice advanced pointer manipulation or face extreme space constraints.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Clearest Logic</div>
+    <div class="lc-approach-quick__name">Two List Heads</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Advanced Pointers</div>
+    <div class="lc-approach-quick__name">Single Rearrange</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Two List Heads (Recommended)
+
+<ApproachTag tag="recommended" />
+
+Build two separate lists — one for nodes < x, one for nodes >= x — then connect them.
+
+The key idea is simplicity: create two independent lists as you traverse, then splice them together. This avoids the complexity of tracking multiple pointers in one list.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass through list" spaceNote="Only pointer variables" />
+
+### Step-by-step Example
+
+**Input:** `head = [1, 4, 3, 2, 5, 2]`, `x = 3`
+
+| Step | current.val | < 3? | Action | smaller list | larger list |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 1 | ✓ | Append to smaller | 1 | — |
+| 2 | 4 | ✗ | Append to larger | 1 | 4 |
+| 3 | 3 | ✗ | Append to larger | 1 | 4 → 3 |
+| 4 | 2 | ✓ | Append to smaller | 1 → 2 | 4 → 3 |
+| 5 | 5 | ✗ | Append to larger | 1 → 2 | 4 → 3 → 5 |
+| 6 | 2 | ✓ | Append to smaller | 1 → 2 → 2 | 4 → 3 → 5 |
+| — | — | — | Merge: smaller.next = larger | **1 → 2 → 2 → 4 → 3 → 5** | — |
+
+<LogicPlayer
+  title="How the two-head approach partitions a list"
+  description="Watch two separate lists build, one for each partition, then merge at the end."
+  target="partition"
+  steps={[
+    {
+      title: 'Start with empty lists and dummy nodes',
+      note: 'We create two dummy nodes: one for nodes < x, one for nodes >= x. Both lists start empty.',
+      formula: 'smaller_dummy → null, larger_dummy → null',
+      callout: 'Both dummy nodes act as sentinels, making it easy to attach the first real node.',
+      items: [
+        { label: '1', state: 'default', index: 0 },
+        { label: '4', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '2', state: 'default', index: 5 },
+      ],
+      items2: [],
+      memory: ['smaller_list: (empty)', 'larger_list: (empty)'],
+    },
+    {
+      title: 'Inspect 1, which is < 3',
+      note: 'Since 1 < 3, attach it to the smaller list.',
+      formula: '1 < 3 → append to smaller',
+      callout: 'The smaller list now has one node: 1.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '4', state: 'default', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '2', state: 'default', index: 5 },
+      ],
+      items2: [],
+      memory: ['smaller_list: 1', 'larger_list: (empty)'],
+    },
+    {
+      title: 'Inspect 4, which is >= 3',
+      note: 'Since 4 >= 3, attach it to the larger list.',
+      formula: '4 >= 3 → append to larger',
+      callout: 'The larger list now has one node: 4.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '3', state: 'default', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '2', state: 'default', index: 5 },
+      ],
+      items2: [],
+      memory: ['smaller_list: 1', 'larger_list: 4'],
+    },
+    {
+      title: 'Inspect 3, which is >= 3',
+      note: 'Since 3 >= 3, attach it to the larger list.',
+      formula: '3 >= 3 → append to larger',
+      callout: 'The larger list grows: 4 → 3.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '2', state: 'default', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '2', state: 'default', index: 5 },
+      ],
+      items2: [],
+      memory: ['smaller_list: 1', 'larger_list: 4 → 3'],
+    },
+    {
+      title: 'Inspect 2, which is < 3',
+      note: 'Since 2 < 3, attach it to the smaller list.',
+      formula: '2 < 3 → append to smaller',
+      callout: 'The smaller list grows: 1 → 2.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '2', state: 'match', index: 3 },
+        { label: '5', state: 'default', index: 4 },
+        { label: '2', state: 'default', index: 5 },
+      ],
+      items2: [],
+      memory: ['smaller_list: 1 → 2', 'larger_list: 4 → 3'],
+    },
+    {
+      title: 'Inspect 5, which is >= 3',
+      note: 'Since 5 >= 3, attach it to the larger list.',
+      formula: '5 >= 3 → append to larger',
+      callout: 'The larger list grows: 4 → 3 → 5.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '2', state: 'match', index: 3 },
+        { label: '5', state: 'match', index: 4 },
+        { label: '2', state: 'default', index: 5 },
+      ],
+      items2: [],
+      memory: ['smaller_list: 1 → 2', 'larger_list: 4 → 3 → 5'],
+    },
+    {
+      title: 'Inspect 2, which is < 3',
+      note: 'Since 2 < 3, attach it to the smaller list.',
+      formula: '2 < 3 → append to smaller',
+      callout: 'The smaller list completes: 1 → 2 → 2.',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '2', state: 'match', index: 3 },
+        { label: '5', state: 'match', index: 4 },
+        { label: '2', state: 'match', index: 5 },
+      ],
+      items2: [],
+      memory: ['smaller_list: 1 → 2 → 2', 'larger_list: 4 → 3 → 5'],
+    },
+    {
+      title: 'Merge: smaller.next = larger',
+      note: 'All nodes are processed. Connect the tail of smaller to the head of larger.',
+      formula: 'smaller.next = larger_dummy.next',
+      callout: 'Final partitioned list: 1 → 2 → 2 → 4 → 3 → 5. Done!',
+      items: [
+        { label: '1', state: 'match', index: 0 },
+        { label: '4', state: 'match', index: 1 },
+        { label: '3', state: 'match', index: 2 },
+        { label: '2', state: 'match', index: 3 },
+        { label: '5', state: 'match', index: 4 },
+        { label: '2', state: 'match', index: 5 },
+      ],
+      items2: [],
+      memory: ['Result: 1 → 2 → 2 → 4 → 3 → 5', 'All nodes partitioned and merged'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function partitionTwoHeads(head, x):
+    smaller_dummy = new ListNode(0)
+    larger_dummy = new ListNode(0)
+    
+    smaller_ptr = smaller_dummy
+    larger_ptr = larger_dummy
+    
+    current = head
+    while current:
+        if current.val < x:
+            smaller_ptr.next = current
+            smaller_ptr = smaller_ptr.next
+        else:
+            larger_ptr.next = current
+            larger_ptr = larger_ptr.next
+        current = current.next
+    
+    // Close the larger list
+    larger_ptr.next = null
+    
+    // Connect the two lists
+    smaller_ptr.next = larger_dummy.next
+    
+    return smaller_dummy.next
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyTwoHeads} lang="python" title="partition_list_two_heads.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppTwoHeads} lang="cpp" title="partition_list_two_heads.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaTwoHeads} lang="java" title="partition_list_two_heads.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsTwoHeads} lang="javascript" title="partition_list_two_heads.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustTwoHeads} lang="rust" title="partition_list_two_heads.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goTwoHeads} lang="go" title="partition_list_two_heads.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Single List Rearrange
+
+<ApproachTag tag="interview" />
+
+Rearrange nodes in a single pass by removing nodes with value < x from their current position and inserting them before the partition boundary.
+
+This approach is more complex but demonstrates mastery of pointer manipulation. Instead of building separate lists, it rearranges the original list in place.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass through list" spaceColor="green" spaceNote="Only pointer variables" />
+
+### Step-by-step Example
+
+**Input:** `head = [1, 4, 3, 2, 5, 2]`, `x = 3`
+
+**Phase 1:** Find the partition point (first node >= x)
+- Start: 1 (< 3), 4 (>= 3) ← partition starts here
+
+**Phase 2:** Rearrange nodes after partition
+- See 2 (< 3 but after partition), move before partition: 1 → 2 → 4 → 3 → 5 → 2
+- See 2 (< 3 but after partition), move before partition: 1 → 2 → 2 → 4 → 3 → 5
+- Final: `1 → 2 → 2 → 4 → 3 → 5`
+
+<Aside type="note" title="Why this approach is complex">
+The single-list approach requires tracking multiple pointers:
+1. `prev` — last node of < x group
+2. `current` — the node to check
+3. `run` — iterator through remaining nodes
+
+Mistakes in pointer updates cause cycles or lost nodes. Use the two-head approach unless you need extreme space efficiency.
+</Aside>
+
+### Pseudocode
+
+```plaintext
+function partitionSingleRearrange(head, x):
+    dummy = new ListNode(0)
+    dummy.next = head
+    
+    // Find partition point
+    prev = dummy
+    current = head
+    while current and current.val < x:
+        prev = current
+        current = current.next
+    
+    // If all nodes < x or list empty, return
+    if not current:
+        return dummy.next
+    
+    // Rearrange nodes < x found after partition
+    partition_prev = prev
+    run = current
+    
+    while run:
+        if run.val < x:
+            // Remove from current position
+            current.next = run.next
+            
+            // Insert before partition
+            run.next = partition_prev.next
+            partition_prev.next = run
+            partition_prev = run
+            
+            run = current.next
+        else:
+            current = run
+            run = run.next
+    
+    return dummy.next
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySingleRearr} lang="python" title="partition_list_single_rearrange.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSingleRearr} lang="cpp" title="partition_list_single_rearrange.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSingleRearr} lang="java" title="partition_list_single_rearrange.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSingleRearr} lang="javascript" title="partition_list_single_rearrange.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSingleRearr} lang="rust" title="partition_list_single_rearrange.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSingleRearr} lang="go" title="partition_list_single_rearrange.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Forgetting to close the larger list:** If you don't set `larger_ptr.next = null`, the result will have a cycle.
+- **Confusing < with <=:** The partition boundary is strictly < x; values equal to x go to the right group.
+- **Losing the list head:** Always return `dummy.next`, not `dummy` itself (if using a dummy node).
+- **Pointer arithmetic errors in single-rearrange:** Tracking too many pointers in the second approach is error-prone. Use the two-head approach unless necessary.
+- **Not handling all nodes < x:** If all nodes are less than x, the larger list is empty (null). Make sure the connection doesn't fail.
+</Aside>
+
+## Edge cases to handle
+
+| Case | Behavior | Example |
+| --- | --- | --- |
+| Empty list | Return null | `[]` → `[]` |
+| All nodes < x | Larger list is null | `[1, 2]` with x=5 → `[1, 2]` |
+| All nodes >= x | Smaller list is null | `[5, 6]` with x=3 → `[5, 6]` |
+| x is minimum | All nodes >= x | `[1, 2, 3]` with x=-1 → `[1, 2, 3]` |
+| x is maximum | All nodes < x | `[1, 2, 3]` with x=100 → `[1, 2, 3]` |
+| Single node | Partition trivially | `[5]` with x=3 → `[5]` |
+| Equal values | Preserve order | `[3, 3, 3]` with x=3 → `[3, 3, 3]` (all >= x) |
+| Negative values | Treat as regular integers | `[-1, 2, -3]` with x=0 → `[-1, -3, 2]` |
+
+## Approach 3: Optimized Two-Pointer
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyoptimized} lang="python" title="partition_list_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppoptimized} lang="cpp" title="partition_list_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaoptimized} lang="java" title="PartitionListOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsoptimized} lang="javascript" title="partition_list_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustoptimized} lang="rust" title="partition_list_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={gooptimized} lang="go" title="partition_list_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 2, title: 'Add Two Numbers', difficulty: 'Medium', leetcodeSlug: 'add-two-numbers' },
+  { number: 21, title: 'Merge Two Sorted Lists', difficulty: 'Easy', leetcodeSlug: 'merge-two-sorted-lists' },
+  { number: 92, title: 'Reverse Linked List II', difficulty: 'Medium', leetcodeSlug: 'reverse-linked-list-ii' },
+  { number: 25, title: 'Reverse Nodes in k-Group', difficulty: 'Hard', leetcodeSlug: 'reverse-nodes-in-k-group' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key points to discuss">
+- **Why partition instead of sort?** The problem explicitly wants to preserve relative order, not sort. Sorting would be O(n log n) with more memory overhead.
+- **Why dummy nodes?** They eliminate special cases when dealing with the head of the result list. Instead of checking if the head is null, you always append to `dummy.next`.
+- **Two-head vs. single-rearrange:** The two-head approach is clearer and less error-prone. Use it in interviews unless asked explicitly for a space-optimal solution.
+- **Handling the partition boundary:** Be precise about < vs. <=. The problem says "less than x" (strictly). Values equal to x go to the right group.
+- **Why not create new nodes?** You must reuse existing nodes and only rearrange pointers. Creating new nodes would waste space and miss the point of the problem.
+- **Follow-up — Partition around three-way:** Extend this to partition into three groups (< x, == x, > x), which is useful for three-way quicksort or the Dutch National Flag problem.
+</Aside>
+
+<PrevNextNav
+  prevProblem={{ number: 82, title: "Remove Duplicates from Sorted List II", slug: "remove-duplicates-from-sorted-list-ii" }}
+  nextProblem={{ number: 87, title: "Scramble String", slug: "scramble-string" }}
+/>

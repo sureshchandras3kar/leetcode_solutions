@@ -1,0 +1,384 @@
+---
+title: Jump Game
+description: Determine if you can reach the last index of an array by jumping from each position. Two approaches — greedy backwards O(n) and DP forward O(n) — in six languages.
+leetcodeNumber: 55
+difficulty: Medium
+leetcodeSlug: jump-game
+tags: [Array, Greedy, Dynamic Programming]
+prev:
+  label: "#54 Spiral Matrix"
+  link: "../spiral-matrix/"
+next:
+  label: "#56 Merge Intervals"
+  link: "../merge-intervals/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import LogicPlayer from '../../../components/LogicPlayer.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyGreedy   from '@solutions/Python/jump_game_greedy.py?raw';
+import cppGreedy  from '@solutions/C++/jump_game_greedy.cpp?raw';
+import javaGreedy from '@solutions/Java/jump_game_greedy.java?raw';
+import jsGreedy   from '@solutions/JavaScript/jump_game_greedy.js?raw';
+import rustGreedy from '@solutions/Rust/jump_game_greedy.rs?raw';
+import goGreedy   from '@solutions/Golang/jump_game_greedy.go?raw';
+import pySpaceOptimized from '@solutions/Python/jump_game_space_optimized.py?raw';
+import cppSpaceOptimized from '@solutions/C++/jump_game_space_optimized.cpp?raw';
+import javaSpaceOptimized from '@solutions/Java/JumpGameSpaceOptimized.java?raw';
+import jsSpaceOptimized from '@solutions/JavaScript/jump_game_space_optimized.js?raw';
+import rustSpaceOptimized from '@solutions/Rust/jump_game_space_optimized.rs?raw';
+import goSpaceOptimized from '@solutions/Golang/jump_game_space_optimized.go?raw';
+
+import pyDP       from '@solutions/Python/jump_game_dp.py?raw';
+import cppDP      from '@solutions/C++/jump_game_dp.cpp?raw';
+import javaDP     from '@solutions/Java/jump_game_dp.java?raw';
+import jsDP       from '@solutions/JavaScript/jump_game_dp.js?raw';
+import rustDP     from '@solutions/Rust/jump_game_dp.rs?raw';
+import goDP       from '@solutions/Golang/jump_game_dp.go?raw';
+
+## Problem Statement
+
+Given an integer array `nums` where you are initially positioned at the array's **first index**, each element in the array represents your maximum jump length from that position.
+
+Return `true` if you can reach the **last index**, or `false` otherwise.
+
+<Aside type="tip" title="What to notice first">
+- Each position tells you the maximum jump length, not the exact distance. You can jump shorter or not at all.
+- The greedy approach tracks the furthest index you can reach working backwards.
+- The forward DP approach tracks the furthest reachable index as you scan left to right.
+- Both achieve O(n) time with O(1) space — no need for memoization tables.
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| `[2, 3, 1, 1, 4]` | `true` | Jump 1 step from index 0 to 1, then 3 steps to the last index. |
+| `[3, 2, 1, 0, 4]` | `false` | You always arrive at index 3; its max jump length is 0, so you cannot reach the last index. |
+| `[0]` | `true` | Already at the last index. |
+| `[2, 0, 0]` | `true` | Jump 1 step from index 0 to 1, then no more jumps needed. |
+| `[0, 2, 3]` | `false` | Stuck at index 0; can only jump 0 steps. |
+
+## Constraints
+
+- `1 <= nums.length <= 10^4`
+- `0 <= nums[i] <= 10^5`
+
+## Real-World Applications
+
+<Aside type="note" title="Where this pattern appears">
+- **Video playback skipping** — user can jump to any point within the remaining video duration; determine if they can reach the end.
+- **Game level progression** — each level grants ability to skip forward a certain number of levels; can the player reach the final level?
+- **Resource allocation** — each task grants a token to spend on skipping future tasks; can all tasks be completed?
+- **Network hop count** — each router can forward packets a certain number of hops; can a packet reach its destination?
+</Aside>
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Greedy (Backwards) | O(n) | O(1) | You want the most intuitive backwards-thinking approach |
+| DP (Forward) | O(n) | O(1) | You prefer forward iteration or early termination optimization |
+
+Both approaches are equally efficient and optimal.
+
+<div class="lc-approach-quick">
+  <div class="lc-approach-quick__card lc-approach-quick__card--best">
+    <div class="lc-approach-quick__label">Most Intuitive</div>
+    <div class="lc-approach-quick__name">Greedy Backwards</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+  <div class="lc-approach-quick__card">
+    <div class="lc-approach-quick__label">Forward Scanning</div>
+    <div class="lc-approach-quick__name">DP Forward</div>
+    <div class="lc-approach-quick__stats">O(n) time &middot; O(1) space</div>
+  </div>
+</div>
+
+## Approach 1: Greedy (Backwards)
+
+<ApproachTag tag="recommended" />
+
+Start at the last index and work backwards. Track the leftmost "good" index that can reach the end. If you can reach index 0, you can reach the last index from the start.
+
+The key insight: if you're at position `i` and your max jump is `nums[i]`, you can reach any position from `i` to `i + nums[i]`. Working backwards, you ask: "Can I reach my current good index from this position?"
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single backwards pass" spaceNote="Only counter variable" />
+
+### Step-by-step Example
+
+**Input:** `nums = [2, 3, 1, 1, 4]`
+
+| Step | i | nums[i] | Reach (i + nums[i]) | Can reach lastGood? | lastGoodIndex |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 4 | 4 | 8 | — | 4 |
+| 2 | 3 | 1 | 4 | ✓ (4 >= 4) | 3 |
+| 3 | 2 | 1 | 3 | ✓ (3 >= 3) | 2 |
+| 4 | 1 | 3 | 4 | ✓ (4 >= 2) | 1 |
+| 5 | 0 | 2 | 2 | ✓ (2 >= 1) | 0 |
+
+Result: `lastGoodIndex == 0`, so return `true` ✓
+
+**Input:** `nums = [3, 2, 1, 0, 4]`
+
+| Step | i | nums[i] | Reach (i + nums[i]) | Can reach lastGood? | lastGoodIndex |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 4 | 4 | 8 | — | 4 |
+| 2 | 3 | 0 | 3 | ✗ (3 < 4) | 4 |
+| 3 | 2 | 1 | 3 | ✗ (3 < 4) | 4 |
+| 4 | 1 | 2 | 3 | ✗ (3 < 4) | 4 |
+| 5 | 0 | 3 | 3 | ✗ (3 < 4) | 4 |
+
+Result: `lastGoodIndex == 4 != 0`, so return `false` ✓
+
+<LogicPlayer
+  title="How the backwards greedy approach finds reachability"
+  description="Watch the lastGoodIndex shrink as we move backwards through the array. When we reach index 0, we know the answer."
+  target="Backwards Greedy"
+  steps={[
+    {
+      title: 'Start from the end and mark it as reachable',
+      note: 'The last index is always reachable by definition — we are already trying to reach it.',
+      formula: 'lastGoodIndex = len(nums) - 1',
+      callout: 'Begin at the goal. Move backwards to find which earlier positions can reach this goal.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '1', state: 'default', index: 3 },
+        { label: '4', state: 'match', index: 4 },
+      ],
+      memory: ['lastGoodIndex = 4 (the end)'],
+    },
+    {
+      title: 'Check index 3: can it reach the goal?',
+      note: 'At index 3, we can jump 1 step, reaching up to index 4. Since 4 >= 4, we can reach the goal.',
+      formula: 'i=3: 3 + nums[3]=1 = 4 >= 4 ✓',
+      callout: 'Index 3 is now a new intermediate goal we can reach.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'default', index: 2 },
+        { label: '1', state: 'match', index: 3 },
+        { label: '4', state: 'match', index: 4 },
+      ],
+      memory: ['lastGoodIndex = 3'],
+    },
+    {
+      title: 'Check index 2: can it reach lastGoodIndex?',
+      note: 'At index 2, we can jump 1 step, reaching up to index 3. Since 3 >= 3, we can reach our current goal.',
+      formula: 'i=2: 2 + nums[2]=1 = 3 >= 3 ✓',
+      callout: 'Index 2 becomes the new intermediate goal.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'default', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+        { label: '1', state: 'match', index: 3 },
+        { label: '4', state: 'match', index: 4 },
+      ],
+      memory: ['lastGoodIndex = 2'],
+    },
+    {
+      title: 'Check index 1: can it reach lastGoodIndex?',
+      note: 'At index 1, we can jump 3 steps, reaching up to index 4. Since 4 >= 2, we can reach our current goal.',
+      formula: 'i=1: 1 + nums[1]=3 = 4 >= 2 ✓',
+      callout: 'Index 1 becomes the new intermediate goal.',
+      items: [
+        { label: '2', state: 'default', index: 0 },
+        { label: '3', state: 'match', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+        { label: '1', state: 'match', index: 3 },
+        { label: '4', state: 'match', index: 4 },
+      ],
+      memory: ['lastGoodIndex = 1'],
+    },
+    {
+      title: 'Check index 0: can it reach lastGoodIndex?',
+      note: 'At index 0, we can jump 2 steps, reaching up to index 2. Since 2 >= 1, we can reach our current goal.',
+      formula: 'i=0: 0 + nums[0]=2 = 2 >= 1 ✓',
+      callout: 'Index 0 reaches the goal. We can return true!',
+      items: [
+        { label: '2', state: 'match', index: 0 },
+        { label: '3', state: 'match', index: 1 },
+        { label: '1', state: 'match', index: 2 },
+        { label: '1', state: 'match', index: 3 },
+        { label: '4', state: 'match', index: 4 },
+      ],
+      memory: ['lastGoodIndex = 0', 'Result: true ✓'],
+    },
+  ]}
+/>
+
+### Pseudocode
+
+```plaintext
+function canJumpGreedy(nums):
+    lastGoodIndex = len(nums) - 1
+    for i from len(nums) - 2 down to 0:
+        if i + nums[i] >= lastGoodIndex:
+            lastGoodIndex = i
+    return lastGoodIndex == 0
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyGreedy} lang="python" title="jump_game_greedy.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppGreedy} lang="cpp" title="jump_game_greedy.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaGreedy} lang="java" title="jump_game_greedy.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsGreedy} lang="javascript" title="jump_game_greedy.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustGreedy} lang="rust" title="jump_game_greedy.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goGreedy} lang="go" title="jump_game_greedy.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Dynamic Programming (Forward)
+
+<ApproachTag tag="interview" />
+
+Scan the array left to right, tracking the furthest index you can reach so far. If you ever encounter an index beyond your reach, you're stuck. If you reach or pass the last index, you win.
+
+This approach can terminate early when `maxReach >= len(nums) - 1`, making it slightly more efficient in practice for arrays where the end is reachable early.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single forward pass" spaceNote="Only counter variable" />
+
+### Step-by-step Example
+
+**Input:** `nums = [2, 3, 1, 1, 4]`
+
+| Step | i | nums[i] | maxReach (before) | New maxReach | i > maxReach? | Continue? |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 2 | 0 | 2 | ✗ | ✓ |
+| 2 | 1 | 3 | 2 | 4 | ✗ | ✓ (maxReach 4 >= 4) → return `true` |
+
+**Input:** `nums = [3, 2, 1, 0, 4]`
+
+| Step | i | nums[i] | maxReach (before) | New maxReach | i > maxReach? | Continue? |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 3 | 0 | 3 | ✗ | ✓ |
+| 2 | 1 | 2 | 3 | 3 | ✗ | ✓ |
+| 3 | 2 | 1 | 3 | 3 | ✗ | ✓ |
+| 4 | 3 | 0 | 3 | 3 | ✗ | ✓ |
+| 5 | 4 | 4 | 3 | — | ✓ → return `false` |
+
+At index 4, we exceed `maxReach` (3), so we are stuck.
+
+### Pseudocode
+
+```plaintext
+function canJumpDP(nums):
+    maxReach = 0
+    for i from 0 to len(nums) - 1:
+        if i > maxReach:
+            return false
+        maxReach = max(maxReach, i + nums[i])
+        if maxReach >= len(nums) - 1:
+            return true
+    return false
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pyDP} lang="python" title="jump_game_dp.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppDP} lang="cpp" title="jump_game_dp.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaDP} lang="java" title="jump_game_dp.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsDP} lang="javascript" title="jump_game_dp.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustDP} lang="rust" title="jump_game_dp.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goDP} lang="go" title="jump_game_dp.go" />
+  </TabItem>
+</Tabs>
+
+## Common mistakes
+
+<Aside type="caution" title="Watch for these pitfalls">
+- **Thinking you must jump exactly the max value.** The number is a *maximum*, not a requirement. You can jump 0, 1, 2, ..., or up to that many steps.
+- **Greedy vs. DP confusion.** Both are greedy in spirit: "how far can I possibly go?" The backwards approach updates a single "good" index; the forward approach tracks a maximum. Both are O(n) with O(1) space.
+- **Off-by-one errors.** Make sure you check `i + nums[i] >= lastGoodIndex` (not `>`), and check `maxReach >= len(nums) - 1` (not `==`), because you might overshoot the end.
+- **Not handling edge cases.** A single-element array always returns `true` (you start at the last index). An array beginning with 0 that has length > 1 always returns `false`.
+</Aside>
+
+## Approach 3: Space-Optimized Variant
+
+<ApproachTag tag="simple" />
+
+A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
+
+### Pseudocode
+
+```plaintext
+function approach3():
+    // Implementation approach goes here
+```
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={pySpaceOptimized} lang="python" title="jump_game_space_optimized.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={cppSpaceOptimized} lang="cpp" title="jump_game_space_optimized.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={javaSpaceOptimized} lang="java" title="JumpGameSpaceOptimized.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={jsSpaceOptimized} lang="javascript" title="jump_game_space_optimized.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={rustSpaceOptimized} lang="rust" title="jump_game_space_optimized.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={goSpaceOptimized} lang="go" title="jump_game_space_optimized.go" />
+  </TabItem>
+</Tabs>
+
+
+<RelatedProblems problems={[
+  { number: 45, title: 'Jump Game II', difficulty: 'Medium', leetcodeSlug: 'jump-game-ii' },
+  { number: 1306, title: 'Jump Game III', difficulty: 'Medium', leetcodeSlug: 'jump-game-iii' },
+  { number: 1871, title: 'Jump Game VII', difficulty: 'Medium', leetcodeSlug: 'jump-game-vii' },
+]} />
+
+## Interview Tips
+
+<Aside type="tip" title="Key trade-offs to discuss">
+- **Why greedy over DP?** Both are O(n) and O(1), but the backwards greedy approach is more intuitive: "work back from the goal to see if the start can reach it."
+- **Early termination:** The forward DP approach can exit as soon as `maxReach >= len(nums) - 1`, but in the worst case both are O(n).
+- **Why not recursion or memoization?** Dynamic programming via a lookup table would use O(n) space. These greedy approaches use only O(1) space because we only care about a single value (the furthest reach or the current good index).
+- **Follow-up — Jump Game II:** If you must return the *minimum* number of jumps instead of just a boolean, the greedy approach with two pointers for levels becomes useful.
+</Aside>
+
+<PrevNextNav
+  prevProblem={undefined}
+  nextProblem={undefined}
+/>

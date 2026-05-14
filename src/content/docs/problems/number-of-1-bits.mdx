@@ -1,0 +1,182 @@
+---
+title: Number of 1 Bits
+description: Write a function that takes an unsigned integer and returns the number of 1 bits (Hamming weight).
+leetcodeNumber: 191
+difficulty: Easy
+leetcodeSlug: number-of-1-bits
+tags: ["Bit Manipulation"]
+prev:
+  label: "#190 Reverse Bits"
+  link: "../reverse-bits/"
+next:
+  label: "#198 House Robber"
+  link: "../house-robber/"
+---
+
+import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
+import ComplexityBadges from '../../../components/ComplexityBadges.astro';
+import ApproachTag from '../../../components/ApproachTag.astro';
+import RelatedProblems from '../../../components/RelatedProblems.astro';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
+
+import pyLoop from '@solutions/Python/number_of_1_bits_loop.py?raw';
+import cppLoop from '@solutions/C++/number_of_1_bits_loop.cpp?raw';
+import javaLoop from '@solutions/Java/number_of_1_bits_loop.java?raw';
+import jsLoop from '@solutions/JavaScript/number_of_1_bits_loop.js?raw';
+import rustLoop from '@solutions/Rust/number_of_1_bits_loop.rs?raw';
+import goLoop from '@solutions/Golang/number_of_1_bits_loop.go?raw';
+
+import pyKernighan from '@solutions/Python/number_of_1_bits_kernighan.py?raw';
+import cppKernighan from '@solutions/C++/number_of_1_bits_kernighan.cpp?raw';
+import javaKernighan from '@solutions/Java/number_of_1_bits_kernighan.java?raw';
+import jsKernighan from '@solutions/JavaScript/number_of_1_bits_kernighan.js?raw';
+import rustKernighan from '@solutions/Rust/number_of_1_bits_kernighan.rs?raw';
+import goKernighan from '@solutions/Golang/number_of_1_bits_kernighan.go?raw';
+
+import pyBuiltin from '@solutions/Python/number_of_1_bits_builtin.py?raw';
+import cppBuiltin from '@solutions/C++/number_of_1_bits_builtin.cpp?raw';
+import javaBuiltin from '@solutions/Java/number_of_1_bits_builtin.java?raw';
+import jsBuiltin from '@solutions/JavaScript/number_of_1_bits_builtin.js?raw';
+import rustBuiltin from '@solutions/Rust/number_of_1_bits_builtin.rs?raw';
+import goBuiltin from '@solutions/Golang/number_of_1_bits_builtin.go?raw';
+
+
+
+## Problem Statement
+
+Write a function that takes an unsigned integer and returns the number of 1 bits (Hamming weight).
+
+You need to solve this problem efficiently.
+
+<Aside type="tip" title="What to notice first">
+- Key insight 1 for Number of 1 Bits
+- Key insight 2 for solving this problem
+- Key insight 3 specific to the approach
+</Aside>
+
+### Examples
+
+| Input | Output | Explanation |
+| --- | --- | --- |
+| Example 1 | Result 1 | Explanation for example 1 |
+| Example 2 | Result 2 | Explanation for example 2 |
+
+## Constraints
+
+- Constraint 1 for Number of 1 Bits
+- Constraint 2
+- Constraint 3
+
+## Complexity Comparison
+
+| Approach | Time | Space | Best When |
+| --- | --- | --- | --- |
+| Loop | O(n) | O(1) | When applicable |
+| Kernighan | O(n) | O(1) | When applicable |
+| Builtin | O(n) | O(1) | When applicable |
+
+
+## Approach 1: Loop
+
+<ApproachTag tag="recommended" />
+
+This approach provides an efficient solution for number of 1 bits.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyLoop}} lang="python" title="number_of_1_bits_loop.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppLoop}} lang="cpp" title="number_of_1_bits_loop.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaLoop}} lang="java" title="number_of_1_bits_loop.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsLoop}} lang="javascript" title="number_of_1_bits_loop.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustLoop}} lang="rust" title="number_of_1_bits_loop.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goLoop}} lang="go" title="number_of_1_bits_loop.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 2: Kernighan
+
+<ApproachTag tag="interview" />
+
+This approach provides an efficient solution for number of 1 bits.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyKernighan}} lang="python" title="number_of_1_bits_kernighan.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppKernighan}} lang="cpp" title="number_of_1_bits_kernighan.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaKernighan}} lang="java" title="number_of_1_bits_kernighan.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsKernighan}} lang="javascript" title="number_of_1_bits_kernighan.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustKernighan}} lang="rust" title="number_of_1_bits_kernighan.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goKernighan}} lang="go" title="number_of_1_bits_kernighan.go" />
+  </TabItem>
+</Tabs>
+
+## Approach 3: Builtin
+
+<ApproachTag tag="simple" />
+
+This approach provides an efficient solution for number of 1 bits.
+
+<ComplexityBadges time="O(n)" space="O(1)" timeColor="green" spaceColor="green" timeNote="Single pass" spaceNote="Minimal storage" />
+
+### Solution Code
+
+<Tabs>
+  <TabItem label="Python">
+    <Code code={{pyBuiltin}} lang="python" title="number_of_1_bits_builtin.py" />
+  </TabItem>
+  <TabItem label="C++">
+    <Code code={{cppBuiltin}} lang="cpp" title="number_of_1_bits_builtin.cpp" />
+  </TabItem>
+  <TabItem label="Java">
+    <Code code={{javaBuiltin}} lang="java" title="number_of_1_bits_builtin.java" />
+  </TabItem>
+  <TabItem label="JavaScript">
+    <Code code={{jsBuiltin}} lang="javascript" title="number_of_1_bits_builtin.js" />
+  </TabItem>
+  <TabItem label="Rust">
+    <Code code={{rustBuiltin}} lang="rust" title="number_of_1_bits_builtin.rs" />
+  </TabItem>
+  <TabItem label="Go">
+    <Code code={{goBuiltin}} lang="go" title="number_of_1_bits_builtin.go" />
+  </TabItem>
+</Tabs>
+
+
+
+<RelatedProblems problems={{
+  { number: 1, title: 'Two Sum', difficulty: 'Easy', leetcodeSlug: 'two-sum' },
+  { number: 9, title: 'Palindrome Number', difficulty: 'Easy', leetcodeSlug: 'palindrome-number' },
+}} />
+
+<PrevNextNav
+  prevProblem={ number: 190, title: "Reverse Bits", slug: "reverse-bits" }
+  nextProblem=undefined
+/>
