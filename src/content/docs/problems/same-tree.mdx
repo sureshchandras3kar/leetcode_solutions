@@ -26,12 +26,6 @@ import javaDFS  from '@solutions/Java/same_tree_dfs.java?raw';
 import jsDFS    from '@solutions/JavaScript/same_tree_dfs.js?raw';
 import rustDFS  from '@solutions/Rust/same_tree_dfs.rs?raw';
 import goDFS    from '@solutions/Golang/same_tree_dfs.go?raw';
-import pybfsIterative from '@solutions/Python/same_tree_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/same_tree_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/SameTreeBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/same_tree_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/same_tree_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/same_tree_bfs_iterative.go?raw';
 
 import pyBFS    from '@solutions/Python/same_tree_bfs.py?raw';
 import cppBFS   from '@solutions/C++/same_tree_bfs.cpp?raw';
@@ -286,45 +280,6 @@ function isSameTree(p, q):
 - **One structure, two algorithms:** The same comparison logic applies; the difference is traversal order.
 </Aside>
 
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="same_tree_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="same_tree_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="SameTreeBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="same_tree_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="same_tree_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="same_tree_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
-
 <RelatedProblems problems={[
   { number: 101, title: 'Symmetric Tree', difficulty: 'Easy', slug: 'problems/symmetric-tree' },
   { number: 104, title: 'Maximum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'maximum-depth-of-binary-tree' },
@@ -341,8 +296,7 @@ function approach3():
 - **Follow-up:** "How would you modify this to check if p is a subtree of q?" (Problem #572) — great discussion point.
 - **Tree validation:** This pattern is foundational for tree comparison, cloning verification, and DOM reconciliation in frameworks.
 
-
 <PrevNextNav
-  prevProblem={ number: 98, title: "Validate Binary Search Tree", slug: "validate-binary-search-tree" }
-  nextProblem={ number: 101, title: "Symmetric Tree", slug: "symmetric-tree" }
+  prevProblem={{ number: 98, title: "Validate Binary Search Tree", slug: "validate-binary-search-tree" }}
+  nextProblem={{ number: 101, title: "Symmetric Tree", slug: "symmetric-tree" }}
 /></Aside>

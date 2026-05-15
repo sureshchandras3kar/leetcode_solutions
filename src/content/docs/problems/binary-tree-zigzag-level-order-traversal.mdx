@@ -23,12 +23,6 @@ import javaDeque   from '@solutions/Java/binary_tree_zigzag_level_order_traversa
 import jsDeque     from '@solutions/JavaScript/binary_tree_zigzag_level_order_traversal_deque.js?raw';
 import rustDeque   from '@solutions/Rust/binary_tree_zigzag_level_order_traversal_deque.rs?raw';
 import goDeque     from '@solutions/Golang/binary_tree_zigzag_level_order_traversal_deque.go?raw';
-import pybfsIterative from '@solutions/Python/binary_tree_zigzag_level_order_traversal_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/binary_tree_zigzag_level_order_traversal_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/BinaryTreeZigzagLevelOrderTraversalBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/binary_tree_zigzag_level_order_traversal_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/binary_tree_zigzag_level_order_traversal_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/binary_tree_zigzag_level_order_traversal_bfs_iterative.go?raw';
 
 import pyParity     from '@solutions/Python/binary_tree_zigzag_level_order_traversal_parity.py?raw';
 import cppParity    from '@solutions/C++/binary_tree_zigzag_level_order_traversal_parity.cpp?raw';
@@ -36,6 +30,7 @@ import javaParity   from '@solutions/Java/binary_tree_zigzag_level_order_travers
 import jsParity     from '@solutions/JavaScript/binary_tree_zigzag_level_order_traversal_parity.js?raw';
 import rustParity   from '@solutions/Rust/binary_tree_zigzag_level_order_traversal_parity.rs?raw';
 import goParity     from '@solutions/Golang/binary_tree_zigzag_level_order_traversal_parity.go?raw';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 ## Problem Statement
 
@@ -131,44 +126,6 @@ Use DFS and check level parity to determine insertion direction.
     <Code code={goParity} lang="go" title="binary_tree_zigzag_level_order_traversal_parity.go" />
   </TabItem>
 </Tabs>
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="BinaryTreeZigzagLevelOrderTraversalBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="binary_tree_zigzag_level_order_traversal_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
 ## Interview Tips
 
 <Aside type="tip" title="Key trade-offs to discuss">
@@ -182,5 +139,4 @@ function approach3():
   prevProblem={undefined}
   nextProblem={undefined}
 />
-
 

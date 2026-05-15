@@ -1,53 +1,27 @@
-import java.util.Stack;
+import java.util.*;
 
-public class MinimumAbsoluteDifferenceInBST_BFS {
-    static class TreeNode {
-        int val;
-        TreeNode left;
-        TreeNode right;
-
-        TreeNode(int val) {
-            this.val = val;
-        }
-    }
-
+class Solution {
     public int getMinimumDifference(TreeNode root) {
-        Stack<TreeNode> stack = new Stack<>();
-        TreeNode current = root;
-        TreeNode prev = null;
         int minDiff = Integer.MAX_VALUE;
-
-        while (!stack.isEmpty() || current != null) {
-            // Go to leftmost node
-            while (current != null) {
-                stack.push(current);
-                current = current.left;
+        Integer prevVal = null;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            if (node == null) continue;
+            
+            if (prevVal != null) {
+                minDiff = Math.min(minDiff, Math.abs(node.val - prevVal));
             }
-
-            // Current is null, pop from stack
-            current = stack.pop();
-
-            // Process current node
-            if (prev != null) {
-                minDiff = Math.min(minDiff, current.val - prev.val);
-            }
-            prev = current;
-
-            // Visit right subtree
-            current = current.right;
+            prevVal = node.val;
+            
+            if (node.left != null) queue.offer(node.left);
+            if (node.right != null) queue.offer(node.right);
         }
-
+        
         return minDiff;
     }
-
-    public static void main(String[] args) {
-        TreeNode root = new TreeNode(4);
-        root.left = new TreeNode(2);
-        root.right = new TreeNode(6);
-        root.left.left = new TreeNode(1);
-        root.left.right = new TreeNode(3);
-
-        MinimumAbsoluteDifferenceInBST_BFS sol = new MinimumAbsoluteDifferenceInBST_BFS();
-        System.out.println(sol.getMinimumDifference(root));  // 1
-    }
 }
+
+System.out.println("MinDiff Solution");

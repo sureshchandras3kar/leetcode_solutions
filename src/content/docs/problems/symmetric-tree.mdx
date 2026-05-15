@@ -26,12 +26,6 @@ import javaDFS    from '@solutions/Java/symmetric_tree_dfs.java?raw';
 import jsDFS      from '@solutions/JavaScript/symmetric_tree_dfs.js?raw';
 import rustDFS    from '@solutions/Rust/symmetric_tree_dfs.rs?raw';
 import goDFS      from '@solutions/Golang/symmetric_tree_dfs.go?raw';
-import pybfsIterative from '@solutions/Python/symmetric_tree_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/symmetric_tree_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/SymmetricTreeBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/symmetric_tree_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/symmetric_tree_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/symmetric_tree_bfs_iterative.go?raw';
 
 import pyBFS      from '@solutions/Python/symmetric_tree_bfs.py?raw';
 import cppBFS     from '@solutions/C++/symmetric_tree_bfs.cpp?raw';
@@ -138,7 +132,7 @@ The key insight is to **compare the left and right subtrees as mirror images**: 
   steps={[
     {
       title: 'Start with root and its mirrored subtrees',
-      note: 'Begin by comparing the root\'s left and right children as if they should be mirrors.',
+      note: "Begin by comparing the root's left and right children as if they should be mirrors.",
       formula: 'isMirror(root.left, root.right)',
       callout: 'Both subtree roots are 2, so they have matching values. Now check their children.',
       items: [
@@ -149,8 +143,8 @@ The key insight is to **compare the left and right subtrees as mirror images**: 
       memory: ['Comparing left and right subtrees'],
     },
     {
-      title: 'Check left\'s left with right\'s right',
-      note: 'In a mirror, the left subtree\'s left child should equal the right subtree\'s right child.',
+      title: "Check left's left with right's right",
+      note: "In a mirror, the left subtree's left child should equal the right subtree's right child.",
       formula: 'isMirror(left.left, right.right)',
       callout: 'Node 3 from left matches node 3 from right. This pair is symmetric.',
       items: [
@@ -162,8 +156,8 @@ The key insight is to **compare the left and right subtrees as mirror images**: 
       memory: ['3 == 3 (mirror pair verified)'],
     },
     {
-      title: 'Check left\'s right with right\'s left',
-      note: 'The left subtree\'s right child should equal the right subtree\'s left child.',
+      title: "Check left's right with right's left",
+      note: "The left subtree's right child should equal the right subtree's left child.",
       formula: 'isMirror(left.right, right.left)',
       callout: 'Node 4 from left matches node 4 from right. Complete mirror verified.',
       items: [
@@ -301,45 +295,6 @@ function isSymmetricBFS(root):
 - **Space usage:** DFS uses call stack (height-bound); BFS uses explicit queue (width-bound). On a balanced tree, both are similar; on a skewed tree, BFS can be better.
 - **Related problem:** Compare with #100 (Same Tree), which checks if two trees are identical, not mirrored. The key difference is the pairing logic.
 </Aside>
-
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="symmetric_tree_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="symmetric_tree_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="SymmetricTreeBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="symmetric_tree_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="symmetric_tree_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="symmetric_tree_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
 
 <RelatedProblems problems={[
   { number: 100, title: 'Same Tree', difficulty: 'Easy', leetcodeSlug: 'same-tree' },

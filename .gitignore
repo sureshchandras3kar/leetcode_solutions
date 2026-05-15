@@ -1,14 +1,33 @@
-.idea
+# IDE
+.idea/
+.vscode/
 *.iml
-out
-gen
+*.code-workspace
 
-# Astro build output
+# Build output
 dist/
 .astro/
+out/
 
 # Node
 node_modules/
+npm-debug.log*
+yarn-debug.log*
 
-# macOS
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Temporary
+*.tmp
+*.log
+.cache/
+

@@ -1,38 +1,34 @@
 class Solution {
     public int snakesAndLadders(int[][] board) {
         int n = board.length;
-        Map<Integer, Integer> memo = new HashMap<>();
-        return dfs(board, 1, n, memo);
+        return dfs(1, board, n, new boolean[n * n + 1]);
     }
     
-    private int dfs(int[][] board, int pos, int n, Map<Integer, Integer> memo) {
+    private int dfs(int pos, int[][] board, int n, boolean[] visited) {
         if (pos == n * n) return 0;
-        if (memo.containsKey(pos)) return memo.get(pos);
+        visited[pos] = true;
+        int minMoves = Integer.MAX_VALUE;
         
-        int result = Integer.MAX_VALUE;
-        for (int i = 1; i <= 6; i++) {
-            int nextPos = pos + i;
-            if (nextPos > n * n) break;
+        for (int next = pos + 1; next <= Math.min(pos + 6, n * n); next++) {
+            int[] cell = getCell(next, n);
+            int destination = board[cell[0]][cell[1]];
+            if (destination != -1) next = destination;
             
-            int[] coords = getCoords(nextPos, n);
-            if (board[coords[0]][coords[1]] != -1) {
-                nextPos = board[coords[0]][coords[1]];
-            }
-            
-            int sub = dfs(board, nextPos, n, memo);
-            if (sub != Integer.MAX_VALUE) {
-                result = Math.min(result, 1 + sub);
+            if (!visited[next]) {
+                int moves = dfs(next, board, n, visited);
+                if (moves != Integer.MAX_VALUE) {
+                    minMoves = Math.min(minMoves, moves + 1);
+                }
             }
         }
         
-        memo.put(pos, result);
-        return result;
+        return minMoves;
     }
     
-    private int[] getCoords(int pos, int n) {
-        pos--;
-        int row = n - 1 - pos / n;
-        int col = (n - 1 - row) % 2 == 0 ? pos % n : n - 1 - pos % n;
-        return new int[]{row, col};
+    private int[] getCell(int pos, int n) {
+        int row = (pos - 1) / n;
+        int col = (pos - 1) % n;
+        if (row % 2 == 1) col = n - 1 - col;
+        return new int[]{n - 1 - row, col};
     }
 }

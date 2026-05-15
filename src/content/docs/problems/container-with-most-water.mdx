@@ -167,7 +167,7 @@ Start with the widest possible container — left pointer at index 0, right poin
       title: 'Pointers converge — answer is 49',
       note: 'After all steps, the pointers meet and the loop ends. The maximum water stored is 49.',
       formula: 'max_water = 49',
-      callout: 'left >= right → return 49',
+      callout: 'left &gt;= right → return 49',
       items: [
         { label: '1', state: 'default', index: 0 },
         { label: '8', state: 'match', index: 1 },
@@ -328,7 +328,7 @@ function approach3():
 
 <RelatedProblems problems={[
   { number: 42,  title: 'Trapping Rain Water',           difficulty: 'Hard',   leetcodeSlug: 'trapping-rain-water' },
-  { number: 15,  title: '3Sum',                          difficulty: 'Medium', slug: 'problems/three-sum', leetcodeSlug: '3sum' },
+  { number: 15,  title: '3Sum',                          difficulty: 'Medium',  leetcodeSlug: '3sum' },
   { number: 84,  title: 'Largest Rectangle in Histogram', difficulty: 'Hard',  leetcodeSlug: 'largest-rectangle-in-histogram' },
 ]} />
 
@@ -341,6 +341,6 @@ function approach3():
 
 
 <PrevNextNav
-  prevProblem={ number: 9, title: "Palindrome Number", slug: "palindrome-number" }
-  nextProblem={ number: 15, title: "3Sum", slug: "three-sum" }
+  prevProblem={{ number: 9, title: "Palindrome Number", slug: "palindrome-number" }}
+  nextProblem={{ number: 15, title: "3Sum", slug: "three-sum" }}
 /></Aside>

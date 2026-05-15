@@ -21,20 +21,14 @@ import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyApproach1 from '@solutions/Python/minimum_genetic_mutation_bfs.py?raw';
 import cppApproach1 from '@solutions/C++/minimum_genetic_mutation_bfs.cpp?raw';
-import javaApproach1 from '@solutions/Java/MinimumGeneticMutationBfs.java?raw';
+import javaApproach1 from '@solutions/Java/MinimumGeneticMutationBFS.java?raw';
 import jsApproach1 from '@solutions/JavaScript/minimum_genetic_mutation_bfs.js?raw';
 import rustApproach1 from '@solutions/Rust/minimum_genetic_mutation_bfs.rs?raw';
 import goApproach1 from '@solutions/Golang/minimum_genetic_mutation_bfs.go?raw';
-import pybfsIterative from '@solutions/Python/minimum_genetic_mutation_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/minimum_genetic_mutation_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/MinimumGeneticMutationBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/minimum_genetic_mutation_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/minimum_genetic_mutation_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/minimum_genetic_mutation_bfs_iterative.go?raw';
 
 import pyApproach2 from '@solutions/Python/minimum_genetic_mutation_dfs.py?raw';
 import cppApproach2 from '@solutions/C++/minimum_genetic_mutation_dfs.cpp?raw';
-import javaApproach2 from '@solutions/Java/MinimumGeneticMutationDfs.java?raw';
+import javaApproach2 from '@solutions/Java/MinimumGeneticMutationDFS.java?raw';
 import jsApproach2 from '@solutions/JavaScript/minimum_genetic_mutation_dfs.js?raw';
 import rustApproach2 from '@solutions/Rust/minimum_genetic_mutation_dfs.rs?raw';
 import goApproach2 from '@solutions/Golang/minimum_genetic_mutation_dfs.go?raw';
@@ -145,45 +139,6 @@ Suppose we need to investigate a mutation from a `startGene` to an `endGene` whe
     <Code code={goApproach2} lang="go" title="minimum_genetic_mutation_dfs.go" />
   </TabItem>
 </Tabs>
-
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="minimum_genetic_mutation_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="minimum_genetic_mutation_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="MinimumGeneticMutationBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="minimum_genetic_mutation_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="minimum_genetic_mutation_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="minimum_genetic_mutation_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
 
 ## Interview Tips
 

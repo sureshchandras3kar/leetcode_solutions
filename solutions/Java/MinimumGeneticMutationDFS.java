@@ -5,35 +5,41 @@ class Solution {
         Set<String> bankSet = new HashSet<>(Arrays.asList(bank));
         if (!bankSet.contains(endGene)) return -1;
         
-        Map<String, Integer> memo = new HashMap<>();
-        char[] chars = {'A', 'C', 'G', 'T'};
-        return dfs(startGene, endGene, bankSet, memo, chars);
+        Set<String> visited = new HashSet<>();
+        return dfs(startGene, endGene, bankSet, visited);
     }
     
-    private int dfs(String gene, String endGene, Set<String> bankSet, Map<String, Integer> memo, char[] chars) {
-        if (gene.equals(endGene)) return 0;
-        if (memo.containsKey(gene)) return memo.get(gene);
+    private int dfs(String curr, String end, Set<String> bank, Set<String> visited) {
+        if (curr.equals(end)) return 0;
+        visited.add(curr);
+        int minSteps = Integer.MAX_VALUE;
         
-        int result = Integer.MAX_VALUE;
-        char[] arr = gene.toCharArray();
-        for (int j = 0; j < arr.length; j++) {
-            char old = arr[j];
+        for (String next : getNeighbors(curr, bank, visited)) {
+            int steps = dfs(next, end, bank, visited);
+            if (steps != -1) minSteps = Math.min(minSteps, steps + 1);
+        }
+        
+        return minSteps == Integer.MAX_VALUE ? -1 : minSteps;
+    }
+    
+    private List<String> getNeighbors(String gene, Set<String> bank, Set<String> visited) {
+        List<String> neighbors = new ArrayList<>();
+        char[] genes = gene.toCharArray();
+        char[] chars = {'A', 'C', 'G', 'T'};
+        
+        for (int i = 0; i < genes.length; i++) {
+            char old = genes[i];
             for (char c : chars) {
                 if (c != old) {
-                    arr[j] = c;
-                    String newGene = new String(arr);
-                    if (bankSet.contains(newGene)) {
-                        int sub = dfs(newGene, endGene, bankSet, memo, chars);
-                        if (sub != Integer.MAX_VALUE) {
-                            result = Math.min(result, 1 + sub);
-                        }
+                    genes[i] = c;
+                    String neighbor = new String(genes);
+                    if (bank.contains(neighbor) && !visited.contains(neighbor)) {
+                        neighbors.add(neighbor);
                     }
                 }
             }
-            arr[j] = old;
+            genes[i] = old;
         }
-        
-        memo.put(gene, result);
-        return result;
+        return neighbors;
     }
 }

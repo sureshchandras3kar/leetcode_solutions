@@ -3,39 +3,38 @@ import java.util.*;
 class Solution {
     public int snakesAndLadders(int[][] board) {
         int n = board.length;
-        Queue<int[]> queue = new LinkedList<>();
-        queue.offer(new int[]{1, 0});
-        boolean[] visited = new boolean[n * n + 1];
-        visited[1] = true;
+        Queue<Integer> queue = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();
+        queue.offer(1);
+        visited.add(1);
+        int moves = 0;
         
         while (!queue.isEmpty()) {
-            int[] curr = queue.poll();
-            int pos = curr[0], moves = curr[1];
-            
-            if (pos == n * n) return moves;
-            
-            for (int i = 1; i <= 6; i++) {
-                int nextPos = pos + i;
-                if (nextPos > n * n) break;
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                int pos = queue.poll();
+                if (pos == n * n) return moves;
                 
-                int[] coords = getCoords(nextPos, n);
-                if (board[coords[0]][coords[1]] != -1) {
-                    nextPos = board[coords[0]][coords[1]];
-                }
-                
-                if (!visited[nextPos]) {
-                    visited[nextPos] = true;
-                    queue.offer(new int[]{nextPos, moves + 1});
+                for (int next = pos + 1; next <= Math.min(pos + 6, n * n); next++) {
+                    int[] cell = getCell(next, n);
+                    int destination = board[cell[0]][cell[1]];
+                    if (destination != -1) next = destination;
+                    
+                    if (!visited.contains(next)) {
+                        visited.add(next);
+                        queue.offer(next);
+                    }
                 }
             }
+            moves++;
         }
         return -1;
     }
     
-    private int[] getCoords(int pos, int n) {
-        pos--;
-        int row = n - 1 - pos / n;
-        int col = (n - 1 - row) % 2 == 0 ? pos % n : n - 1 - pos % n;
-        return new int[]{row, col};
+    private int[] getCell(int pos, int n) {
+        int row = (pos - 1) / n;
+        int col = (pos - 1) % n;
+        if (row % 2 == 1) col = n - 1 - col;
+        return new int[]{n - 1 - row, col};
     }
 }

@@ -90,11 +90,11 @@ After replacing 0→-1: `[-1, 1, -1, 1]`
 
 | i | num | delta | prefix | seen (before) | length if match | best |
 | --- | --- | --- | --- | --- | --- | --- |
-| — | — | — | 0 | `{}` | — | 0 |
-| 0 | 0 | -1 | -1 | `{0:-1}` | — | 0 |
-| 1 | 1 | +1 | 0 | `{0:-1, -1:0}` | 1−(−1)=**2** | 2 |
-| 2 | 0 | -1 | -1 | `{0:-1, -1:0}` | 2−0=**2** | 2 |
-| 3 | 1 | +1 | 0 | `{0:-1, -1:0}` | 3−(−1)=**4** | 4 |
+| — | — | — | 0 | `&#123;&#125;` | — | 0 |
+| 0 | 0 | -1 | -1 | `&#123;0:-1&#125;` | — | 0 |
+| 1 | 1 | +1 | 0 | `&#123;0:-1, -1:0&#125;` | 1−(−1)=**2** | 2 |
+| 2 | 0 | -1 | -1 | `&#123;0:-1, -1:0&#125;` | 2−0=**2** | 2 |
+| 3 | 1 | +1 | 0 | `&#123;0:-1, -1:0&#125;` | 3−(−1)=**4** | 4 |
 
 **Result:** 4
 
@@ -104,10 +104,10 @@ After replacing 0→-1: `[-1, 1, -1]`
 
 | i | delta | prefix | seen (before) | length if match | best |
 | --- | --- | --- | --- | --- | --- |
-| — | — | 0 | `{}` | — | 0 |
-| 0 | -1 | -1 | `{0:-1}` | — | 0 |
-| 1 | +1 | 0 | `{0:-1, -1:0}` | 1−(−1)=**2** | 2 |
-| 2 | -1 | -1 | `{0:-1, -1:0}` | 2−0=**2** | 2 |
+| — | — | 0 | `&#123;&#125;` | — | 0 |
+| 0 | -1 | -1 | `&#123;0:-1&#125;` | — | 0 |
+| 1 | +1 | 0 | `&#123;0:-1, -1:0&#125;` | 1−(−1)=**2** | 2 |
+| 2 | -1 | -1 | `&#123;0:-1, -1:0&#125;` | 2−0=**2** | 2 |
 
 **Result:** 2
 
@@ -231,8 +231,8 @@ function findMaxLength(nums):
 </Aside>
 
 <RelatedProblems problems={[
-  { number: 560, title: 'Subarray Sum Equals K',         difficulty: 'Medium', slug: 'problems/subarray-sum-equals-k', leetcodeSlug: 'subarray-sum-equals-k' },
-  { number: 1,   title: 'Two Sum',                       difficulty: 'Easy',   slug: 'problems/two-sum',              leetcodeSlug: 'two-sum' },
+  { number: 560, title: 'Subarray Sum Equals K',         difficulty: 'Medium',  leetcodeSlug: 'subarray-sum-equals-k' },
+  { number: 1,   title: 'Two Sum',                       difficulty: 'Easy',               leetcodeSlug: 'two-sum' },
   { number: 128, title: 'Longest Consecutive Sequence',  difficulty: 'Medium',                                        leetcodeSlug: 'longest-consecutive-sequence' },
 ]} />
 

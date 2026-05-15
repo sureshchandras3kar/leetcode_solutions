@@ -19,25 +19,19 @@ import ApproachTag from '../../../components/ApproachTag.astro';
 import RelatedProblems from '../../../components/RelatedProblems.astro';
 import PrevNextNav from '../../../components/PrevNextNav.astro';
 
-import pyApproach1 from '@solutions/Python/course_schedule_ii_dfs_topological.py?raw';
-import cppApproach1 from '@solutions/C++/course_schedule_ii_dfs_topological.cpp?raw';
-import javaApproach1 from '@solutions/Java/CourseScheduleIiDfsTopological.java?raw';
-import jsApproach1 from '@solutions/JavaScript/course_schedule_ii_dfs_topological.js?raw';
-import rustApproach1 from '@solutions/Rust/course_schedule_ii_dfs_topological.rs?raw';
-import goApproach1 from '@solutions/Golang/course_schedule_ii_dfs_topological.go?raw';
-import pybfsIterative from '@solutions/Python/course_schedule_ii_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/course_schedule_ii_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/CourseScheduleIiBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/course_schedule_ii_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/course_schedule_ii_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/course_schedule_ii_bfs_iterative.go?raw';
+import pyApproach1 from '@solutions/Python/course_schedule_ii_dfs.py?raw';
+import cppApproach1 from '@solutions/C++/course_schedule_ii_dfs.cpp?raw';
+import javaApproach1 from '@solutions/Java/CourseScheduleIIDFS.java?raw';
+import jsApproach1 from '@solutions/JavaScript/course_schedule_ii_dfs.js?raw';
+import rustApproach1 from '@solutions/Rust/course_schedule_ii_dfs.rs?raw';
+import goApproach1 from '@solutions/Golang/course_schedule_ii_dfs.go?raw';
 
-import pyApproach2 from '@solutions/Python/course_schedule_ii_bfs_kahn.py?raw';
-import cppApproach2 from '@solutions/C++/course_schedule_ii_bfs_kahn.cpp?raw';
-import javaApproach2 from '@solutions/Java/CourseScheduleIiBfsKahn.java?raw';
-import jsApproach2 from '@solutions/JavaScript/course_schedule_ii_bfs_kahn.js?raw';
-import rustApproach2 from '@solutions/Rust/course_schedule_ii_bfs_kahn.rs?raw';
-import goApproach2 from '@solutions/Golang/course_schedule_ii_bfs_kahn.go?raw';
+import pyApproach2 from '@solutions/Python/course_schedule_ii_bfs_iterative.py?raw';
+import cppApproach2 from '@solutions/C++/course_schedule_ii_bfs_iterative.cpp?raw';
+import javaApproach2 from '@solutions/Java/CourseScheduleIiBfsIterative.java?raw';
+import jsApproach2 from '@solutions/JavaScript/course_schedule_ii_bfs_iterative.js?raw';
+import rustApproach2 from '@solutions/Rust/course_schedule_ii_bfs_iterative.rs?raw';
+import goApproach2 from '@solutions/Golang/course_schedule_ii_bfs_iterative.go?raw';
 
 ## Problem Statement
 
@@ -140,45 +134,6 @@ You are given a number of `courses` labeled from `0` to `numCourses - 1` and a l
     <Code code={goApproach2} lang="go" title="course_schedule_ii_bfs_kahn.go" />
   </TabItem>
 </Tabs>
-
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="course_schedule_ii_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="course_schedule_ii_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="CourseScheduleIiBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="course_schedule_ii_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="course_schedule_ii_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="course_schedule_ii_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
 
 ## Interview Tips
 

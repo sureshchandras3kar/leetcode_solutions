@@ -183,7 +183,7 @@ Sorted: `[-4, -1, -1, 0, 1, 2]`
     },
     {
       title: 'All done — return [[-1,-1,2],[-1,0,1]]',
-      note: 'After right--, left>=right so the inner loop ends. No more valid i values.',
+      note: 'After right--, left&gt;=right so the inner loop ends. No more valid i values.',
       formula: 'return [[-1,-1,2], [-1,0,1]]',
       callout: 'Two unique zero-sum triplets found with no duplicates.',
       items: [
@@ -363,8 +363,8 @@ function approach3():
 </Aside>
 
 <RelatedProblems problems={[
-  { number: 1, title: 'Two Sum', difficulty: 'Easy', slug: 'problems/two-sum', leetcodeSlug: 'two-sum' },
-  { number: 167, title: 'Two Sum II', difficulty: 'Medium', slug: 'problems/two-sum-ii', leetcodeSlug: 'two-sum-ii-input-array-is-sorted' },
+  { number: 1, title: 'Two Sum', difficulty: 'Easy',  leetcodeSlug: 'two-sum' },
+  { number: 167, title: 'Two Sum II', difficulty: 'Medium',  leetcodeSlug: 'two-sum-ii-input-array-is-sorted' },
   { number: 18, title: '4Sum', difficulty: 'Medium', leetcodeSlug: '4sum' },
   { number: 11, title: 'Container With Most Water', difficulty: 'Medium', leetcodeSlug: 'container-with-most-water' },
 ]} />
@@ -380,6 +380,6 @@ function approach3():
 
 
 <PrevNextNav
-  prevProblem={ number: 11, title: "Container With Most Water", slug: "container-with-most-water" }
-  nextProblem={ number: 17, title: "Letter Combinations of a Phone Number", slug: "letter-combinations-of-a-phone-number" }
+  prevProblem={{ number: 11, title: "Container With Most Water", slug: "container-with-most-water" }}
+  nextProblem={{ number: 17, title: "Letter Combinations of a Phone Number", slug: "letter-combinations-of-a-phone-number" }}
 /></Aside>

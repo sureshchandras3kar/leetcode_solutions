@@ -21,20 +21,14 @@ import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 import pyApproach1 from '@solutions/Python/snakes_and_ladders_bfs.py?raw';
 import cppApproach1 from '@solutions/C++/snakes_and_ladders_bfs.cpp?raw';
-import javaApproach1 from '@solutions/Java/SnakesAndLaddersBfs.java?raw';
+import javaApproach1 from '@solutions/Java/SnakesAndLaddersBFS.java?raw';
 import jsApproach1 from '@solutions/JavaScript/snakes_and_ladders_bfs.js?raw';
 import rustApproach1 from '@solutions/Rust/snakes_and_ladders_bfs.rs?raw';
 import goApproach1 from '@solutions/Golang/snakes_and_ladders_bfs.go?raw';
-import pybfsIterative from '@solutions/Python/snakes_and_ladders_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/snakes_and_ladders_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/SnakesAndLaddersBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/snakes_and_ladders_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/snakes_and_ladders_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/snakes_and_ladders_bfs_iterative.go?raw';
 
 import pyApproach2 from '@solutions/Python/snakes_and_ladders_dfs.py?raw';
 import cppApproach2 from '@solutions/C++/snakes_and_ladders_dfs.cpp?raw';
-import javaApproach2 from '@solutions/Java/SnakesAndLaddersDfs.java?raw';
+import javaApproach2 from '@solutions/Java/SnakesAndLaddersDFS.java?raw';
 import jsApproach2 from '@solutions/JavaScript/snakes_and_ladders_dfs.js?raw';
 import rustApproach2 from '@solutions/Rust/snakes_and_ladders_dfs.rs?raw';
 import goApproach2 from '@solutions/Golang/snakes_and_ladders_dfs.go?raw';
@@ -151,45 +145,6 @@ You start at square `1` on the board. On each turn:
     <Code code={goApproach2} lang="go" title="snakes_and_ladders_dfs.go" />
   </TabItem>
 </Tabs>
-
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="snakes_and_ladders_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="snakes_and_ladders_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="SnakesAndLaddersBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="snakes_and_ladders_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="snakes_and_ladders_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="snakes_and_ladders_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
 
 ## Interview Tips
 

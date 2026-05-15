@@ -95,9 +95,9 @@ Cleaned view (not actually built): `"amanaplanacanalpanama"`
 
 | Step | left char | right char | match? | action |
 | --- | --- | --- | --- | --- |
-| 1 | `'A'` → `'a'` | `'a'` | ✓ | advance both |
-| 2 | `'m'` | `'m'` | ✓ | advance both |
-| 3 | `'a'` | `'a'` | ✓ | advance both |
+| 1 | `'A'` → ``a`` | `'a'` | ✓ | advance both |
+| 2 | ``m`` | `'m'` | ✓ | advance both |
+| 3 | ``a`` | `'a'` | ✓ | advance both |
 | ... | right pointer skips `':'`, `' '` | left skips `','`, `' '` | ... | skip non-alphanumeric |
 | last | pointers meet | — | — | return `true` |
 
@@ -126,7 +126,7 @@ When the left pointer lands on `','` or `' '`, the inner while loop advances it 
     },
     {
       title: 'Compare A and a (both alphanumeric)',
-      note: 'Both are alphanumeric. Lowercased: \'a\' == \'a\'. Match — advance both pointers.',
+      note: "Both are alphanumeric. Lowercased: 'a' == 'a'. Match — advance both pointers.",
       formula: 'lower(A) == lower(a) → true',
       callout: 'Both pointers move inward after a successful match.',
       items: [
@@ -140,7 +140,7 @@ When the left pointer lands on `','` or `' '`, the inner while loop advances it 
     },
     {
       title: 'Right pointer skips a non-alphanumeric character',
-      note: 'Right pointer encounters \':\' or \',\'. The inner while loop keeps decrementing right until it finds an alphanumeric character.',
+      note: "Right pointer encounters ':' or ','. The inner while loop keeps decrementing right until it finds an alphanumeric character.",
       formula: 'while not isAlphanumeric(s[right]): right--',
       callout: 'Skipping punctuation without any comparison.',
       items: [
@@ -155,7 +155,7 @@ When the left pointer lands on `','` or `' '`, the inner while loop advances it 
     {
       title: 'Pointers meet — return true',
       note: 'All characters have been compared and every pair matched. The string is a valid palindrome.',
-      formula: 'left >= right → return true',
+      formula: 'left &gt;= right → return true',
       callout: 'When pointers cross or meet without a mismatch, the string is a palindrome.',
       items: [
         { label: 'a', state: 'match', index: 0 },
@@ -295,7 +295,7 @@ function approach3():
 
 
 <RelatedProblems problems={[
-  { number: 9,   title: 'Palindrome Number',            difficulty: 'Easy',   slug: 'problems/palindrome-number', leetcodeSlug: 'palindrome-number' },
+  { number: 9,   title: 'Palindrome Number',            difficulty: 'Easy',  leetcodeSlug: 'palindrome-number' },
   { number: 234, title: 'Palindrome Linked List',       difficulty: 'Easy',   leetcodeSlug: 'palindrome-linked-list' },
   { number: 5,   title: 'Longest Palindromic Substring', difficulty: 'Medium', leetcodeSlug: 'longest-palindromic-substring' },
 ]} />
@@ -309,6 +309,6 @@ function approach3():
 
 
 <PrevNextNav
-  prevProblem={ number: 124, title: "Binary Tree Maximum Path Sum", slug: "binary-tree-maximum-path-sum" }
-  nextProblem={ number: 127, title: "Word Ladder", slug: "word-ladder" }
+  prevProblem={{ number: 124, title: "Binary Tree Maximum Path Sum", slug: "binary-tree-maximum-path-sum" }}
+  nextProblem={{ number: 127, title: "Word Ladder", slug: "word-ladder" }}
 /></Aside>

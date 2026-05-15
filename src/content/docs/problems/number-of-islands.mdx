@@ -26,12 +26,6 @@ import javaDFS from '@solutions/Java/NumberOfIslandsDFS.java?raw';
 import jsDFS from '@solutions/JavaScript/number_of_islands_dfs.js?raw';
 import rustDFS from '@solutions/Rust/number_of_islands_dfs.rs?raw';
 import goDFS from '@solutions/Golang/number_of_islands_dfs.go?raw';
-import pybfsIterative from '@solutions/Python/number_of_islands_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/number_of_islands_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/NumberOfIslandsBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/number_of_islands_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/number_of_islands_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/number_of_islands_bfs_iterative.go?raw';
 
 import pyBFS from '@solutions/Python/number_of_islands_bfs.py?raw';
 import cppBFS from '@solutions/C++/number_of_islands_bfs.cpp?raw';
@@ -248,57 +242,9 @@ function bfs(grid, i, j):
   </TabItem>
 </Tabs>
 
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="number_of_islands_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="number_of_islands_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="NumberOfIslandsBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="number_of_islands_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="number_of_islands_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="number_of_islands_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
-
-## Common Mistakes
-
-<Aside type="caution" title="Watch for these pitfalls">
-- Forgetting to mark a cell as visited immediately when found (DFS) or when enqueued (BFS), leading to infinite loops or double counting.
-- Processing cells that are out of bounds without proper boundary checks.
-- Confusing island count with cell count — each DFS/BFS traversal counts as one island.
-- Not handling empty grid or all-water grid edge cases.
-</Aside>
-
 <RelatedProblems problems={[
-  { number: 130, title: 'Surrounded Regions', difficulty: 'Medium', slug: 'problems/surrounded-regions', leetcodeSlug: 'surrounded-regions' },
-  { number: 133, title: 'Clone Graph', difficulty: 'Medium', slug: 'problems/clone-graph', leetcodeSlug: 'clone-graph' },
+  { number: 130, title: 'Surrounded Regions', difficulty: 'Medium',  leetcodeSlug: 'surrounded-regions' },
+  { number: 133, title: 'Clone Graph', difficulty: 'Medium',  leetcodeSlug: 'clone-graph' },
   { number: 695, title: 'Max Area of Island', difficulty: 'Medium', leetcodeSlug: 'max-area-of-island' },
   { number: 827, title: 'Making A Large Island', difficulty: 'Hard', leetcodeSlug: 'making-a-large-island' },
 ]} />

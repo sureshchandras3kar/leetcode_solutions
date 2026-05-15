@@ -122,14 +122,14 @@ The key insight is that each character is visited at most twice (once by `right`
 
 | Step | left | right | char | window | seen | max_length | Action |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 0 | 0 | 'a' | `"a"` | {a:0} | 1 | Add 'a', expand |
-| 2 | 0 | 1 | 'b' | `"ab"` | {a:0, b:1} | 2 | Add 'b', expand |
-| 3 | 0 | 2 | 'c' | `"abc"` | {a:0, b:1, c:2} | 3 | Add 'c', expand |
-| 4 | 0 | 3 | 'a' | `"bca"` | {b:1, c:2, a:3} | 3 | 'a' seen at 0, move left to 1, update 'a' to 3 |
-| 5 | 1 | 4 | 'b' | `"cab"` | {c:2, a:3, b:4} | 3 | 'b' seen at 1, move left to 2, update 'b' to 4 |
-| 6 | 2 | 5 | 'c' | `"abc"` | {a:3, b:4, c:5} | 3 | 'c' seen at 2, move left to 3, update 'c' to 5 |
-| 7 | 3 | 6 | 'b' | `"ab"` | {a:3, b:6, c:5} | 3 | 'b' seen at 4, move left to 5, update 'b' to 6 |
-| 8 | 5 | 7 | 'b' | `"b"` | {b:7, c:5} | 3 | 'b' seen at 6, move left to 7, update 'b' to 7 |
+| 1 | 0 | 0 | 'a' | `"a"` | &#123;a:0&#125; | 1 | Add 'a', expand |
+| 2 | 0 | 1 | 'b' | `"ab"` | &#123;a:0, b:1&#125; | 2 | Add 'b', expand |
+| 3 | 0 | 2 | 'c' | `"abc"` | &#123;a:0, b:1, c:2&#125; | 3 | Add 'c', expand |
+| 4 | 0 | 3 | 'a' | `"bca"` | &#123;b:1, c:2, a:3&#125; | 3 | 'a' seen at 0, move left to 1, update 'a' to 3 |
+| 5 | 1 | 4 | 'b' | `"cab"` | &#123;c:2, a:3, b:4&#125; | 3 | 'b' seen at 1, move left to 2, update 'b' to 4 |
+| 6 | 2 | 5 | 'c' | `"abc"` | &#123;a:3, b:4, c:5&#125; | 3 | 'c' seen at 2, move left to 3, update 'c' to 5 |
+| 7 | 3 | 6 | 'b' | `"ab"` | &#123;a:3, b:6, c:5&#125; | 3 | 'b' seen at 4, move left to 5, update 'b' to 6 |
+| 8 | 5 | 7 | 'b' | `"b"` | &#123;b:7, c:5&#125; | 3 | 'b' seen at 6, move left to 7, update 'b' to 7 |
 
 <LogicPlayer
   title="How the sliding window finds the longest substring"
