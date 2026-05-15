@@ -23,12 +23,6 @@ import javaBounds   from '@solutions/Java/validate_binary_search_tree_bounds.jav
 import jsBounds     from '@solutions/JavaScript/validate_binary_search_tree_bounds.js?raw';
 import rustBounds   from '@solutions/Rust/validate_binary_search_tree_bounds.rs?raw';
 import goBounds     from '@solutions/Golang/validate_binary_search_tree_bounds.go?raw';
-import pybfsIterative from '@solutions/Python/validate_binary_search_tree_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/validate_binary_search_tree_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/ValidateBinarySearchTreeBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/validate_binary_search_tree_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/validate_binary_search_tree_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/validate_binary_search_tree_bfs_iterative.go?raw';
 
 import pyInorder     from '@solutions/Python/validate_binary_search_tree_inorder.py?raw';
 import cppInorder    from '@solutions/C++/validate_binary_search_tree_inorder.cpp?raw';
@@ -36,6 +30,7 @@ import javaInorder   from '@solutions/Java/validate_binary_search_tree_inorder.j
 import jsInorder     from '@solutions/JavaScript/validate_binary_search_tree_inorder.js?raw';
 import rustInorder   from '@solutions/Rust/validate_binary_search_tree_inorder.rs?raw';
 import goInorder     from '@solutions/Golang/validate_binary_search_tree_inorder.go?raw';
+import PrevNextNav from '../../../components/PrevNextNav.astro';
 
 ## Problem Statement
 
@@ -135,44 +130,6 @@ In-order traversal of a valid BST yields sorted values. Track previous value and
     <Code code={goInorder} lang="go" title="validate_binary_search_tree_inorder.go" />
   </TabItem>
 </Tabs>
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="validate_binary_search_tree_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="validate_binary_search_tree_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="ValidateBinarySearchTreeBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="validate_binary_search_tree_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="validate_binary_search_tree_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="validate_binary_search_tree_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
 ## Interview Tips
 
 <Aside type="tip" title="Key trade-offs to discuss">

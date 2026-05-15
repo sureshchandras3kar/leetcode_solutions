@@ -26,12 +26,6 @@ import javaQueue  from '@solutions/Java/PopulatingNextRightPointersIIQueue.java?
 import jsQueue    from '@solutions/JavaScript/populating_next_right_pointers_ii_queue.js?raw';
 import rustQueue  from '@solutions/Rust/populating_next_right_pointers_ii_queue.rs?raw';
 import goQueue    from '@solutions/Golang/populating_next_right_pointers_ii_queue.go?raw';
-import pydfsRecursive from '@solutions/Python/populating_next_right_pointers_in_each_node_ii_dfs_recursive.py?raw';
-import cppdfsRecursive from '@solutions/C++/populating_next_right_pointers_in_each_node_ii_dfs_recursive.cpp?raw';
-import javadfsRecursive from '@solutions/Java/PopulatingNextRightPointersInEachNodeIiDfsRecursive.java?raw';
-import jsdfsRecursive from '@solutions/JavaScript/populating_next_right_pointers_in_each_node_ii_dfs_recursive.js?raw';
-import rustdfsRecursive from '@solutions/Rust/populating_next_right_pointers_in_each_node_ii_dfs_recursive.rs?raw';
-import godfsRecursive from '@solutions/Golang/populating_next_right_pointers_in_each_node_ii_dfs_recursive.go?raw';
 
 import pyPrecomp  from '@solutions/Python/populating_next_right_pointers_ii_precomputed_links.py?raw';
 import cppPrecomp from '@solutions/C++/populating_next_right_pointers_ii_precomputed_links.cpp?raw';
@@ -233,45 +227,6 @@ function connect(root):
 - Using level-order queue when O(1) space solution exists.
 </Aside>
 
-## Approach 3: DFS Recursive Solution
-
-<ApproachTag tag="simple" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(h)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pydfs_recursive} lang="python" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppdfs_recursive} lang="cpp" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javadfs_recursive} lang="java" title="PopulatingNextRightPointersInEachNodeIiDfsRecursive.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsdfs_recursive} lang="javascript" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustdfs_recursive} lang="rust" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={godfs_recursive} lang="go" title="populating_next_right_pointers_in_each_node_ii_dfs_recursive.go" />
-  </TabItem>
-</Tabs>
-
-
 <RelatedProblems problems={[
   { number: 116, title: 'Populating Next Right Pointers in Each Node', difficulty: 'Medium', leetcodeSlug: 'populating-next-right-pointers-in-each-node' },
   { number: 102, title: 'Binary Tree Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-level-order-traversal' },
@@ -285,7 +240,6 @@ function approach3():
 - **Why Pre-Computed Links?** Demonstrates O(1) space mastery and efficient tree manipulation.
 - **Edge cases:** Root is null, single node, tree with only left/right children.
 - **Follow-up:** How would you handle a graph with arbitrary parent pointers?
-
 
 <PrevNextNav
   prevProblem={{ number: 114, title: "Flatten Binary Tree to Linked List", slug: "flatten-binary-tree-to-linked-list" }}

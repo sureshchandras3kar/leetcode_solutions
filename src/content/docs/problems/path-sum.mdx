@@ -26,12 +26,6 @@ import javaDFS  from '@solutions/Java/PathSumDFSRecursive.java?raw';
 import jsDFS    from '@solutions/JavaScript/path_sum_dfs_recursive.js?raw';
 import rustDFS  from '@solutions/Rust/path_sum_dfs_recursive.rs?raw';
 import goDFS    from '@solutions/Golang/path_sum_dfs_recursive.go?raw';
-import pybfsIterative from '@solutions/Python/path_sum_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/path_sum_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/PathSumBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/path_sum_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/path_sum_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/path_sum_bfs_iterative.go?raw';
 
 import pyBFS    from '@solutions/Python/path_sum_bfs_iterative.py?raw';
 import cppBFS   from '@solutions/C++/path_sum_bfs_iterative.cpp?raw';
@@ -178,45 +172,6 @@ function hasPathSum(root, targetSum):
   </TabItem>
 </Tabs>
 
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="path_sum_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="path_sum_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="PathSumBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="path_sum_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="path_sum_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="path_sum_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
-
 <RelatedProblems problems={[
   { number: 111, title: 'Minimum Depth of Binary Tree', difficulty: 'Easy', leetcodeSlug: 'minimum-depth-of-binary-tree' },
   { number: 113, title: 'Path Sum II', difficulty: 'Medium', leetcodeSlug: 'path-sum-ii' },
@@ -230,7 +185,6 @@ function approach3():
 - **Early termination:** Both can return true immediately upon finding a valid path.
 - **Space:** DFS uses O(h) for recursion; BFS uses O(w) for queue.
 - **Edge cases:** Empty root, single node, all negative/positive values.
-
 
 <PrevNextNav
   prevProblem={{ number: 108, title: "Convert Sorted Array to Binary Search Tree", slug: "convert-sorted-array-to-bst" }}

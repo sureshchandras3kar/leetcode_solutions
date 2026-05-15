@@ -25,12 +25,6 @@ import javaDFS from '@solutions/Java/CloneGraphDFS.java?raw';
 import jsDFS from '@solutions/JavaScript/clone_graph_dfs.js?raw';
 import rustDFS from '@solutions/Rust/clone_graph_dfs.rs?raw';
 import goDFS from '@solutions/Golang/clone_graph_dfs.go?raw';
-import pybfsIterative from '@solutions/Python/clone_graph_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/clone_graph_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/CloneGraphBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/clone_graph_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/clone_graph_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/clone_graph_bfs_iterative.go?raw';
 
 import pyBFS from '@solutions/Python/clone_graph_bfs.py?raw';
 import cppBFS from '@solutions/C++/clone_graph_bfs.cpp?raw';
@@ -161,56 +155,9 @@ Use queue-based BFS to iterate through the original graph while cloning nodes.
   </TabItem>
 </Tabs>
 
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="clone_graph_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="clone_graph_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="CloneGraphBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="clone_graph_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="clone_graph_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="clone_graph_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
-
-## Common Mistakes
-
-<Aside type="caution" title="Watch for these pitfalls">
-- Forgetting to use a visited map, causing infinite loops in cyclic graphs.
-- Not creating new nodes — just copying references creates shallow copy.
-- Processing neighbors before adding current node to visited map.
-</Aside>
-
 <RelatedProblems problems={[
-  { number: 200, title: 'Number of Islands', difficulty: 'Medium', slug: 'problems/number-of-islands', leetcodeSlug: 'number-of-islands' },
-  { number: 207, title: 'Course Schedule', difficulty: 'Medium', slug: 'problems/course-schedule', leetcodeSlug: 'course-schedule' },
+  { number: 200, title: 'Number of Islands', difficulty: 'Medium',  leetcodeSlug: 'number-of-islands' },
+  { number: 207, title: 'Course Schedule', difficulty: 'Medium',  leetcodeSlug: 'course-schedule' },
 ]} />
 
 ## Interview Tips

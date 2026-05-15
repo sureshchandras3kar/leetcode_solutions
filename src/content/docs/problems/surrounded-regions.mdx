@@ -25,12 +25,6 @@ import javaDFS from '@solutions/Java/SurroundedRegionsDFS.java?raw';
 import jsDFS from '@solutions/JavaScript/surrounded_regions_dfs.js?raw';
 import rustDFS from '@solutions/Rust/surrounded_regions_dfs.rs?raw';
 import goDFS from '@solutions/Golang/surrounded_regions_dfs.go?raw';
-import pybfsIterative from '@solutions/Python/surrounded_regions_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/surrounded_regions_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/SurroundedRegionsBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/surrounded_regions_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/surrounded_regions_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/surrounded_regions_bfs_iterative.go?raw';
 
 import pyUnionFind from '@solutions/Python/surrounded_regions_union_find.py?raw';
 import cppUnionFind from '@solutions/C++/surrounded_regions_union_find.cpp?raw';
@@ -179,55 +173,8 @@ Create a virtual boundary node and union it with all border-connected 'O's. Flip
   </TabItem>
 </Tabs>
 
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="surrounded_regions_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="surrounded_regions_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="SurroundedRegionsBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="surrounded_regions_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="surrounded_regions_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="surrounded_regions_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
-
-## Common Mistakes
-
-<Aside type="caution" title="Watch for these pitfalls">
-- Processing interior cells first instead of starting from borders.
-- Forgetting to flip marked cells back to 'O' at the end.
-- Not handling all four borders when marking border-connected regions.
-</Aside>
-
 <RelatedProblems problems={[
-  { number: 200, title: 'Number of Islands', difficulty: 'Medium', slug: 'problems/number-of-islands', leetcodeSlug: 'number-of-islands' },
+  { number: 200, title: 'Number of Islands', difficulty: 'Medium',  leetcodeSlug: 'number-of-islands' },
   { number: 733, title: 'Flood Fill', difficulty: 'Easy', leetcodeSlug: 'flood-fill' },
   { number: 1020, title: 'Number of Enclaves', difficulty: 'Medium', leetcodeSlug: 'number-of-enclaves' },
 ]} />

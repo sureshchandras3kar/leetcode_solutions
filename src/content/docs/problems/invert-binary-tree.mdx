@@ -26,12 +26,6 @@ import javaDFS   from '@solutions/Java/invert_binary_tree_dfs.java?raw';
 import jsDFS     from '@solutions/JavaScript/invert_binary_tree_dfs.js?raw';
 import rustDFS   from '@solutions/Rust/invert_binary_tree_dfs.rs?raw';
 import goDFS     from '@solutions/Golang/invert_binary_tree_dfs.go?raw';
-import pybfsIterative from '@solutions/Python/invert_binary_tree_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/invert_binary_tree_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/InvertBinaryTreeBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/invert_binary_tree_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/invert_binary_tree_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/invert_binary_tree_bfs_iterative.go?raw';
 
 import pyBFS     from '@solutions/Python/invert_binary_tree_bfs.py?raw';
 import cppBFS    from '@solutions/C++/invert_binary_tree_bfs.cpp?raw';
@@ -313,45 +307,6 @@ function invertTreeBFS(root):
 - **Returning the wrong node** — return the modified root, not one of its children.
 - **In BFS:** forgetting to add children to the queue before dequeuing the next node.
 </Aside>
-
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="invert_binary_tree_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="invert_binary_tree_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="InvertBinaryTreeBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="invert_binary_tree_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="invert_binary_tree_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="invert_binary_tree_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
 
 <RelatedProblems problems={[
   { number: 101, title: 'Symmetric Tree', difficulty: 'Easy', leetcodeSlug: 'symmetric-tree' },

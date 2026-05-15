@@ -26,12 +26,6 @@ import javaBFS   from '@solutions/Java/binary_tree_right_side_view_bfs.java?raw'
 import jsBFS     from '@solutions/JavaScript/binary_tree_right_side_view_bfs.js?raw';
 import rustBFS   from '@solutions/Rust/binary_tree_right_side_view_bfs.rs?raw';
 import goBFS     from '@solutions/Golang/binary_tree_right_side_view_bfs.go?raw';
-import pybfsIterative from '@solutions/Python/binary_tree_right_side_view_bfs_iterative.py?raw';
-import cppbfsIterative from '@solutions/C++/binary_tree_right_side_view_bfs_iterative.cpp?raw';
-import javabfsIterative from '@solutions/Java/BinaryTreeRightSideViewBfsIterative.java?raw';
-import jsbfsIterative from '@solutions/JavaScript/binary_tree_right_side_view_bfs_iterative.js?raw';
-import rustbfsIterative from '@solutions/Rust/binary_tree_right_side_view_bfs_iterative.rs?raw';
-import gobfsIterative from '@solutions/Golang/binary_tree_right_side_view_bfs_iterative.go?raw';
 
 import pyDFS     from '@solutions/Python/binary_tree_right_side_view_dfs.py?raw';
 import cppDFS    from '@solutions/C++/binary_tree_right_side_view_dfs.cpp?raw';
@@ -247,54 +241,6 @@ function rightSideViewDFS(root):
     <Code code={goDFS} lang="go" title="binary_tree_right_side_view_dfs.go" />
   </TabItem>
 </Tabs>
-
-## Approach 3: BFS Iterative Solution
-
-<ApproachTag tag="interview" />
-
-A third approach demonstrating an alternative technique for solving this problem. This implementation optimizes either time or space complexity compared to the previous approaches.
-
-<ComplexityBadges time="O(n)" space="O(n)" timeColor="green" spaceColor="green" timeNote="Optimized complexity" spaceNote="Efficient space usage" />
-
-### Pseudocode
-
-```plaintext
-function approach3():
-    // Implementation approach goes here
-```
-
-### Solution Code
-
-<Tabs>
-  <TabItem label="Python">
-    <Code code={pybfs_iterative} lang="python" title="binary_tree_right_side_view_bfs_iterative.py" />
-  </TabItem>
-  <TabItem label="C++">
-    <Code code={cppbfs_iterative} lang="cpp" title="binary_tree_right_side_view_bfs_iterative.cpp" />
-  </TabItem>
-  <TabItem label="Java">
-    <Code code={javabfs_iterative} lang="java" title="BinaryTreeRightSideViewBfsIterative.java" />
-  </TabItem>
-  <TabItem label="JavaScript">
-    <Code code={jsbfs_iterative} lang="javascript" title="binary_tree_right_side_view_bfs_iterative.js" />
-  </TabItem>
-  <TabItem label="Rust">
-    <Code code={rustbfs_iterative} lang="rust" title="binary_tree_right_side_view_bfs_iterative.rs" />
-  </TabItem>
-  <TabItem label="Go">
-    <Code code={gobfs_iterative} lang="go" title="binary_tree_right_side_view_bfs_iterative.go" />
-  </TabItem>
-</Tabs>
-
-
-## Common Mistakes
-
-<Aside type="caution" title="Watch for these pitfalls">
-- **Taking the wrong node at each level.** Make sure you're getting the rightmost, not the leftmost.
-- **DFS: visiting left before right.** In the DFS approach, visit right first so the first time you reach a level is from the right side.
-- **Not handling empty trees.** Return an empty list for null input.
-- **Off-by-one errors with level tracking.** Ensure your level tracking is correct.
-</Aside>
 
 <RelatedProblems problems={[
   { number: 102, title: 'Binary Tree Level Order Traversal', difficulty: 'Medium', leetcodeSlug: 'binary-tree-level-order-traversal' },
