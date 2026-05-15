@@ -153,8 +153,8 @@ The key idea is simple: maintain a tail pointer that points to the last node of 
     },
     {
       title: 'Compare 1 vs 1, attach list1[0] = 1',
-      note: 'Both list heads are 1. Since 1 <= 1, we attach list1 node and advance list1.',
-      formula: 'list1.val (1) <= list2.val (1) → attach list1',
+      note: 'Both list heads are 1. Since 1 &lt;= 1, we attach list1 node and advance list1.',
+      formula: 'list1.val (1) &lt;= list2.val (1) → attach list1',
       callout: 'After attaching, the tail moves to this node and list1 advances.',
       items: [
         { label: '1', state: 'match', index: 0 },
@@ -221,8 +221,8 @@ The key idea is simple: maintain a tail pointer that points to the last node of 
     },
     {
       title: 'Compare 4 vs 4, attach list1[2] = 4',
-      note: 'list1 points to 4, list2 points to 4. Since 4 <= 4, attach list1 and advance list1.',
-      formula: 'list1.val (4) <= list2.val (4) → attach list1',
+      note: 'list1 points to 4, list2 points to 4. Since 4 &lt;= 4, attach list1 and advance list1.',
+      formula: 'list1.val (4) &lt;= list2.val (4) → attach list1',
       callout: 'After this step, list1 will be exhausted (list1 → null).',
       items: [
         { label: '1', state: 'match', index: 0 },

@@ -138,7 +138,7 @@ The key insight is to **compare the left and right subtrees as mirror images**: 
   steps={[
     {
       title: 'Start with root and its mirrored subtrees',
-      note: 'Begin by comparing the root\'s left and right children as if they should be mirrors.',
+      note: "Begin by comparing the root's left and right children as if they should be mirrors.",
       formula: 'isMirror(root.left, root.right)',
       callout: 'Both subtree roots are 2, so they have matching values. Now check their children.',
       items: [
@@ -149,8 +149,8 @@ The key insight is to **compare the left and right subtrees as mirror images**: 
       memory: ['Comparing left and right subtrees'],
     },
     {
-      title: 'Check left\'s left with right\'s right',
-      note: 'In a mirror, the left subtree\'s left child should equal the right subtree\'s right child.',
+      title: "Check left's left with right's right",
+      note: "In a mirror, the left subtree's left child should equal the right subtree's right child.",
       formula: 'isMirror(left.left, right.right)',
       callout: 'Node 3 from left matches node 3 from right. This pair is symmetric.',
       items: [
@@ -162,8 +162,8 @@ The key insight is to **compare the left and right subtrees as mirror images**: 
       memory: ['3 == 3 (mirror pair verified)'],
     },
     {
-      title: 'Check left\'s right with right\'s left',
-      note: 'The left subtree\'s right child should equal the right subtree\'s left child.',
+      title: "Check left's right with right's left",
+      note: "The left subtree's right child should equal the right subtree's left child.",
       formula: 'isMirror(left.right, right.left)',
       callout: 'Node 4 from left matches node 4 from right. Complete mirror verified.',
       items: [

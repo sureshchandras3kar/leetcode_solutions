@@ -226,9 +226,9 @@ Maintain a `current_end` that represents the farthest index reachable with the c
       memory: ['jumps = 2', 'current_end = 4', 'farthest = 4'],
     },
     {
-      title: 'current_end >= last index, done',
+      title: 'current_end &gt;= last index, done',
       note: 'current_end=4 is now at or past the last index (index 4). We have reached the end.',
-      formula: 'current_end >= len(nums)-1',
+      formula: 'current_end &gt;= len(nums)-1',
       callout: 'We reached the goal with 2 jumps.',
       items: [
         { label: '2', state: 'default', index: 0 },

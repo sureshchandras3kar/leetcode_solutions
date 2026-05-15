@@ -320,8 +320,8 @@ function isValidSudoku(board):
 
 Replace each set with a single integer. Bit `k` (0-indexed) is set when digit `k+1` has been seen. This eliminates hash overhead and reduces each check to a bitwise AND.
 
-- **Check** digit `d`: `(mask >> (d - 1)) & 1 == 1`
-- **Set** digit `d`: `mask |= (1 << (d - 1))`
+- **Check** digit `d`: `(mask &gt;&gt; (d - 1)) & 1 == 1`
+- **Set** digit `d`: `mask |= (1 &lt;&lt; (d - 1))`
 
 <ComplexityBadges time="O(1)" space="O(1)" timeColor="green" spaceColor="green" timeNote="81 cells fixed" spaceNote="27 integers" />
 
@@ -335,7 +335,7 @@ For digit `5`: bit index = `5 - 1 = 4`, so bit pattern = `0b000010000` (bit 4 se
 | 3 | bit 2 | `0b000010100` = 20 |
 | 7 | bit 6 | `0b001010100` = 84 |
 
-To check if `3` is already in this mask: `84 & (1 << 2)` = `84 & 4` = `4` ≠ 0 → duplicate detected.
+To check if `3` is already in this mask: `84 & (1 &lt;&lt; 2)` = `84 & 4` = `4` ≠ 0 → duplicate detected.
 
 ### Pseudocode
 
@@ -348,7 +348,7 @@ function isValidSudoku(board):
         for c in 0..8:
             d = board[r][c]
             if d == '.': continue
-            bit = 1 << (int(d) - 1)
+            bit = 1 &lt;&lt; (int(d) - 1)
             box = (r // 3) * 3 + (c // 3)
             if rows[r] & bit or cols[c] & bit or boxes[box] & bit:
                 return false
@@ -442,6 +442,6 @@ function approach3():
 
 
 <PrevNextNav
-  prevProblem={ number: 35, title: "Search Insert Position", slug: "search-insert-position" }
-  nextProblem={ number: 39, title: "Combination Sum", slug: "combination-sum" }
+  prevProblem={{ number: 35, title: "Search Insert Position", slug: "search-insert-position" }}
+  nextProblem={{ number: 39, title: "Combination Sum", slug: "combination-sum" }}
 /></Aside>

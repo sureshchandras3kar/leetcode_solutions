@@ -151,8 +151,8 @@ The key insight is that both pointers move in the same direction (left only move
     },
     {
       title: 'Expand window to [2, 3, 1, 2] with sum 8',
-      note: 'Keep expanding right until sum >= 7. Now sum = 8, so condition is met.',
-      formula: 'left = 0, right = 3, sum = 8 >= 7',
+      note: 'Keep expanding right until sum &gt;= 7. Now sum = 8, so condition is met.',
+      formula: 'left = 0, right = 3, sum = 8 &gt;= 7',
       callout: 'We found a valid window! Now try shrinking from the left.',
       items: [
         { label: '2', state: 'active', index: 0 },
@@ -181,8 +181,8 @@ The key insight is that both pointers move in the same direction (left only move
     },
     {
       title: 'Expand to [3, 1, 2, 4] with sum 10',
-      note: 'Now sum = 10 >= 7. Try shrinking again.',
-      formula: 'left = 1, right = 4, sum = 10 >= 7',
+      note: 'Now sum = 10 &gt;= 7. Try shrinking again.',
+      formula: 'left = 1, right = 4, sum = 10 &gt;= 7',
       callout: 'Valid window found. Remove 3 from left.',
       items: [
         { label: '2', state: 'default', index: 0 },
@@ -196,8 +196,8 @@ The key insight is that both pointers move in the same direction (left only move
     },
     {
       title: 'Continue shrinking: [1, 2, 4] with sum 7',
-      note: 'After removing 3, we have [1, 2, 4] with sum 7 >= 7. Keep shrinking.',
-      formula: 'left = 2, right = 4, sum = 7 >= 7',
+      note: 'After removing 3, we have [1, 2, 4] with sum 7 &gt;= 7. Keep shrinking.',
+      formula: 'left = 2, right = 4, sum = 7 &gt;= 7',
       callout: 'Remove 1 from left and check again.',
       items: [
         { label: '2', state: 'default', index: 0 },
@@ -226,8 +226,8 @@ The key insight is that both pointers move in the same direction (left only move
     },
     {
       title: 'Expand to [2, 4, 3] with sum 9',
-      note: 'Adding 3 gives sum = 9 >= 7. Now shrink from left.',
-      formula: 'left = 3, right = 5, sum = 9 >= 7',
+      note: 'Adding 3 gives sum = 9 &gt;= 7. Now shrink from left.',
+      formula: 'left = 3, right = 5, sum = 9 &gt;= 7',
       callout: 'Remove 2 from left.',
       items: [
         { label: '2', state: 'default', index: 0 },
@@ -241,8 +241,8 @@ The key insight is that both pointers move in the same direction (left only move
     },
     {
       title: 'Found minimum: [4, 3] with sum 7',
-      note: 'After removing 2, we have [4, 3] with sum 7 >= 7 and length 2. This is our answer!',
-      formula: 'left = 4, right = 5, sum = 7 >= 7',
+      note: 'After removing 2, we have [4, 3] with sum 7 &gt;= 7 and length 2. This is our answer!',
+      formula: 'left = 4, right = 5, sum = 7 &gt;= 7',
       callout: 'Minimum length found: 2. No need to shrink further as only one element remains.',
       items: [
         { label: '2', state: 'default', index: 0 },
@@ -315,7 +315,7 @@ This approach trades the simplicity of sliding window for an alternative algorit
 
 **Prefix array:** `[0, 2, 5, 6, 8, 12, 15]` (cumulative sums)
 
-| Step | right | prefix[right] | Find left where prefix[left] <= prefix[right] - 7 | left | Length | Action |
+| Step | right | prefix[right] | Find left where prefix[left] &lt;= prefix[right] - 7 | left | Length | Action |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 3 | 8 | Search for 1 (8 - 7) | 1 | 8 - 5 = 3, length = 3 - 1 + 1 = 3 | Update minLength = 3 |
 | 2 | 4 | 12 | Search for 5 (12 - 7) | 1 | 12 - 5 = 7, length = 4 - 1 + 1 = 4 | Keep minLength = 3 |

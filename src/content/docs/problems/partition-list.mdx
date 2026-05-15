@@ -135,7 +135,7 @@ The key idea is simplicity: create two independent lists as you traverse, then s
   steps={[
     {
       title: 'Start with empty lists and dummy nodes',
-      note: 'We create two dummy nodes: one for nodes < x, one for nodes >= x. Both lists start empty.',
+      note: 'We create two dummy nodes: one for nodes < x, one for nodes &gt;= x. Both lists start empty.',
       formula: 'smaller_dummy → null, larger_dummy → null',
       callout: 'Both dummy nodes act as sentinels, making it easy to attach the first real node.',
       items: [
@@ -166,9 +166,9 @@ The key idea is simplicity: create two independent lists as you traverse, then s
       memory: ['smaller_list: 1', 'larger_list: (empty)'],
     },
     {
-      title: 'Inspect 4, which is >= 3',
-      note: 'Since 4 >= 3, attach it to the larger list.',
-      formula: '4 >= 3 → append to larger',
+      title: 'Inspect 4, which is &gt;= 3',
+      note: 'Since 4 &gt;= 3, attach it to the larger list.',
+      formula: '4 &gt;= 3 → append to larger',
       callout: 'The larger list now has one node: 4.',
       items: [
         { label: '1', state: 'match', index: 0 },
@@ -182,9 +182,9 @@ The key idea is simplicity: create two independent lists as you traverse, then s
       memory: ['smaller_list: 1', 'larger_list: 4'],
     },
     {
-      title: 'Inspect 3, which is >= 3',
-      note: 'Since 3 >= 3, attach it to the larger list.',
-      formula: '3 >= 3 → append to larger',
+      title: 'Inspect 3, which is &gt;= 3',
+      note: 'Since 3 &gt;= 3, attach it to the larger list.',
+      formula: '3 &gt;= 3 → append to larger',
       callout: 'The larger list grows: 4 → 3.',
       items: [
         { label: '1', state: 'match', index: 0 },
@@ -214,9 +214,9 @@ The key idea is simplicity: create two independent lists as you traverse, then s
       memory: ['smaller_list: 1 → 2', 'larger_list: 4 → 3'],
     },
     {
-      title: 'Inspect 5, which is >= 3',
-      note: 'Since 5 >= 3, attach it to the larger list.',
-      formula: '5 >= 3 → append to larger',
+      title: 'Inspect 5, which is &gt;= 3',
+      note: 'Since 5 &gt;= 3, attach it to the larger list.',
+      formula: '5 &gt;= 3 → append to larger',
       callout: 'The larger list grows: 4 → 3 → 5.',
       items: [
         { label: '1', state: 'match', index: 0 },
@@ -414,7 +414,7 @@ function partitionSingleRearrange(head, x):
 
 <Aside type="caution" title="Watch for these pitfalls">
 - **Forgetting to close the larger list:** If you don't set `larger_ptr.next = null`, the result will have a cycle.
-- **Confusing < with <=:** The partition boundary is strictly < x; values equal to x go to the right group.
+- **Confusing < with &lt;=:** The partition boundary is strictly < x; values equal to x go to the right group.
 - **Losing the list head:** Always return `dummy.next`, not `dummy` itself (if using a dummy node).
 - **Pointer arithmetic errors in single-rearrange:** Tracking too many pointers in the second approach is error-prone. Use the two-head approach unless necessary.
 - **Not handling all nodes < x:** If all nodes are less than x, the larger list is empty (null). Make sure the connection doesn't fail.
@@ -485,7 +485,7 @@ function approach3():
 - **Why partition instead of sort?** The problem explicitly wants to preserve relative order, not sort. Sorting would be O(n log n) with more memory overhead.
 - **Why dummy nodes?** They eliminate special cases when dealing with the head of the result list. Instead of checking if the head is null, you always append to `dummy.next`.
 - **Two-head vs. single-rearrange:** The two-head approach is clearer and less error-prone. Use it in interviews unless asked explicitly for a space-optimal solution.
-- **Handling the partition boundary:** Be precise about < vs. <=. The problem says "less than x" (strictly). Values equal to x go to the right group.
+- **Handling the partition boundary:** Be precise about comparison operators. The problem says "less than x" (strictly). Values equal to x go to the right group.
 - **Why not create new nodes?** You must reuse existing nodes and only rearrange pointers. Creating new nodes would waste space and miss the point of the problem.
 - **Follow-up — Partition around three-way:** Extend this to partition into three groups (< x, == x, > x), which is useful for three-way quicksort or the Dutch National Flag problem.
 </Aside>

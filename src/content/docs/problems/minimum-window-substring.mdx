@@ -120,9 +120,9 @@ The key insight is that we only need to shrink the window when it becomes invali
 
 | Step | left | right | Window | Char Count | Formed | Valid? | Action |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 0 | 0 | "A" | {A:1} | 0/3 | ✗ | Expand right |
-| 2 | 0 | 3 | "ADOBEC" | {A:1,B:1,C:1} | 3/3 | ✓ | Contract left |
-| 3 | 5 | 12 | "BANC" | {B:1,A:1,N:1,C:1} | 3/3 | ✓ | Found minimum |
+| 1 | 0 | 0 | "A" | &#123;A:1&#125; | 0/3 | ✗ | Expand right |
+| 2 | 0 | 3 | "ADOBEC" | &#123;A:1,B:1,C:1&#125; | 3/3 | ✓ | Contract left |
+| 3 | 5 | 12 | "BANC" | &#123;B:1,A:1,N:1,C:1&#125; | 3/3 | ✓ | Found minimum |
 
 <LogicPlayer
   title="How the sliding window finds the minimum substring"

@@ -156,8 +156,8 @@ Result: `lastGoodIndex == 4 != 0`, so return `false` ✓
     },
     {
       title: 'Check index 3: can it reach the goal?',
-      note: 'At index 3, we can jump 1 step, reaching up to index 4. Since 4 >= 4, we can reach the goal.',
-      formula: 'i=3: 3 + nums[3]=1 = 4 >= 4 ✓',
+      note: 'At index 3, we can jump 1 step, reaching up to index 4. Since 4 &gt;= 4, we can reach the goal.',
+      formula: 'i=3: 3 + nums[3]=1 = 4 &gt;= 4 ✓',
       callout: 'Index 3 is now a new intermediate goal we can reach.',
       items: [
         { label: '2', state: 'default', index: 0 },
@@ -170,8 +170,8 @@ Result: `lastGoodIndex == 4 != 0`, so return `false` ✓
     },
     {
       title: 'Check index 2: can it reach lastGoodIndex?',
-      note: 'At index 2, we can jump 1 step, reaching up to index 3. Since 3 >= 3, we can reach our current goal.',
-      formula: 'i=2: 2 + nums[2]=1 = 3 >= 3 ✓',
+      note: 'At index 2, we can jump 1 step, reaching up to index 3. Since 3 &gt;= 3, we can reach our current goal.',
+      formula: 'i=2: 2 + nums[2]=1 = 3 &gt;= 3 ✓',
       callout: 'Index 2 becomes the new intermediate goal.',
       items: [
         { label: '2', state: 'default', index: 0 },
@@ -184,8 +184,8 @@ Result: `lastGoodIndex == 4 != 0`, so return `false` ✓
     },
     {
       title: 'Check index 1: can it reach lastGoodIndex?',
-      note: 'At index 1, we can jump 3 steps, reaching up to index 4. Since 4 >= 2, we can reach our current goal.',
-      formula: 'i=1: 1 + nums[1]=3 = 4 >= 2 ✓',
+      note: 'At index 1, we can jump 3 steps, reaching up to index 4. Since 4 &gt;= 2, we can reach our current goal.',
+      formula: 'i=1: 1 + nums[1]=3 = 4 &gt;= 2 ✓',
       callout: 'Index 1 becomes the new intermediate goal.',
       items: [
         { label: '2', state: 'default', index: 0 },
@@ -198,8 +198,8 @@ Result: `lastGoodIndex == 4 != 0`, so return `false` ✓
     },
     {
       title: 'Check index 0: can it reach lastGoodIndex?',
-      note: 'At index 0, we can jump 2 steps, reaching up to index 2. Since 2 >= 1, we can reach our current goal.',
-      formula: 'i=0: 0 + nums[0]=2 = 2 >= 1 ✓',
+      note: 'At index 0, we can jump 2 steps, reaching up to index 2. Since 2 &gt;= 1, we can reach our current goal.',
+      formula: 'i=0: 0 + nums[0]=2 = 2 &gt;= 1 ✓',
       callout: 'Index 0 reaches the goal. We can return true!',
       items: [
         { label: '2', state: 'match', index: 0 },

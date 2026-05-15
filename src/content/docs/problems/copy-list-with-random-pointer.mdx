@@ -149,9 +149,9 @@ Original list: 7 → 13 → 11 → 10 → 1
     },
     {
       title: 'Set next and random pointers (Pass 2)',
-      note: 'For each original node, set the clone\'s next/random to the mapped clones of the original\'s next/random.',
+      note: "For each original node, set the clone's next/random to the mapped clones of the original's next/random.",
       formula: 'clone.next = nodeMap[original.next]; clone.random = nodeMap[original.random]',
-      callout: 'The map guarantees O(1) lookup for any original node's clone.',
+      callout: "The map guarantees O(1) lookup for any original node's clone.",
       items: [
         { label: '7', state: 'active', index: 0 },
         { label: '13', state: 'default', index: 1 },
@@ -369,7 +369,9 @@ function approach3():
 - **Distinguishing deep from shallow:** Explicitly mention that you are creating new nodes, not just copying pointers. Shallow copy would fail this problem.
 
 
+</Aside>
+
 <PrevNextNav
-  prevProblem={ number: 137, title: "Single Number II", slug: "single-number-ii" }
-  nextProblem={ number: 139, title: "Word Break", slug: "word-break" }
-/></Aside>
+  prevProblem={{ number: 137, title: "Single Number II", slug: "single-number-ii" }}
+  nextProblem={{ number: 139, title: "Word Break", slug: "word-break" }}
+/>
